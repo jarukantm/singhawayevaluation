@@ -1374,10 +1374,10 @@ function rbHTML(pid,cid,isSelf){
     var pop='<div class="rph"><div class="rpb" style="background:'+RCOL[r]+'">'+r+'</div><div class="rpn">'+r+' \u2013 '+RNAME[r]+'</div></div>';
     if(fd){pop+='<div class="rps"></div><div class="rpf"><span class="rpft" style="background:'+fd.bg+';color:'+fd.cl+'">'+fl+'</span><span style="color:'+fd.cl+'">'+fd.nm+'</span></div><div class="rpd">'+fd.df[r]+'</div>';}
     var dis=(locked&&!isSel)?' disabled':'';
-    /* onclick: set rating + show inline def (no popup on mobile) */
+    /* onclick: set rating + show inline def */
+    var defTarget=isSelf?'self':pid;
     var oc=locked?''
-      :'setRating(\''+pid+'\',\''+cid+'\',\''+r+'\','+isSelf+')'
-      +((!isSelf&&!locked)?';toggleDef(\''+pid+'\',\''+cid+'\',\''+r+'\')':'');
+      :'setRating(\''+pid+'\',\''+cid+'\',\''+r+'\','+isSelf+');toggleDef(\''+defTarget+'\',\''+cid+'\',\''+r+'\')';
     html+='<div class="rbw"><button class="rb r'+r+(isSel?' sel':'')+'"'+dis+' onclick="'+oc+'">'+r+'</button>'
       +'<div class="rpop">'+pop+'</div></div>';
   });
@@ -1761,10 +1761,13 @@ function renderSelf(){
     html+='</div>';
     html+='<div class="crs'+(co?' op':'')+'">';
     cc.forEach(function(c){
+      var selfDefKey='idef_self_'+c.id;
       html+='<div class="cr">';
       html+='<div class="cl">'+ftag(c.foc)+'<div class="ct"><div class="clb">'+c.lb+'</div></div></div>';
       html+=rbHTML('self',c.id,true);
       html+='</div>';
+      /* inline def box — shown when rating button tapped */
+      html+='<div id="'+selfDefKey+'" class="idef-box" style="display:none;margin:0 16px 8px;padding:10px 12px;background:var(--s1);border-left:3px solid var(--pb);border-radius:0 var(--r) var(--r) 0"></div>';
     });
     html+='</div></div>';
   });
@@ -1962,7 +1965,7 @@ function renderGrid(){
     var ph=getPhoto(p.empId);
     var avH=ph?'<div class="gcav"><img src="'+ph+'" alt="'+p.name+'"></div>':'<div class="gcav" style="background:'+p.color+'">'+ini(p.name)+'</div>';
     var drag=!locked?'draggable="true"':'';
-    html+='<div class="gchip'+(isSel?' gsel':'')+'" '+drag+' data-idx="'+i+'" data-pid="'+p.empId+'" id="gc_'+p.empId+'">';
+    html+='<div class="gchip'+(isSel?' gsel':'')+'" '+drag+' data-idx="'+i+'" data-pid="'+p.empId+'" id="gc_'+p.empId+'" onclick="gmTapChip(\''+p.empId+'\')">';
     html+=avH+'<span>'+p.name.split(' ')[0]+'<span style="font-size:9px;color:var(--t2);margin-left:2px">('+p.nick+')</span></span>';
     if(allDone)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2713</span>';
     if(isSel)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2714</span>';
@@ -2140,6 +2143,7 @@ function renderGrid(){
   });
 }
 function gmEnterSel(pid){gmSM=true;gmSel={};gmSel[pid]=true;renderGrid();}
+function gmTapChip(pid){if(gmSel[pid]){delete gmSel[pid];}else{gmSel[pid]=true;gmSM=true;}if(!Object.keys(gmSel).length){gmSM=false;gmDP=null;}renderGrid();}
 function gmExitSel(){gmSM=false;gmSel={};renderGrid();}
 function gmSelAll(){persons.forEach(function(p){gmSel[p.empId]=true;});renderGrid();}
 function gmClearSel(){gmSel={};renderGrid();}
@@ -2366,21 +2370,25 @@ function renderDash(){
       html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:9px;color:var(--t2);width:22px;text-align:right">'+v+'</div>';
       html+='<div style="position:absolute;left:28px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
     });
-    fkeys.forEach(function(f){
+    var FC=['#2E4265','#8599AB','#A8B5C2','#D5D5D6','#8FA3BC'];
+    fkeys.forEach(function(f,fi){
       var fd=FDEF[f];
       var cur=avgScore2(ids3,CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);
-      var barH=cur?Math.max(6,Math.round(cur/5*maxH)):0;
+      var barH=cur?Math.max(22,Math.round(cur/5*maxH)):0;
       var lbl=s2l(cur);
       /* use fd.cl as bar color — matches FDEF theme */
-      var barColor=fd.cl;
+      var barColor=FC[fi]||fd.cl;
       var barColorLight=barColor+'44';
-      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
-      html+='<div style="font-size:11px;font-weight:700;color:'+(cur?barColor:'var(--t2)')+'">'+( cur?cur.toFixed(2):'\u2013')+'</div>';
-      html+='<div style="width:100%;height:'+barH+'px;background:'+barColor+';border-radius:4px 4px 0 0;min-height:'+(cur?'6':'0')+'px;position:relative;box-shadow:0 2px 6px '+barColorLight+'">';
-      if(cur)html+='<div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);padding:1px 6px;border-radius:5px;background:'+RCOL[lbl.l]+';color:#fff;font-size:9px;font-weight:700">'+lbl.l+'</div>';
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">';
+      /* level badge above bar */
+      html+='<div style="height:20px;display:flex;align-items:center;justify-content:center">';
+      if(cur)html+='<span style="padding:1px 5px;border-radius:4px;background:'+RCOL[lbl.l]+';color:#fff;font-size:9px;font-weight:700">'+lbl.l+'</span>';
       html+='</div>';
-      html+='<div style="font-size:10px;font-weight:700;color:'+barColor+'">'+f+'</div>';
-      html+='<div style="font-size:8px;color:var(--t2);text-align:center;max-width:60px;word-break:break-word">'+fd.nm+'</div>';
+      html+='<div style="width:100%;height:'+barH+'px;background:'+barColor+';border-radius:4px 4px 0 0;min-height:'+(cur?'6':'0')+'px;display:flex;align-items:center;justify-content:center">';
+      if(cur&&barH>=16)html+='<span style="color:#fff;font-size:10px;font-weight:700;font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
+      html+='</div>';
+      html+='<div style="font-size:13px;font-weight:700;color:'+barColor+';margin-top:4px">'+f+'</div>';
+      /* removed fd.nm label */
       html+='</div>';
     });
     html+='</div></div>';
