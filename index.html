@@ -549,7 +549,9 @@ button,input,select{font-family:var(--fb)}
 .rsn-ind:hover{opacity:1}
 .rsn-ind.has-note{opacity:1;color:var(--pb)}
 
-/* ══ DASHBOARD v2 ══ */
+/* Grid view sticky chip bar needs scroll container */
+#v-grid{overflow-y:auto}
+#v-grid #gchipBar{position:sticky;top:0;z-index:30}
 .db-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0)}
 .db-filter-lbl{font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap}
 .db-ftab{padding:5px 14px;font-size:11px;font-weight:600;border:1.5px solid var(--b1);border-radius:20px;background:transparent;color:var(--t1);cursor:pointer;transition:.12s;white-space:nowrap}
@@ -1063,8 +1065,31 @@ button,input,select{font-family:var(--fb)}
             <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> Low</div>
             <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> Improve</div>
           </div>
-          <div class="cbr"><span class="cbl">ผู้รับการประเมิน :</span><div class="chw" id="gchips"></div><button class="ach" id="gadd">+ เพิ่มบุคคล</button></div>
-          <div id="gcontent"></div>
+          <div id="gridWrap" style="display:flex;flex-direction:column;min-height:0">
+            <!-- Sticky person-selector card -->
+            <div id="gchipBar" style="
+              position:sticky;top:0;z-index:30;
+              background:var(--s0);
+              border:1px solid var(--b0);
+              border-radius:var(--rl);
+              box-shadow:var(--sd1);
+              padding:10px 14px 10px;
+              margin-bottom:10px;
+              backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">
+              <!-- Instruction -->
+              <div style="font-size:11px;color:var(--t2);margin-bottom:8px" id="gInstruction">
+                \uD83D\uDC46 <b style="color:var(--t1)">กดเลือกชื่อ</b> แล้ว <b style="color:var(--t1)">กดช่องคะแนน</b> ด้านล่าง — เลือกได้หลายคนพร้อมกัน
+              </div>
+              <!-- Chips -->
+              <div class="chw" id="gchips" style="flex-wrap:wrap;gap:6px"></div>
+              <!-- Row: add button + selected hint -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:6px">
+                <button class="ach" id="gadd">+ เพิ่มบุคคล</button>
+                <div id="gmStickyHint" style="display:none;font-size:10px;color:var(--pb);font-weight:600"></div>
+              </div>
+            </div>
+            <div id="gcontent"></div>
+          </div>
         </div>
       </div>
       <!-- DASH -->
@@ -2117,8 +2142,25 @@ function renderGrid(){
       +'<button onclick="gmSel={};gmSM=false;renderGrid()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:3px 8px;font-size:10px;cursor:pointer">ยกเลิกทั้งหมด</button>';
   }
   updateStickyBar();
-  /* re-update bar when gmSel changes — hook onto renderGrid itself is complex,
-     so we update immediately here after DOM is built */
+  /* Update sticky hint in chip bar area */
+  var stickyHint=document.getElementById('gmStickyHint');
+  var gInstr=document.getElementById('gInstruction');
+  if(stickyHint){
+    var selCnt=Object.keys(gmSel).length;
+    if(selCnt>0){
+      stickyHint.style.display='flex';
+      stickyHint.style.alignItems='center';
+      stickyHint.style.gap='6px';
+      stickyHint.innerHTML='<span style="background:var(--pb);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">'
+        +selCnt+' คน</span>'
+        +'<span style="color:var(--pb)">&#8595; กดช่องคะแนน</span>'
+        +'<button onclick="gmSel={};gmSM=false;renderGrid()" style="background:rgba(163,45,45,.1);border:1px solid rgba(163,45,45,.25);color:var(--I);border-radius:6px;padding:2px 8px;font-size:10px;cursor:pointer;white-space:nowrap">\u00d7 ยกเลิก</button>';
+      if(gInstr)gInstr.style.display='none';
+    } else {
+      stickyHint.style.display='none';
+      if(gInstr)gInstr.style.display='block';
+    }
+  }
 }
 /* override renderGrid to refresh sticky bar after render */
 var _origRenderGrid=renderGrid;
