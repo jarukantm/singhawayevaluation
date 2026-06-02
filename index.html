@@ -1065,29 +1065,9 @@ button,input,select{font-family:var(--fb)}
             <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> Low</div>
             <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> Improve</div>
           </div>
-          <div id="gridWrap" style="display:flex;flex-direction:column;min-height:0">
-            <!-- Sticky person-selector card -->
-            <div id="gchipBar" style="
-              position:sticky;top:0;z-index:30;
-              background:var(--s0);
-              border:1px solid var(--b0);
-              border-radius:var(--rl);
-              box-shadow:var(--sd1);
-              padding:10px 14px 10px;
-              margin-bottom:10px;
-              backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">
-              <!-- Instruction -->
-              <div style="font-size:11px;color:var(--t2);margin-bottom:8px" id="gInstruction">
-                \uD83D\uDC46 <b style="color:var(--t1)">กดเลือกชื่อ</b> แล้ว <b style="color:var(--t1)">กดช่องคะแนน</b> ด้านล่าง — เลือกได้หลายคนพร้อมกัน
-              </div>
-              <!-- Chips -->
-              <div class="chw" id="gchips" style="flex-wrap:wrap;gap:6px"></div>
-              <!-- Row: add button + selected hint -->
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:6px">
-                <button class="ach" id="gadd">+ เพิ่มบุคคล</button>
-                <div id="gmStickyHint" style="display:none;font-size:10px;color:var(--pb);font-weight:600"></div>
-              </div>
-            </div>
+          <div id="gridWrap">
+            <!-- Chip bar for grid view (person list, not sticky - gmb card below is sticky) -->
+            <div class="cbr" style="display:none"><div class="chw" id="gchips"></div><button class="ach" id="gadd" style="display:none">+ เพิ่มบุคคล</button></div>
             <div id="gcontent"></div>
           </div>
         </div>
@@ -1978,12 +1958,27 @@ function renderGrid(){
   function placed(cid,r){return persons.filter(function(p){return gS(p.empId,cid)===r;});}
   var sumHtml2=oSaved?scoreSummaryCard():'';
   var html=sumHtml2+'<div class="gm">';
-  /* bank */
-  html+='<div class="gmb"><div class="gmt">';
-  html+='<div class="gml"><b>ลากชื่อ \u2192 ตาราง</b> \u00B7 กดค้าง 0.5 วิ = เลือกหลายคน \u00B7 ลากสลับลำดับ</div>';
+  /* ── Sticky selector card ── */
+  html+='<div class="gmb" style="position:sticky;top:0;z-index:20;background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">';
+  html+='<div class="gmt">';
+  /* คำอธิบาย 3 ข้อ */
+  html+='<div style="font-size:10px;color:var(--t2);line-height:1.8;margin-bottom:8px">';
+  html+='<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px">'
+    +'<span style="background:var(--blt);color:var(--pb);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700">1</span>'
+    +'\u0e25\u0e32\u0e01\u0e23\u0e32\u0e22\u0e0a\u0e37\u0e48\u0e2d\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e08\u0e31\u0e14\u0e40\u0e23\u0e35\u0e22\u0e07\u0e25\u0e33\u0e14\u0e31\u0e1a</span>';
+  html+='<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px">'
+    +'<span style="background:var(--blt);color:var(--pb);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700">2</span>'
+    +'\u0e01\u0e14\u0e04\u0e49\u0e32\u0e07 5 \u0e27\u0e34 = \u0e42\u0e2b\u0e21\u0e14\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2b\u0e25\u0e32\u0e22\u0e04\u0e19</span>';
+  html+='<span style="display:inline-flex;align-items:center;gap:4px">'
+    +'<span style="background:var(--blt);color:var(--pb);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700">3</span>'
+    +'\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e23\u0e32\u0e22\u0e0a\u0e37\u0e48\u0e2d \u2192 \u0e40\u0e25\u0e37\u0e2d\u0e01\u0e0a\u0e48\u0e2d\u0e07\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19</span>';
+  html+='</div>';
+  /* Dropdown */
   html+='<select class="gcatsel" id="gcatsel">';
   CATS.forEach(function(c){html+='<option value="'+c+'"'+(c===gmCat?' selected':'')+'>'+CAT_META[c].lb+'</option>';});
-  html+='</select></div><div class="gmc" id="gmchips2">';
+  html+='</select></div>';
+  /* chips */
+  html+='<div class="gmc" id="gmchips2">';
   persons.forEach(function(p,i){
     var allDone=cc.every(function(c){return gS(p.empId,c.id);});
     var isSel=!!gmSel[p.empId];
@@ -1996,21 +1991,20 @@ function renderGrid(){
     if(isSel)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2714</span>';
     html+='</div>';
   });
-  html+='</div></div>';
-  /* sel bar */
-  if(gmSM){
-    html+='<div class="gsbar"><span class="gsi">โหมดเลือกหลายคน: <b>'+Object.keys(gmSel).length+' คน</b></span>';
-    html+='<button class="smb smo" onclick="gmSelAll()">เลือกทั้งหมด</button>';
-    html+='<button class="smb smo" onclick="gmClearSel()">ล้าง</button>';
-    html+='<button class="smb smd" onclick="gmExitSel()">ออก</button>';
-    html+='</div>';
+  html+='</div>';/* end gmchips2 */
+  /* Bottom row of sticky card: add button + selection status */
+  var selNow=Object.keys(gmSel).length;
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px 4px;flex-wrap:wrap;gap:6px">';
+  html+=(!locked)?'<button class="ach" onclick="openAdd()">+ \u0e40\u0e1e\u0e34\u0e48\u0e21\u0e1a\u0e38\u0e04\u0e04\u0e25</button>':'<span></span>';
+  if(selNow>0){
+    html+='<div style="display:flex;align-items:center;gap:6px">'
+      +'<span style="background:var(--pb);color:#fff;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700">'+selNow+' \u0e04\u0e19 \u2193 \u0e01\u0e14\u0e0a\u0e48\u0e2d\u0e07\u0e04\u0e30\u0e41\u0e19\u0e19</span>'
+      +'<button onclick="gmSel={};gmSM=false;renderGrid()" style="background:rgba(163,45,45,.1);border:1px solid rgba(163,45,45,.25);color:var(--I);border-radius:6px;padding:2px 8px;font-size:10px;cursor:pointer">\u00d7 \u0e22\u0e01\u0e40\u0e25\u0e34\u0e01</button>'
+      +'</div>';
   }
+  html+='</div>';
+  html+='</div>';/* end gmb */
   /* grid */
-  var isTD=(('ontouchstart' in window)||navigator.maxTouchPoints>0);
-  var gridHint=isTD
-    ?'\u2460 \u0e01\u0e14\u0e0a\u0e37\u0e48\u0e2d\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e40\u0e25\u0e37\u0e2d\u0e01 \u2461 \u0e01\u0e14\u0e0a\u0e48\u0e2d\u0e07\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01'
-    :'\u0e25\u0e32\u0e01\u0e0a\u0e37\u0e48\u0e2d \u2192 \u0e0a\u0e48\u0e2d\u0e07\u0e04\u0e30\u0e41\u0e19\u0e19 \u00B7 \u0e01\u0e14\u0e04\u0e49\u0e32\u0e07 0.5 \u0e27\u0e34 = \u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2b\u0e25\u0e32\u0e22\u0e04\u0e19';
-  html+='<div style="padding:6px 10px;background:rgba(13,110,231,.06);border-radius:var(--r);font-size:10px;color:var(--pb);font-weight:600;margin-bottom:4px">'+gridHint+'</div>';
   html+='<div class="ggrid">';
   html+='<div class="gghc" style="background:'+m.bg+';color:'+m.cl+'">'+m.lb+'</div>';
   RATINGS.forEach(function(r){
@@ -2088,7 +2082,7 @@ function renderGrid(){
   persons.forEach(function(p,i){
     var el=document.getElementById('gc_'+p.empId);if(!el||locked)return;
     el.addEventListener('mousedown',function(){
-      gmLPT=setTimeout(function(){clearTimeout(gmLPT);gmLPT=null;gmEnterSel(p.empId);},500);
+      gmLPT=setTimeout(function(){clearTimeout(gmLPT);gmLPT=null;gmEnterSel(p.empId);},5000);
     });
     el.addEventListener('mouseup',function(){if(gmLPT){clearTimeout(gmLPT);gmLPT=null;}});
     el.addEventListener('mousemove',function(){if(gmLPT){clearTimeout(gmLPT);gmLPT=null;}});
@@ -2110,61 +2104,8 @@ function renderGrid(){
     });
   });
 
-  /* ── Sticky selected-person bar — stays visible on scroll ── */
-  var selBar=document.getElementById('gmStickyBar');
-  if(!selBar){
-    selBar=document.createElement('div');
-    selBar.id='gmStickyBar';
-    selBar.style.cssText='position:sticky;top:0;z-index:20;background:rgba(13,110,231,.95);'
-      +'backdrop-filter:blur(8px);color:#fff;padding:8px 12px;border-radius:var(--r);'
-      +'display:none;align-items:center;gap:8px;flex-wrap:wrap;box-shadow:0 3px 12px rgba(13,110,231,.3);';
-    var gcontent=document.getElementById('gcontent');
-    if(gcontent)gcontent.insertBefore(selBar,gcontent.firstChild);
-  }
-  function updateStickyBar(){
-    if(!selBar)return;
-    var pids=Object.keys(gmSel);
-    if(!pids.length){selBar.style.display='none';return;}
-    selBar.style.display='flex';
-    var names=pids.map(function(id){
-      var p=persons.filter(function(x){return x.empId===id;})[0];
-      return p?p.name.split(' ')[0]:'?';
-    });
-    selBar.innerHTML='<span style="font-size:11px;font-weight:700">&#128073; '+pids.length+' คน:</span>'
-      +names.map(function(n,i){
-        var pid=pids[i];
-        var ph=getPhoto(pid);
-        var av=ph?'<img src="'+ph+'" style="width:18px;height:18px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:3px" alt="">'
-          :'';
-        return '<span style="background:rgba(255,255,255,.2);padding:2px 8px;border-radius:10px;font-size:11px;cursor:pointer" onclick="gmTapChip(\''+pid+'\')" title="คลิกเพื่อยกเลิก">'+av+n+' ✕</span>';
-      }).join('')
-      +'<span style="margin-left:auto;font-size:10px;opacity:.8">&#8595; กดช่องคะแนนด้านล่าง</span>'
-      +'<button onclick="gmSel={};gmSM=false;renderGrid()" style="background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:3px 8px;font-size:10px;cursor:pointer">ยกเลิกทั้งหมด</button>';
-  }
-  updateStickyBar();
-  /* Update sticky hint in chip bar area */
-  var stickyHint=document.getElementById('gmStickyHint');
-  var gInstr=document.getElementById('gInstruction');
-  if(stickyHint){
-    var selCnt=Object.keys(gmSel).length;
-    if(selCnt>0){
-      stickyHint.style.display='flex';
-      stickyHint.style.alignItems='center';
-      stickyHint.style.gap='6px';
-      stickyHint.innerHTML='<span style="background:var(--pb);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700">'
-        +selCnt+' คน</span>'
-        +'<span style="color:var(--pb)">&#8595; กดช่องคะแนน</span>'
-        +'<button onclick="gmSel={};gmSM=false;renderGrid()" style="background:rgba(163,45,45,.1);border:1px solid rgba(163,45,45,.25);color:var(--I);border-radius:6px;padding:2px 8px;font-size:10px;cursor:pointer;white-space:nowrap">\u00d7 ยกเลิก</button>';
-      if(gInstr)gInstr.style.display='none';
-    } else {
-      stickyHint.style.display='none';
-      if(gInstr)gInstr.style.display='block';
-    }
-  }
+  /* gmb card handles selection state via renderGrid re-render */
 }
-/* override renderGrid to refresh sticky bar after render */
-var _origRenderGrid=renderGrid;
-renderGrid=function(){_origRenderGrid();var sb=document.getElementById('gmStickyBar');if(sb){var pids=Object.keys(gmSel);if(!pids.length){sb.style.display='none';}else{sb.style.display='flex';}}};
 
 function gmEnterSel(pid){gmSM=true;gmSel={};gmSel[pid]=true;renderGrid();}
 function gmTapChip(pid){if(gmSel[pid]){delete gmSel[pid];}else{gmSel[pid]=true;gmSM=true;}if(!Object.keys(gmSel).length){gmSM=false;gmDP=null;}renderGrid();}
