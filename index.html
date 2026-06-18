@@ -675,11 +675,22 @@ button,input,select{font-family:var(--fb)}
   .fg{grid-template-columns:repeat(3,1fr)}
   .ggrid{grid-template-columns:1fr repeat(5,65px)}
   .focus-chart-wrap{grid-template-columns:1fr!important}
+
+  /* ── Criterion row: stack label on top, rating + note below (mobile) ──
+     Desktop keeps everything in one line; mobile wraps to two rows for
+     readability and bigger tap targets. */
+  .cr{flex-wrap:wrap;align-items:flex-start;padding:12px 14px;gap:8px 0;min-height:0}
+  .cl{flex:1 1 100%;width:100%}
+  .clb{font-size:13px}
+  .ra{flex:1 1 auto;order:2;gap:5px;margin-top:2px}
+  .rb{width:auto;flex:1;min-width:0;height:36px;font-size:12px}
+  .note-cell,.note-col-hd{order:3;flex:1 1 100%;width:100%;max-width:none;min-width:0;margin-top:4px}
 }
 @media(max-width:420px){
   .fg{grid-template-columns:repeat(2,1fr)}
-  .rb{width:30px;height:27px;font-size:9px}
-  .ra{gap:2px}
+  .rb{height:33px;font-size:11px}
+  .ra{gap:4px}
+  .cr{padding:10px 12px}
 }
 </style>
 </head>
