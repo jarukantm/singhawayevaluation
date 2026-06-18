@@ -171,7 +171,7 @@ button,input,select{font-family:var(--fb)}
 .views{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
 .view{display:none;flex:1;overflow-y:auto;padding:1.25rem;min-height:0}
 .view.on{display:flex;flex-direction:column}
-.vi{display:flex;flex-direction:column;gap:1rem;max-width:1100px;margin:0 auto;width:100%;padding-bottom:2rem}
+.vi{display:flex;flex-direction:column;gap:1rem;width:100%;padding-bottom:2rem}
 
 /* ── BUTTONS ── */
 .btn{padding:7px 16px;font-size:12px;font-weight:700;border-radius:var(--r);cursor:pointer;
@@ -205,6 +205,11 @@ button,input,select{font-family:var(--fb)}
 .lgi{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1);font-weight:500}
 .lgb{width:8px;height:8px;border-radius:2px}
 .lgn{margin-left:auto;font-size:10px;color:var(--t2)}
+.lgn-touch{display:none}
+@media(hover:none),(pointer:coarse){
+  .lgn-hover{display:none}
+  .lgn-touch{display:inline}
+}
 
 /* ── CARD ── */
 .card{background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);overflow:hidden}
@@ -216,7 +221,8 @@ button,input,select{font-family:var(--fb)}
 .cttl{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--t0);flex:1}
 
 /* ── PERSON CARD ── */
-.pc{background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);overflow:visible;transition:.15s}
+.pc{background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);overflow:visible;transition:.15s;position:relative}
+.pc:has(.rbw:hover){z-index:10000}
 .pc>.pch2{border-radius:var(--rl) var(--rl) 0 0}
 .pc:hover{box-shadow:var(--sd1);border-color:var(--pb2)}
 .pch2{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:background .1s}
@@ -265,6 +271,10 @@ button,input,select{font-family:var(--fb)}
 .note-col-hd{font-size:9px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.4px;padding:6px 10px 6px 0;white-space:nowrap;min-width:130px;max-width:200px}
 .note-cell{min-width:130px;max-width:200px;font-size:11px;line-height:1.4;border-radius:var(--r);padding:4px 8px;cursor:pointer;transition:.15s;flex-shrink:0;word-break:break-word}
 .note-cell.note-add{color:var(--pb);border:1.5px dashed rgba(13,110,231,.3);background:rgba(13,110,231,.04)}
+.note-cell.note-required{color:var(--I);border:1.5px dashed rgba(163,45,45,.45);background:rgba(163,45,45,.06);animation:reqPulse 2s ease-in-out infinite}
+.note-cell.note-required:hover{background:rgba(163,45,45,.12);border-color:var(--I)}
+.note-cell.note-required .note-add-lbl{font-size:11px;font-weight:700}
+@keyframes reqPulse{0%,100%{box-shadow:0 0 0 0 rgba(163,45,45,.18)}50%{box-shadow:0 0 0 3px rgba(163,45,45,.08)}}
 .note-cell.note-add:hover{background:rgba(13,110,231,.1);border-color:var(--pb)}
 .note-cell.note-add .note-add-lbl{font-size:11px;font-weight:600}
 .note-cell.note-has{color:var(--t0);border:1.5px solid rgba(13,110,231,.2);background:rgba(13,110,231,.05);position:relative;padding-right:22px}
@@ -286,35 +296,40 @@ button,input,select{font-family:var(--fb)}
 .catv{font-size:10px;color:var(--t2);transition:transform .18s}
 .catv.op{transform:rotate(180deg)}
 /* Override old .cr to not conflict */
-.ra{display:flex;gap:3px;flex-shrink:0}
+.ra{display:flex;gap:4px;flex-shrink:0}
 .rbw{position:relative;display:inline-flex}
-.rb{width:36px;height:30px;border-radius:7px;border:1.5px solid var(--b1);background:transparent;
-  cursor:pointer;font-size:10px;font-weight:700;color:var(--t1);transition:all .09s;
+.rbw:hover{z-index:10000}
+.rb{width:38px;height:32px;border-radius:9px;border:1.5px solid var(--b1);
+  background:var(--s1);box-shadow:0 1px 2px rgba(8,20,50,.06),inset 0 1px 0 rgba(255,255,255,.6);
+  cursor:pointer;font-size:11px;font-weight:700;color:var(--t1);
+  transition:transform .1s,box-shadow .1s,background .1s,border-color .1s;
   display:flex;align-items:center;justify-content:center;font-family:var(--fh)}
-.rb:hover{transform:scale(1.08)}
-.rb.rE:hover{border-color:var(--E);color:var(--E);background:rgba(29,158,117,.12)}
-.rb.rG:hover{border-color:var(--G);color:var(--G);background:rgba(13,110,231,.12)}
-.rb.rS:hover{border-color:var(--S);color:var(--S);background:rgba(91,111,149,.1)}
-.rb.rL:hover{border-color:var(--L);color:var(--L);background:rgba(186,117,23,.12)}
-.rb.rI:hover{border-color:var(--I);color:var(--I);background:rgba(163,45,45,.12)}
-.rb:active{transform:scale(.88)!important}
-.rb.sel.rE{background:var(--E);border-color:var(--E);color:#fff;box-shadow:0 2px 8px rgba(29,158,117,.3)}
-.rb.sel.rG{background:var(--G);border-color:var(--G);color:#fff;box-shadow:0 2px 8px rgba(13,110,231,.3)}
-.rb.sel.rS{background:var(--S);border-color:var(--S);color:#fff}
-.rb.sel.rL{background:var(--L);border-color:var(--L);color:#fff}
-.rb.sel.rI{background:var(--I);border-color:var(--I);color:#fff}
+.rb:hover{transform:translateY(-1.5px);box-shadow:0 4px 10px rgba(8,20,50,.14),inset 0 1px 0 rgba(255,255,255,.6)}
+.rb.rE:hover{border-color:var(--E);color:var(--E);background:rgba(29,158,117,.14)}
+.rb.rG:hover{border-color:var(--G);color:var(--G);background:rgba(13,110,231,.14)}
+.rb.rS:hover{border-color:var(--S);color:var(--S);background:rgba(91,111,149,.12)}
+.rb.rL:hover{border-color:var(--L);color:var(--L);background:rgba(186,117,23,.14)}
+.rb.rI:hover{border-color:var(--I);color:var(--I);background:rgba(163,45,45,.14)}
+.rb:active{transform:translateY(0) scale(.92)!important;box-shadow:inset 0 2px 4px rgba(8,20,50,.18)!important}
+.rb.sel.rE{background:var(--E);border-color:var(--E);color:#fff;box-shadow:0 3px 10px rgba(29,158,117,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.rb.sel.rG{background:var(--G);border-color:var(--G);color:#fff;box-shadow:0 3px 10px rgba(13,110,231,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.rb.sel.rS{background:var(--S);border-color:var(--S);color:#fff;box-shadow:0 3px 10px rgba(91,111,149,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.rb.sel.rL{background:var(--L);border-color:var(--L);color:#fff;box-shadow:0 3px 10px rgba(186,117,23,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.rb.sel.rI{background:var(--I);border-color:var(--I);color:#fff;box-shadow:0 3px 10px rgba(163,45,45,.4),inset 0 1px 0 rgba(255,255,255,.25)}
+.rb:disabled{cursor:default;opacity:.45;box-shadow:none}
+.rb:disabled:hover{transform:none}
 /* popup -- desktop only, triggered by real :hover */
 .rpop{display:none;position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);
-  background:var(--s0);border:1px solid var(--b1);border-radius:var(--rl);
-  box-shadow:var(--sd2);padding:12px 14px;width:240px;z-index:9999;
+  background:var(--s0);border:2px solid var(--navy);border-color:rgba(8,20,50,.35);border-radius:var(--rl);
+  box-shadow:0 14px 36px rgba(8,20,50,.28),0 3px 10px rgba(8,20,50,.16);padding:12px 14px;width:240px;z-index:9999;
   pointer-events:none;text-align:left;white-space:normal}
 @media(hover:hover) and (pointer:fine){
   .rbw:hover .rpop{display:block}
 }
-.rpop::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
-  border:7px solid transparent;border-top-color:var(--b1)}
-.rpop::before{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(-1px);
-  border:7px solid transparent;border-top-color:var(--s0);z-index:1}
+.rpop::after{content:'';position:absolute;top:100%;left:calc(50% + var(--arrow-shift,0px));transform:translateX(-50%);
+  border:8px solid transparent;border-top-color:rgba(8,20,50,.35)}
+.rpop::before{content:'';position:absolute;top:100%;left:calc(50% + var(--arrow-shift,0px));transform:translateX(-50%) translateY(-2px);
+  border:6px solid transparent;border-top-color:var(--s0);z-index:1}
 .rph{display:flex;align-items:center;gap:7px;margin-bottom:7px}
 .rpb{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;
   font-family:var(--fh);font-size:13px;font-weight:700;color:#fff}
@@ -350,6 +365,10 @@ button,input,select{font-family:var(--fb)}
 .gmb{padding:10px 14px;background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0)}
 .gmt{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin-bottom:8px}
 .gml{font-size:11px;font-weight:700;color:var(--t1)}
+.gstep{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
+  border-radius:50%;background:var(--pb);color:#fff;font-size:9px;font-weight:700;
+  margin-right:4px;margin-left:8px;flex-shrink:0}
+.gstep:first-child{margin-left:0}
 .gmc{display:flex;flex-wrap:wrap;gap:5px}
 .gchip{display:flex;align-items:center;gap:5px;padding:5px 9px 5px 4px;border-radius:16px;
   border:1px solid var(--b1);background:var(--s1);font-size:11px;color:var(--t0);
@@ -385,9 +404,14 @@ button,input,select{font-family:var(--fb)}
 .gdrop{border-left:1px solid var(--b0);border-bottom:1px solid var(--b0);background:var(--s0);
   display:flex;flex-wrap:wrap;align-items:flex-start;align-content:flex-start;
   gap:3px;padding:5px 6px;min-height:42px;transition:background .12s}
-.gpl{display:flex;align-items:center;gap:2px;padding:2px 6px 2px 3px;border-radius:10px;
-  font-size:9px;font-weight:700;color:#fff;cursor:pointer;border:none}
-.gpl:hover{opacity:.7;text-decoration:line-through}
+.gpl{display:flex;align-items:center;gap:3px;padding:2px 4px 2px 3px;border-radius:10px;
+  font-size:9px;font-weight:700;color:#fff;cursor:grab;border:none;position:relative}
+.gpl:hover{box-shadow:0 0 0 2px rgba(255,255,255,.5) inset}
+.gpl.gpl-dragging{opacity:.35}
+.gpl-rm{display:flex;align-items:center;justify-content:center;width:12px;height:12px;
+  border-radius:50%;background:rgba(0,0,0,.25);color:#fff;font-size:8px;line-height:1;
+  cursor:pointer;flex-shrink:0;margin-left:1px}
+.gpl-rm:hover{background:rgba(0,0,0,.5)}
 .gplav{width:12px;height:12px;border-radius:50%;overflow:hidden;flex-shrink:0}
 .gplav img{width:100%;height:100%;object-fit:cover}
 /* chip done state -- person fully scored in current category */
@@ -618,15 +642,39 @@ button,input,select{font-family:var(--fb)}
 .hbg-btn span{display:block;width:16px;height:2px;background:var(--t0);margin:3px 0;border-radius:1px}
 .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
 
+/* ── Bottom Navigation Bar — Modern Floating Style (mobile only) ── */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:60;
+  padding:8px 12px max(12px,env(safe-area-inset-bottom));
+  background:transparent;pointer-events:none}
+.mob-nav-inner{display:flex;justify-content:space-around;align-items:center;
+  background:rgba(8,20,50,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.1);border-radius:24px;
+  padding:6px 8px;pointer-events:all;
+  box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.05)}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:7px 14px;border:none;background:transparent;cursor:pointer;
+  color:rgba(255,255,255,.4);font-size:9px;font-weight:600;
+  border-radius:18px;transition:all .2s cubic-bezier(.4,0,.2,1);
+  -webkit-tap-highlight-color:transparent;min-width:60px;position:relative}
+.mob-nav-btn .mn-ico{font-size:22px;line-height:1;transition:transform .2s}
+.mob-nav-btn.on{color:#fff;background:rgba(13,110,231,.25)}
+.mob-nav-btn.on .mn-ico{transform:scale(1.1)}
+.mob-nav-btn::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%) scaleX(0);
+  width:16px;height:2px;background:var(--pb2);border-radius:2px;transition:transform .2s}
+.mob-nav-btn.on::after{transform:translateX(-50%) scaleX(1)}
+
 @media(max-width:768px){
   .sb{position:fixed;left:0;top:0;bottom:0;z-index:50;transform:translateX(-100%);transition:transform .25s}
   .sb.open{transform:translateX(0)}
   .mob-overlay.open{display:block}
-  .hbg-btn{display:block}
+  .hbg-btn{display:none!important}
+  .mob-nav{display:block}
   .main{width:100%}
+  #sa.on{padding-bottom:90px}
   .d2{grid-template-columns:1fr}
   .fg{grid-template-columns:repeat(3,1fr)}
   .ggrid{grid-template-columns:1fr repeat(5,65px)}
+  .focus-chart-wrap{grid-template-columns:1fr!important}
 }
 @media(max-width:420px){
   .fg{grid-template-columns:repeat(2,1fr)}
@@ -637,7 +685,29 @@ button,input,select{font-family:var(--fb)}
 </head>
 <body>
 
-<!-- MOBILE HAMBURGER -->
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mob-nav" id="mobNav">
+  <div class="mob-nav-inner">
+    <button class="mob-nav-btn on" id="mn-self" onclick="showTab('self')">
+      <span class="mn-ico">&#128221;</span>
+      <span>ตนเอง</span>
+    </button>
+    <button class="mob-nav-btn" id="mn-person" onclick="showTab('person')">
+      <span class="mn-ico">&#128100;</span>
+      <span>รายบุคคล</span>
+    </button>
+    <button class="mob-nav-btn" id="mn-grid" onclick="showTab('grid')">
+      <span class="mn-ico">&#128203;</span>
+      <span>รายหัวข้อ</span>
+    </button>
+    <button class="mob-nav-btn" id="mn-dash" onclick="showTab('dash')">
+      <span class="mn-ico">&#128202;</span>
+      <span>ภาพรวม</span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE HAMBURGER (tablet fallback, hidden when bottom nav active) -->
 <button class="hbg-btn" id="hbgBtn"><span></span><span></span><span></span></button>
 <div class="mob-overlay" id="mobOvl"></div>
 
@@ -673,7 +743,7 @@ button,input,select{font-family:var(--fb)}
         <div class="wav"><img id="wavimg" src="" alt="Profile"></div>
         <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0)" id="wname"></div>
         <div style="font-size:12px;color:var(--t1);margin-top:3px" id="wrole"></div>
-        <div style="font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t0);margin-top:14px;margin-bottom:4px">&#127919; วิธีการประเมิน Singhaway FOCUS</div>
+        <div style="font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t0);margin-top:14px;margin-bottom:4px">&#128221; วิธีการประเมิน Singhaway FOCUS</div>
         <div style="font-size:11px;color:var(--t1);margin-bottom:12px">กรุณาอ่านและรับทราบก่อนเริ่มประเมิน</div>
       </div>
       <div class="wrules">
@@ -765,16 +835,19 @@ button,input,select{font-family:var(--fb)}
 
       <!-- ⑤ Textarea -->
       <div style="margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:12px;font-weight:700;color:var(--t0)">&#9997;&#65039; เหตุผล / ข้อสังเกต</div>
+        <div style="font-size:12px;font-weight:700;color:var(--t0)">&#9997;&#65039; เหตุผล / ข้อสังเกต <span id="rsnReqMark" style="display:none;color:var(--I)">*</span></div>
         <div id="rsnCharCount" style="font-size:10px;color:var(--t2)">0 / 300</div>
       </div>
       <textarea class="rsn-textarea" id="rsnText" maxlength="300"
         placeholder="เช่น: ทำงานได้เร็วกว่ากำหนดสม่ำเสมอ, ต้องการพัฒนาด้านการสื่อสาร, ริเริ่มแก้ปัญหาเชิงรุก..."
         style="min-height:90px"></textarea>
+      <div id="rsnReqWarn" style="display:none;margin-top:6px;padding:7px 10px;background:rgba(163,45,45,.08);border:1px solid rgba(163,45,45,.25);border-radius:var(--r);font-size:11px;color:var(--I);font-weight:600">
+        &#9888; ระดับ Low / Improve จำเป็นต้องระบุเหตุผลเสมอ
+      </div>
 
       <!-- ⑥ Actions -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:8px">
-        <div style="font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px">
+        <div id="rsnHint" style="font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px">
           <span style="font-size:14px">&#128161;</span> ปล่อยว่างแล้วกด "ปิด" เพื่อไม่บันทึกเหตุผล
         </div>
         <div style="display:flex;gap:8px">
@@ -819,7 +892,7 @@ button,input,select{font-family:var(--fb)}
   <!-- FEEDBACK WALL ALL -->
   <div class="ovl" id="fwAllovl">
     <div class="mbox" style="max-width:500px">
-      <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px">&#128172; Feedback Wall — ทั้งหมด</div>
+      <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px">&#128172; ข้อเสนอแนะทั้งหมด</div>
       <div style="font-size:11px;color:var(--t2);margin-bottom:14px">ไม่เปิดเผยตัวตนผู้ให้ข้อมูล</div>
       <div id="fwAllBody" style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:4px"></div>
       <div style="display:flex;justify-content:flex-end;margin-top:14px">
@@ -853,14 +926,14 @@ button,input,select{font-family:var(--fb)}
     </div>
     <nav class="sb-nav">
       <div class="sb-sec-lbl">ประเมินตนเอง</div>
-      <button class="nb on" id="t-self" onclick="showTab('self')"><div class="ni">&#128302;</div>ประเมินตนเอง</button>
+      <button class="nb on" id="t-self" onclick="showTab('self')"><div class="ni">&#128221;</div>ประเมินตนเอง</button>
       <div class="sb-sep"></div>
       <div class="sb-sec-lbl">ประเมินผู้อื่น</div>
       <button class="nb" id="t-person" onclick="showTab('person')"><div class="ni">&#128100;</div>รายบุคคล</button>
       <button class="nb" id="t-grid" onclick="showTab('grid')"><div class="ni">&#128203;</div>รายหัวข้อ</button>
       <div class="sb-sep"></div>
       <div class="sb-sec-lbl">ภาพรวม</div>
-      <button class="nb" id="t-dash" onclick="showTab('dash')"><div class="ni">&#128202;</div>Dashboard</button>
+      <button class="nb" id="t-dash" onclick="showTab('dash')"><div class="ni">&#128202;</div>ภาพรวมผลประเมิน</button>
     </nav>
     <div class="sb-foot">
       <button class="sb-logout" id="loutbtn" onclick="doLogout()">&#128682; ออกจากระบบ</button>
@@ -889,7 +962,7 @@ button,input,select{font-family:var(--fb)}
             <div class="lgi"><div class="lgb" style="background:var(--S)"></div><b>S</b> Standard</div>
             <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> Low</div>
             <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> Improve</div>
-            <div class="lgn">ชี้ปุ่มเพื่อดูนิยาม</div>
+            <div class="lgn"><span class="lgn-hover">ชี้ระดับคะแนนเพื่อดูนิยาม</span><span class="lgn-touch">เลือกระดับคะแนนเพื่อดูนิยาม</span></div>
           </div>
           <div class="card">
             <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--b0);background:var(--hg)">
@@ -914,7 +987,7 @@ button,input,select{font-family:var(--fb)}
             <div class="lgi"><div class="lgb" style="background:var(--S)"></div><b>S</b> Standard</div>
             <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> Low</div>
             <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> Improve</div>
-            <div class="lgn">ชี้ปุ่มเพื่อดูนิยาม</div>
+            <div class="lgn"><span class="lgn-hover">ชี้ระดับคะแนนเพื่อดูนิยาม</span><span class="lgn-touch">เลือกระดับคะแนนเพื่อดูนิยาม</span></div>
           </div>
           <div class="cbr"><span class="cbl">ผู้รับการประเมิน :</span><div class="chw" id="pchips"></div><button class="ach" id="padd">+ เพิ่มบุคคล</button></div>
           <div id="pcards"></div>
@@ -938,7 +1011,7 @@ button,input,select{font-family:var(--fb)}
       <div class="view" id="v-dash">
         <div class="vi">
           <div class="phd">
-            <div><div class="ptitle">&#128202; Dashboard สรุปผล</div></div>
+            <div><div class="ptitle">&#128202; ภาพรวมผลประเมิน</div></div>
             <div></div>
           </div>
           <div id="dbody"></div>
@@ -1076,8 +1149,8 @@ function gS(pid,cid){return othSc[sk(pid,cid)]||null;}
 function gSelf(cid){return selfSc[cid]||null;}
 function s2l(avg){
   if(!avg)return{l:'\u2014',c:'var(--t2)'};
-  if(avg>=4.5)return{l:'E',c:RCOL.E};if(avg>=3.5)return{l:'G',c:RCOL.G};
-  if(avg>=2.5)return{l:'S',c:RCOL.S};if(avg>=1.5)return{l:'L',c:RCOL.L};
+  if(avg>=4.5)return{l:'E',c:RCOL.E};if(avg>=3.25)return{l:'G',c:RCOL.G};
+  if(avg>=1.8)return{l:'S',c:RCOL.S};if(avg>=0.5)return{l:'L',c:RCOL.L};
   return{l:'I',c:RCOL.I};
 }
 function avgFor(ids,crits,isSelf){
@@ -1106,7 +1179,7 @@ function doLogin(){
   CU=Object.assign({},ud,{username:u});
   persons=getDefaults(CU);
   persons.forEach(function(p2){expd[p2.empId]=false;CATS.forEach(function(c){catOp[p2.empId+c]=true;});});
-  if(persons.length)expd[persons[0].empId]=true;
+  /* All person cards start collapsed so the user sees the full list (and count) before opening any */
   /* setup welcome popup */
   h('wavimg').src=getPhoto(CU.empId)||'';
   h('wname').textContent=CU.name;
@@ -1168,12 +1241,13 @@ function getDefaults(user){
 }
 
 /* TABS */
-var TAB_TITLES={'self':'ประเมินตนเอง','person':'ประเมินรายบุคคล','grid':'ประเมินรายหัวข้อ','dash':'Dashboard สรุปผล'};
+var TAB_TITLES={'self':'ประเมินตนเอง','person':'ประเมินรายบุคคล','grid':'ประเมินรายหัวข้อ','dash':'ภาพรวมผลประเมิน'};
 function showTab(t){
   curTab=t;
   ['self','person','grid','dash'].forEach(function(x){
     h('t-'+x).classList.toggle('on',x===t);
     h('v-'+x).classList.toggle('on',x===t);
+    var mb=h('mn-'+x);if(mb)mb.classList.toggle('on',x===t);
   });
   /* update topbar */
   if(h('tbtitle'))h('tbtitle').textContent=TAB_TITLES[t]||t;
@@ -1199,8 +1273,15 @@ function setRating(pid,cid,r,isSelf){
   if(isSelf){selfSc[cid]=newR;}
   else{var k=sk(pid,cid);othSc[k]=newR;}
   autoSave();
-  /* No auto-open reason popup. Inline definition is shown via toggleDef().
-     User taps "+ เหตุผล" manually to add a reason. */
+  /* L (Low) and I (Improve) ratings require a written reason.
+     Auto-open the reason popup (for person-evaluation only -- self-assessment
+     has no comment mechanism) if no comment exists yet for this person+criterion. */
+  if(!isSelf&&newR&&(newR==='L'||newR==='I')&&!rsnNotes[pid+'|'+cid]){
+    openReason(pid,cid,newR,function(){renderTab();});
+    return; /* renderTab() runs via the popup's callback once saved */
+  }
+  /* No auto-open reason popup for other ratings. Inline definition is shown
+     via toggleDef(). User taps "+ เหตุผล" manually to add a reason. */
   renderTab();
 }
 /* Toggle the inline FOCUS definition box under a crit row.
@@ -1209,6 +1290,34 @@ function setRating(pid,cid,r,isSelf){
  * target = 'self' for self-assessment, or pid for person evaluation. */
 var _openDefKey=null;
 var _isHoverDevice=window.matchMedia&&window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+
+/* ── Keep rating-definition popups inside the viewport ──
+ * .rpop is centered on its .rbw button by default (left:50%;transform:translateX(-50%)).
+ * For buttons near the screen edge (e.g. the rightmost "I" column) this centers the
+ * popup off-screen. On hover we measure the popup's rect and nudge it back on-screen
+ * via an inline transform override, instead of clipping. */
+if(_isHoverDevice){
+  document.addEventListener('mouseover',function(e){
+    var rbw=e.target.closest&&e.target.closest('.rbw');
+    if(!rbw)return;
+    var pop=rbw.querySelector('.rpop');
+    if(!pop)return;
+    /* reset to default centered position first so measurements are accurate */
+    pop.style.left='50%';pop.style.transform='translateX(-50%)';pop.style.setProperty('--arrow-shift','0px');
+    requestAnimationFrame(function(){
+      var pr=pop.getBoundingClientRect();
+      var margin=10;
+      var shift=0;
+      if(pr.left<margin)shift=margin-pr.left;
+      else if(pr.right>window.innerWidth-margin)shift=(window.innerWidth-margin)-pr.right;
+      if(shift!==0){
+        pop.style.transform='translateX(calc(-50% + '+shift+'px))';
+        /* shift the arrow back so it still points at the button, not at the popup's new center */
+        pop.style.setProperty('--arrow-shift',(-shift)+'px');
+      }
+    });
+  });
+}
 function toggleDef(target,cid,r){
   if(_isHoverDevice)return; /* desktop: definition already shown via hover popup */
   var key=target+'_'+cid;
@@ -1266,6 +1375,8 @@ function rbHTML(pid,cid,isSelf){
 function noteCell(pid,cid,locked){
   var hasNote=!!rsnNotes[pid+'|'+cid];
   var noteText=hasNote?rsnNotes[pid+'|'+cid]:'';
+  var rating=gS(pid,cid);
+  var required=(rating==='L'||rating==='I');
   if(locked){
     /* locked state: show note text if exists, otherwise dash */
     return hasNote
@@ -1277,6 +1388,11 @@ function noteCell(pid,cid,locked){
     return '<div class="note-cell note-has" onclick="openReasonFromNote(\''+pid+'\',\''+cid+'\')" title="\u0e41\u0e01\u0e49\u0e44\u0e02: '+noteText+'">'
       +'<span class="note-txt">'+noteText+'</span>'
       +'<span class="note-edit-ico">&#9998;</span>'
+      +'</div>';
+  }
+  if(required){
+    return '<div class="note-cell note-required" onclick="openReasonFromNote(\''+pid+'\',\''+cid+'\')" title="\u0e23\u0e30\u0e14\u0e31\u0e1a Low/Improve \u0e08\u0e33\u0e40\u0e1b\u0e47\u0e19\u0e15\u0e49\u0e2d\u0e07\u0e23\u0e30\u0e1a\u0e38\u0e40\u0e2b\u0e15\u0e38\u0e1c\u0e25">'
+      +'<span class="note-add-lbl">&#9888; ต้องระบุเหตุผล</span>'
       +'</div>';
   }
   return '<div class="note-cell note-add" onclick="openReasonFromNote(\''+pid+'\',\''+cid+'\')">'
@@ -1348,10 +1464,31 @@ function openReason(pid,cid,r,onDone){
   if(ta){
     ta.value=existing;
     if(cc)cc.textContent=existing.length+' / 300';
-    ta.oninput=function(){if(cc)cc.textContent=this.value.length+' / 300';};
+    ta.oninput=function(){if(cc)cc.textContent=this.value.length+' / 300';_rsnUpdateReqState();};
   }
+  /* 8. mandatory-reason state for L/I ratings */
+  _rsnUpdateReqState();
   h('rsnovl').classList.add('on');
   setTimeout(function(){if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}},80);
+}
+/* Toggle the required-reason UI (asterisk, warning, skip-button state) based on
+ * the current rating (L/I = mandatory) and whether text has been entered. */
+function _rsnUpdateReqState(){
+  if(!rsnCurrent)return;
+  var required=(rsnCurrent.r==='L'||rsnCurrent.r==='I');
+  var txt=h('rsnText')?h('rsnText').value.trim():'';
+  var ok=!required||!!txt;
+  if(h('rsnReqMark'))h('rsnReqMark').style.display=required?'inline':'none';
+  if(h('rsnHint'))h('rsnHint').style.display=required?'none':'flex';
+  if(h('rsnReqWarn'))h('rsnReqWarn').style.display=(required&&!txt)?'block':'none';
+  if(h('rsnskipbtn')){
+    h('rsnskipbtn').style.display=required?'none':'inline-flex';
+  }
+  if(h('rsnsavebtn')){
+    h('rsnsavebtn').disabled=!ok;
+    h('rsnsavebtn').style.opacity=ok?'1':'.5';
+    h('rsnsavebtn').style.cursor=ok?'pointer':'not-allowed';
+  }
 }
 
 function openReasonFromNote(pid,cid){
@@ -1360,12 +1497,20 @@ function openReasonFromNote(pid,cid){
 }
 
 h('rsnskipbtn').addEventListener('click',function(){
+  var required=rsnCurrent&&(rsnCurrent.r==='L'||rsnCurrent.r==='I');
+  if(required)return; /* button is hidden in this state, but guard anyway */
   cov('rsnovl');
   if(rsnCurrent.cb){var cb=rsnCurrent.cb;rsnCurrent.cb=null;cb();}
 });
 h('rsnsavebtn').addEventListener('click',function(){
   var k=rsnCurrent.pid+'|'+rsnCurrent.cid;
   var txt=h('rsnText').value.trim();
+  var required=(rsnCurrent.r==='L'||rsnCurrent.r==='I');
+  if(required&&!txt){
+    _rsnUpdateReqState();
+    h('rsnText').focus();
+    return; /* block save -- reason is mandatory for Low/Improve */
+  }
   if(txt)rsnNotes[k]=txt;else delete rsnNotes[k];
   autoSave();cov('rsnovl');
   if(rsnCurrent.cb){var cb=rsnCurrent.cb;rsnCurrent.cb=null;cb();}
@@ -1379,8 +1524,12 @@ function openBatchReason(pids,cid,r,onDone){
   var crit=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){crit=CRITERIA[i];break;}}
   var fLetter=crit?crit.foc:'';var fd=fLetter?FDEF[fLetter]:null;
 
-  /* subtitle */
-  if(h('batchSubtitle'))h('batchSubtitle').textContent='บันทึกเหตุผลสำหรับ '+pids.length+' คน \u2014 ปล่อยว่างได้ทุกช่อง';
+  /* subtitle -- changes wording when reason is mandatory (L/I ratings) */
+  var batchRequired=(r==='L'||r==='I');
+  if(h('batchSubtitle'))h('batchSubtitle').textContent=batchRequired
+    ?'\u0e23\u0e30\u0e14\u0e31\u0e1a Low / Improve \u0e08\u0e33\u0e40\u0e1b\u0e47\u0e19\u0e15\u0e49\u0e2d\u0e07\u0e23\u0e30\u0e1a\u0e38\u0e40\u0e2b\u0e15\u0e38\u0e1c\u0e25\u0e17\u0e38\u0e01\u0e04\u0e19 ('+pids.length+' \u0e04\u0e19)'
+    :'บันทึกเหตุผลสำหรับ '+pids.length+' คน \u2014 ปล่อยว่างได้ทุกช่อง';
+  if(h('batchskipbtn'))h('batchskipbtn').style.display=batchRequired?'none':'inline-flex';
 
   /* rating badge */
   if(h('batchRatingTag'))h('batchRatingTag').innerHTML=
@@ -1436,7 +1585,7 @@ function openBatchReason(pids,cid,r,onDone){
       /* textarea */
       var ta=document.createElement('textarea');
       ta.style.cssText='width:100%;padding:9px 11px;border:1.5px solid var(--b0);border-radius:var(--r);font-size:12px;font-family:var(--fb);background:var(--s1);color:var(--t0);resize:none;height:60px;outline:none;transition:.15s;display:block';
-      ta.placeholder='เหตุผล / ข้อสังเกต (ปล่อยว่างได้)';
+      ta.placeholder=batchRequired?'จำเป็นต้องระบุเหตุผล (ระดับ Low/Improve)':'เหตุผล / ข้อสังเกต (ปล่อยว่างได้)';
       ta.value=existing;
       ta.dataset.pid=pid;ta.dataset.cid=cid;
       ta.addEventListener('focus',function(){
@@ -1456,14 +1605,28 @@ function openBatchReason(pids,cid,r,onDone){
   h('batchrsnovl').classList.add('on');
 }
 
-/* ???? - ???????????????????????? */
+/* ข้าม - ไม่บังคับยกเว้นกรณี L/I */
 h('batchskipbtn').addEventListener('click',function(){
+  var batchRequired=(batchRsnData.r==='L'||batchRsnData.r==='I');
+  if(batchRequired)return; /* button is hidden in this state, but guard anyway */
   cov('batchrsnovl');
   if(batchRsnData.cb){var cb=batchRsnData.cb;batchRsnData.cb=null;cb();}
 });
-/* ?????? - ??????????????????????? */
+/* บันทึก - บันทึกเหตุผลทั้งหมด พร้อมตรวจสอบกรณีบังคับ (L/I) */
 h('batchsavebtn').addEventListener('click',function(){
   var textareas=h('batchPersonList').querySelectorAll('textarea');
+  var batchRequired=(batchRsnData.r==='L'||batchRsnData.r==='I');
+  if(batchRequired){
+    var emptyOnes=[];
+    textareas.forEach(function(ta){
+      if(!ta.value.trim())emptyOnes.push(ta);
+      ta.parentElement.style.borderColor=ta.value.trim()?'var(--b0)':'var(--I)';
+    });
+    if(emptyOnes.length){
+      emptyOnes[0].focus();
+      return; /* block save -- every person needs a reason for L/I */
+    }
+  }
   textareas.forEach(function(ta){
     var pid=ta.dataset.pid;var cid=ta.dataset.cid;
     var txt=ta.value.trim();
@@ -1496,7 +1659,7 @@ function scoreSummaryCard(){
   }).sort(function(a,b){return b.avg-a.avg;});
 
   var html='<div class="sc-sum"><div class="sc-sum-hd">';
-  html+='<span class="sc-sum-title">&#127942; สรุปคะแนน \u2014 จัดลำดับจากมากไปน้อย</span>';
+  html+='<span class="sc-sum-title">&#128202; สรุปคะแนน \u2014 จัดลำดับจากมากไปน้อย</span>';
   html+='<span class="sc-sum-sub">'+ranked.length+' คน</span>';
   html+='</div><div class="sc-rank-row">';
 
@@ -1816,7 +1979,7 @@ function renderGrid(){
   var locked=oSub||oSaved;
   var total=CRITERIA.length*persons.length;var done=0;
   persons.forEach(function(p){CRITERIA.forEach(function(c){if(gS(p.empId,c.id))done++;});});
-  if(h('tbsub'))h('tbsub').textContent='\u0e25\u0e32\u0e01\u0e0a\u0e37\u0e48\u0e2d \u2192 \u0e0a\u0e48\u0e2d\u0e07\u0e04\u0e30\u0e41\u0e19\u0e19 \u00b7 \u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e41\u0e25\u0e49\u0e27 '+done+'/'+total;
+  if(h('tbsub'))h('tbsub').textContent='ประเมินแล้ว '+done+'/'+total+' รายการ';
   if(h('tbright'))h('tbright').innerHTML=actBtns(false);
   if(h('gadd'))h('gadd').style.display=locked?'none':'inline-flex';
   renderChipBar('gchips');
@@ -1828,7 +1991,7 @@ function renderGrid(){
   var html=sumHtml2+'<div class="gm">';
   /* bank */
   html+='<div class="gmb"><div class="gmt">';
-  html+='<div class="gml"><b>ลากชื่อ \u2192 ตาราง</b> \u00B7 กดค้าง 0.5 วิ = เลือกหลายคน \u00B7 ลากสลับลำดับ</div>';
+  html+='<div class="gml"><span class="gstep">1</span>ลากชื่อลงตาราง <span class="gstep">2</span>กดค้าง 0.5 วิ เลือกหลายคน</div>';
   html+='<select class="gcatsel" id="gcatsel">';
   CATS.forEach(function(c){html+='<option value="'+c+'"'+(c===gmCat?' selected':'')+'>'+CAT_META[c].lb+'</option>';});
   html+='</select></div><div class="gmc" id="gmchips2">';
@@ -1883,7 +2046,11 @@ function renderGrid(){
       pl.forEach(function(p){
         var ph2=getPhoto(p.empId);
         var avPl=ph2?'<div class="gplav"><img src="'+ph2+'" alt="'+p.name+'"></div>':'<span style="font-size:8px">'+ini(p.name)+'</span>';
-        html+='<button class="gpl" style="background:'+p.color+'" data-pid="'+p.empId+'" data-cid="'+c.id+'">'+avPl+' '+p.name.split(' ')[0]+'</button>';
+        var dragAttr=!locked?'draggable="true"':'';
+        html+='<span class="gpl" style="background:'+p.color+'" data-pid="'+p.empId+'" data-cid="'+c.id+'" data-r="'+r+'" '+dragAttr+' title="\u0e25\u0e32\u0e01\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e23\u0e30\u0e14\u0e31\u0e1a \u00B7 \u0e01\u0e14\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e41\u0e01\u0e49\u0e44\u0e02\u0e04\u0e2d\u0e21\u0e40\u0e21\u0e19\u0e15\u0e4c">'
+          +'<span class="gpl-body" data-pid="'+p.empId+'" data-cid="'+c.id+'" data-r="'+r+'">'+avPl+' '+p.name.split(' ')[0]+'</span>'
+          +(!locked?'<span class="gpl-rm" data-pid="'+p.empId+'" data-cid="'+c.id+'" title="\u0e25\u0e1a\u0e04\u0e30\u0e41\u0e19\u0e19">\u00d7</span>':'')
+          +'</span>';
       });
       html+='</div>';
     });
@@ -1925,10 +2092,11 @@ function renderGrid(){
     });
   });
   /* drop zones */
+  var gplDragSrc=null; /* {pid,cid} of an already-placed chip being dragged to a new rating */
   document.querySelectorAll('.gdrop').forEach(function(dz){
     var cid=dz.dataset.cid;var r=dz.dataset.r;
     dz.addEventListener('dragover',function(e){
-      if(!gmDP)return;e.preventDefault();
+      if(!gmDP&&!gplDragSrc)return;e.preventDefault();
       dz.style.background=RCOL[r]+'18';
       var crit=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){crit=CRITERIA[i];break;}}
       var fd=crit?FDEF[crit.foc]:null;
@@ -1942,6 +2110,18 @@ function renderGrid(){
     dz.addEventListener('drop',function(e){
       e.preventDefault();dz.style.background='';hideDz();
       document.querySelectorAll('.gchip').forEach(function(x){x.classList.remove('gdg');});
+      /* CASE A: moving an already-placed chip to a different rating level */
+      if(gplDragSrc){
+        var movePid=gplDragSrc.pid;var moveCid=gplDragSrc.cid;gplDragSrc=null;
+        if(moveCid!==cid){return;} /* safety: only allow moving within the same criterion row */
+        var oldR=othSc[sk(movePid,moveCid)];
+        if(oldR===r)return; /* dropped on the same cell -- no change */
+        othSc[sk(movePid,moveCid)]=r;autoSave();
+        /* keep existing comment as-is; let the user review/edit it for the new rating */
+        openReason(movePid,moveCid,r,function(){renderTab();});
+        return;
+      }
+      /* CASE B: dragging from the person bank (new evaluation) */
       if(!gmDP)return;
       if(gmDP==='__multi__'){
         var pids=Object.keys(gmSel);
@@ -1958,12 +2138,38 @@ function renderGrid(){
       }
     });
   });
-  /* placed chips - remove on click */
-  document.querySelectorAll('.gpl').forEach(function(btn){
-    if(locked)return;
-    btn.addEventListener('click',function(){
+  /* placed chips -- click opens editable reason popup (pre-filled with existing comment) */
+  document.querySelectorAll('.gpl-body').forEach(function(body){
+    body.addEventListener('click',function(e){
+      e.stopPropagation();
+      if(locked)return;
+      var pid=this.dataset.pid;var cid=this.dataset.cid;var r=this.dataset.r;
+      openReason(pid,cid,r,function(){renderTab();});
+    });
+  });
+  /* remove button -- explicit delete, separate from click-to-edit */
+  document.querySelectorAll('.gpl-rm').forEach(function(rm){
+    rm.addEventListener('click',function(e){
+      e.stopPropagation();
       var pid=this.dataset.pid;var cid=this.dataset.cid;
       delete othSc[sk(pid,cid)];renderTab();
+    });
+  });
+  /* drag an already-placed chip to a different rating cell -- moves the score,
+     keeps the existing comment intact (comment stays linked to pid+cid, not to the rating) */
+  document.querySelectorAll('.gpl').forEach(function(chip){
+    if(locked)return;
+    chip.addEventListener('dragstart',function(e){
+      var pid=this.dataset.pid;var cid=this.dataset.cid;
+      gplDragSrc={pid:pid,cid:cid};
+      e.dataTransfer.effectAllowed='move';
+      e.stopPropagation(); /* don't trigger the bank-chip drag handlers */
+      this.classList.add('gpl-dragging');
+    });
+    chip.addEventListener('dragend',function(){
+      this.classList.remove('gpl-dragging');
+      gplDragSrc=null;hideDz();
+      document.querySelectorAll('.gdrop').forEach(function(z){z.style.background='';});
     });
   });
 }
@@ -2109,7 +2315,28 @@ function dataCount(empIds,crits,filter){
   return n;
 }
 /* Zone chart y-position helper */
-function yPct(v){return v?Math.max(3,Math.min(94,(1-(v-1)/4)*88+2)):50;}
+/* Maps a 0-5 score to a vertical % position matching the FOCUS zone chart's
+ * non-linear band heights (E 10% / G 25% / S 29% / L 26% / I 10%, top-to-bottom). */
+function yPct(v){
+  if(!v)return 50;
+  v=Math.max(0,Math.min(5,v));
+  /* zone boundaries from top (score 5) to bottom (score 0), with cumulative % */
+  var bounds=[
+    {lo:4.5,hi:5,   topPct:0,  hPct:10},
+    {lo:3.25,hi:4.5,topPct:10, hPct:25},
+    {lo:1.8,hi:3.25,topPct:35, hPct:29},
+    {lo:0.5,hi:1.8, topPct:64, hPct:26},
+    {lo:0,hi:0.5,   topPct:90, hPct:10}
+  ];
+  for(var i=0;i<bounds.length;i++){
+    var b=bounds[i];
+    if(v>=b.lo&&v<=b.hi){
+      var frac=(b.hi>b.lo)?(b.hi-v)/(b.hi-b.lo):0; /* higher score -> nearer top of its band */
+      return b.topPct+frac*b.hPct;
+    }
+  }
+  return 50;
+}
 
 function renderDash(){
   var fkeys=Object.keys(FDEF);
@@ -2202,16 +2429,16 @@ function renderDash(){
 
   /* --- 3. FOCUS CHART --- */
   html+='<div class="card">';
-  html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#127919;</div>';
+  html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128202;</div>';
   html+='<div class="db-sh-ttl">ผลการประเมินคะแนน FOCUS</div>';
   html+='<div class="chart-legend"><span class="chart-legend-item"><span class="chart-ld" style="background:var(--pb)"></span>คะแนน</span></div>';
   html+='</div>';
   if(noData){
-    html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#127919; ยังไม่มีข้อมูลการประเมิน</div>';
+    html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน</div>';
   } else {
     var ids3=dbFilter==='self'?selfId:allIds;
     var maxH=160;
-    html+='<div style="padding:0 16px 16px"><div style="display:grid;grid-template-columns:3fr 1fr;gap:16px;align-items:end">';
+    html+='<div style="padding:0 16px 16px"><div class="focus-chart-wrap" style="align-items:end">';
     html+='<div>';
     /* y-axis labels */
     html+='<div style="display:flex;margin-bottom:4px;padding-left:32px">';
@@ -2221,22 +2448,28 @@ function renderDash(){
     /* Y-axis */
     [5,4,3,2,1].forEach(function(v,i){
       var top=(1-v/5)*100;
-      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:9px;color:var(--t2);width:22px;text-align:right">'+v+'</div>';
-      html+='<div style="position:absolute;left:28px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
+      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:clamp(10px,2.6vw,13px);font-weight:700;color:var(--t2);width:26px;text-align:right">'+v+'</div>';
+      html+='<div style="position:absolute;left:30px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
     });
-    /* bars per FOCUS letter */
+    /* bars per FOCUS letter -- score number centered INSIDE the bar, level badge above */
     fkeys.forEach(function(f){
       var fd=FDEF[f];
       var cur=avgScore2(ids3,CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);
-      var barH=cur?Math.max(6,Math.round(cur/5*maxH)):0;
+      var barH=cur?Math.max(38,Math.round(cur/5*maxH)):0; /* min height raised so the centered number always fits */
       var lbl=s2l(cur);
-      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
-      html+='<div style="font-size:11px;font-weight:700;color:'+(cur?lbl.c:'var(--t2)')+'">'+( cur?cur.toFixed(2):'\u2013')+'</div>';
-      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:4px 4px 0 0;min-height:'+( cur?'6':'0')+'px;position:relative">';
-      if(cur)html+='<div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);padding:1px 6px;border-radius:5px;background:'+RCOL[lbl.l]+';color:#fff;font-size:9px;font-weight:700">'+lbl.l+'</div>';
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px">';
+      /* level badge (E/G/S/L/I) above the bar */
+      html+='<div style="min-height:26px;display:flex;align-items:center">';
+      if(cur)html+='<span style="padding:3px 10px;border-radius:7px;background:'+RCOL[lbl.l]+';color:#fff;font-size:clamp(10px,2.8vw,14px);font-weight:800;font-family:var(--fh)">'+lbl.l+'</span>';
       html+='</div>';
-      html+='<div style="font-size:10px;font-weight:700;color:'+fd.cl+'">'+f+'</div>';
-      html+='<div style="font-size:8px;color:var(--t2);text-align:center;max-width:60px;word-break:break-word">'+fd.nm+'</div>';
+      /* bar with score number centered inside */
+      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;min-height:'+( cur?'38':'0')+'px;position:relative;display:flex;align-items:center;justify-content:center">';
+      if(cur)html+='<span style="font-size:clamp(11px,3.4vw,18px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
+      else html+='<span style="font-size:clamp(10px,2.8vw,15px);color:var(--t2)">\u2013</span>';
+      html+='</div>';
+      /* FOCUS letter (F/O/C/U/S) */
+      html+='<div style="font-size:clamp(12px,3.2vw,17px);font-weight:800;color:'+fd.cl+'">'+f+'</div>';
+      html+='<div style="font-size:clamp(8px,2vw,11px);font-weight:600;color:var(--t2);text-align:center;max-width:70px;word-break:break-word">'+fd.nm+'</div>';
       html+='</div>';
     });
     html+='</div></div>';
@@ -2246,20 +2479,32 @@ function renderDash(){
     var fm=focHas.length?focHas.reduce(function(a,b){return a+b;},0)/focHas.length:0;
     var fmL=s2l(fm);
     html+='<div>';
-    html+='<div style="font-size:10px;font-weight:700;color:var(--t2);margin-bottom:6px;text-align:center">ภาพรวม FOCUS</div>';
+    html+='<div style="font-size:clamp(11px,2.6vw,13px);font-weight:700;color:var(--t2);margin-bottom:6px;text-align:center">ภาพรวม FOCUS</div>';
     html+='<div style="position:relative;height:200px;border-radius:var(--r);overflow:hidden">';
-    var zones=[['E','rgba(29,158,117,.15)'],['G','rgba(24,95,165,.12)'],['S','rgba(91,111,149,.1)'],['L','rgba(186,117,23,.1)'],['I','rgba(163,45,45,.1)']];
+    /* Zone chart -- background bands sized to match actual score ranges (not equal 20% each):
+       E 4.5-5.0 (10%), G 3.25-4.5 (25%), S 1.8-3.25 (29%), L 0.5-1.8 (26%), I 0-0.5 (10%)
+       Stacked top-to-bottom since the chart's y-axis has 5 at top, 0 at bottom. */
+    var zones=[
+      ['E','rgba(29,158,117,.16)',10],
+      ['G','rgba(24,95,165,.14)',25],
+      ['S','rgba(91,111,149,.12)',29],
+      ['L','rgba(186,117,23,.14)',26],
+      ['I','rgba(163,45,45,.16)',10]
+    ];
+    var zTop=0;
     zones.forEach(function(z,zi){
-      html+='<div style="position:absolute;top:'+(zi*20)+'%;left:0;right:0;height:20%;background:'+z[1]+';display:flex;align-items:center;justify-content:flex-end;padding-right:8px">';
-      html+='<span style="font-size:10px;font-weight:700;color:rgba(0,0,0,.25)">'+z[0]+'</span></div>';
+      var zh=z[2];
+      html+='<div style="position:absolute;top:'+zTop+'%;left:0;right:0;height:'+zh+'%;background:'+z[1]+';display:flex;align-items:center;justify-content:flex-end;padding-right:12px">';
+      html+='<span style="font-size:clamp(12px,3.2vw,18px);font-weight:800;color:rgba(0,0,0,.34)">'+z[0]+'</span></div>';
+      zTop+=zh;
     });
     if(fm){
-      html+='<div style="position:absolute;left:50%;top:'+yPct(fm)+'%;transform:translate(-50%,-50%);width:44px;height:44px;border-radius:50%;background:'+RCOL[fmL.l]+';border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--fh)">';
-      html+='<div style="font-size:14px;font-weight:700;color:#fff">'+fmL.l+'</div>';
-      html+='<div style="font-size:8px;color:rgba(255,255,255,.8)">'+fm.toFixed(2)+'</div>';
+      html+='<div style="position:absolute;left:50%;top:'+yPct(fm)+'%;transform:translate(-50%,-50%);width:clamp(40px,11vw,56px);height:clamp(40px,11vw,56px);border-radius:50%;background:'+RCOL[fmL.l]+';border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--fh)">';
+      html+='<div style="font-size:clamp(13px,3.4vw,19px);font-weight:800;color:#fff;line-height:1.1">'+fmL.l+'</div>';
+      html+='<div style="font-size:clamp(8px,2vw,11px);font-weight:700;color:rgba(255,255,255,.9)">'+fm.toFixed(2)+'</div>';
       html+='</div>';
     } else {
-      html+='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:12px">\u2013</div>';
+      html+='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:clamp(10px,2.6vw,13px)">\u2013</div>';
     }
     html+='</div>';
     html+='</div>';
@@ -2270,7 +2515,7 @@ function renderDash(){
   /* --- 4. FEEDBACK WALL --- */
   html+='<div class="card">';
   html+='<div class="chd"><div class="db-sh-ico" style="background:rgba(83,74,183,.1)">&#128172;</div>';
-  html+='<div class="db-sh-ttl">Feedback Wall</div>';
+  html+='<div class="db-sh-ttl">ข้อเสนอแนะจากการประเมิน</div>';
   html+='<span style="font-size:10px;color:var(--t2)">\u0e44\u0e21\u0e48\u0e40\u0e1b\u0e34\u0e14\u0e40\u0e1c\u0e22\u0e15\u0e31\u0e27\u0e15\u0e19</span></div>';
   html+='<div style="padding:10px 14px">';
   var feedbacks=collectFeedbacks();
@@ -2296,7 +2541,7 @@ function renderDash(){
       html+='<div style="text-align:center"><button class="btn boteal" onclick="openFeedbackAll()">&#128172; ดูทั้งหมด ('+feedbacks.length+' ข้อความ)</button></div>';
     }
   } else {
-    html+='<div style="padding:1.5rem;text-align:center;color:var(--t2);font-size:13px">&#128172; ยังไม่มี Feedback<br><span style="font-size:11px">เมื่อมีการให้เหตุผลในการประเมิน จะแสดงที่นี่</span></div>';
+    html+='<div style="padding:1.5rem;text-align:center;color:var(--t2);font-size:13px">&#128172; ยังไม่มีข้อเสนอแนะ<br><span style="font-size:11px">เมื่อมีการให้เหตุผลในการประเมิน จะแสดงที่นี่</span></div>';
   }
   html+='</div></div>';
 
@@ -2305,7 +2550,7 @@ function renderDash(){
   if(showOverview){
     html+='<div class="card">';
     html+='<div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128200;</div>';
-    html+='<div class="db-sh-ttl">Score Overview \u2014 สรุปรายบุคคล</div>';
+    html+='<div class="db-sh-ttl">ภาพรวมคะแนนรายบุคคล</div>';
     if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px;margin-right:6px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
     html+='<span style="font-size:10px;color:var(--t2)">เรียงตามระดับ ส &gt; ก &gt; ป \u00B7 คะแนนมาก&gt;น้อย</span></div>';
     html+='<div style="padding:14px 16px">';
