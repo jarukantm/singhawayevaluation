@@ -2,11 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0B1E3D">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Singhaway FOCUS Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -220,7 +216,8 @@ button,input,select{font-family:var(--fb)}
 .cttl{font-family:var(--fh);font-size:13px;font-weight:700;color:var(--t0);flex:1}
 
 /* ── PERSON CARD ── */
-.pc{background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);overflow:hidden;transition:.15s}
+.pc{background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);overflow:visible;transition:.15s}
+.pc>.pch2{border-radius:var(--rl) var(--rl) 0 0}
 .pc:hover{box-shadow:var(--sd1);border-color:var(--pb2)}
 .pch2{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:background .1s}
 .pch2:hover{background:var(--s1)}
@@ -276,6 +273,11 @@ button,input,select{font-family:var(--fb)}
 .note-cell.note-view{color:var(--t1);border:1px solid var(--b0);background:var(--s1);cursor:default}
 .note-cell.note-empty{color:var(--t2);cursor:default;font-size:12px;border:none;background:transparent}
 .note-txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+/* ── INLINE DEFINITION BOX (replaces clipped hover popup) ── */
+.idef-box{display:none;margin:0 16px 8px;padding:10px 12px;background:var(--s1);
+  border-left:3px solid var(--pb);border-radius:0 var(--r) var(--r) 0;
+  animation:idefIn .15s ease}
+@keyframes idefIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 /* cat header with เหตุผล label */
 .cath{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--b0);transition:background .1s}
 .cath:hover{background:var(--s1)}
@@ -301,17 +303,14 @@ button,input,select{font-family:var(--fb)}
 .rb.sel.rS{background:var(--S);border-color:var(--S);color:#fff}
 .rb.sel.rL{background:var(--L);border-color:var(--L);color:#fff}
 .rb.sel.rI{background:var(--I);border-color:var(--I);color:#fff}
-/* popup */
-/* --- Disable hover popups on touch devices (mobile) --- */
-@media(hover:none){
-  .rbw:hover .rpop{display:none!important}
-}
-/* Rating popup only on true hover (desktop) */
+/* popup -- desktop only, triggered by real :hover */
 .rpop{display:none;position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);
   background:var(--s0);border:1px solid var(--b1);border-radius:var(--rl);
-  box-shadow:var(--sd2);padding:12px 14px;width:220px;z-index:9999;
+  box-shadow:var(--sd2);padding:12px 14px;width:240px;z-index:9999;
   pointer-events:none;text-align:left;white-space:normal}
-.rbw:hover .rpop{display:block}
+@media(hover:hover) and (pointer:fine){
+  .rbw:hover .rpop{display:block}
+}
 .rpop::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);
   border:7px solid transparent;border-top-color:var(--b1)}
 .rpop::before{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%) translateY(-1px);
@@ -354,8 +353,7 @@ button,input,select{font-family:var(--fb)}
 .gmc{display:flex;flex-wrap:wrap;gap:5px}
 .gchip{display:flex;align-items:center;gap:5px;padding:5px 9px 5px 4px;border-radius:16px;
   border:1px solid var(--b1);background:var(--s1);font-size:11px;color:var(--t0);
-  cursor:pointer;font-weight:500;transition:.12s;
-  user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+  cursor:grab;font-weight:500;transition:.12s;user-select:none}
 .gchip:hover{border-color:var(--pb)}
 .gchip.gsel{border-color:var(--pb);background:var(--s2);outline:2px solid var(--pb);outline-offset:1px}
 .gchip.gdg{opacity:.3;transform:scale(.95)}
@@ -392,6 +390,18 @@ button,input,select{font-family:var(--fb)}
 .gpl:hover{opacity:.7;text-decoration:line-through}
 .gplav{width:12px;height:12px;border-radius:50%;overflow:hidden;flex-shrink:0}
 .gplav img{width:100%;height:100%;object-fit:cover}
+/* chip done state -- person fully scored in current category */
+.gchip.gdone{opacity:.45;background:var(--s2)}
+.gchip.gdone .gcav{filter:grayscale(1)}
+/* per-row evaluated-so-far indicator */
+.ggcc{flex-wrap:wrap;row-gap:4px}
+.ggcc-done{display:flex;align-items:center;gap:3px;margin-left:auto;flex-shrink:0}
+.ggcc-done-av{width:16px;height:16px;border-radius:50%;overflow:hidden;border:1.5px solid var(--s0);
+  margin-left:-5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:6px;font-weight:700;color:#fff}
+.ggcc-done-av:first-child{margin-left:0}
+.ggcc-done-av img{width:100%;height:100%;object-fit:cover}
+.ggcc-done-cnt{font-size:9px;font-weight:700;color:var(--t2);margin-left:4px;white-space:nowrap}
 
 /* ── DZ CALLOUT ── */
 .dzc{position:fixed;z-index:9998;background:var(--s0);border:1px solid var(--b1);
@@ -549,9 +559,7 @@ button,input,select{font-family:var(--fb)}
 .rsn-ind:hover{opacity:1}
 .rsn-ind.has-note{opacity:1;color:var(--pb)}
 
-/* Grid view sticky chip bar needs scroll container */
-#v-grid{overflow-y:auto}
-#v-grid #gchipBar{position:sticky;top:0;z-index:30}
+/* ══ DASHBOARD v2 ══ */
 .db-filter{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px 14px;background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0)}
 .db-filter-lbl{font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap}
 .db-ftab{padding:5px 14px;font-size:11px;font-weight:600;border:1.5px solid var(--b1);border-radius:20px;background:transparent;color:var(--t1);cursor:pointer;transition:.12s;white-space:nowrap}
@@ -603,176 +611,33 @@ button,input,select{font-family:var(--fb)}
 .psub{font-size:12px;color:var(--t1);margin-top:3px}
 .pacts{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
 
-/* ════════════════════════════════
-   MOBILE — smartphone optimized
-════════════════════════════════ */
+/* ── MOBILE ── */
 .hbg-btn{display:none;position:fixed;top:10px;left:10px;z-index:300;
   background:var(--s0);border:1px solid var(--b0);border-radius:var(--r);
   padding:7px;cursor:pointer;box-shadow:var(--sd0)}
 .hbg-btn span{display:block;width:16px;height:2px;background:var(--t0);margin:3px 0;border-radius:1px}
 .mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:40}
 
-/* ── Bottom Navigation Bar — Modern Floating Style ── */
-.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:60;
-  padding:8px 12px max(12px,env(safe-area-inset-bottom));
-  background:transparent;pointer-events:none}
-.mob-nav-inner{display:flex;justify-content:space-around;align-items:center;
-  background:rgba(8,20,50,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,.1);border-radius:24px;
-  padding:6px 8px;pointer-events:all;
-  box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.05)}
-.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:7px 14px;border:none;background:transparent;cursor:pointer;
-  color:rgba(255,255,255,.4);font-size:9px;font-weight:600;
-  border-radius:18px;transition:all .2s cubic-bezier(.4,0,.2,1);
-  -webkit-tap-highlight-color:transparent;min-width:60px;position:relative}
-.mob-nav-btn .mn-ico{font-size:22px;line-height:1;transition:transform .2s}
-.mob-nav-btn.on{color:#fff;background:rgba(13,110,231,.25)}
-.mob-nav-btn.on .mn-ico{transform:scale(1.1)}
-/* active indicator line */
-.mob-nav-btn::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%) scaleX(0);
-  width:16px;height:2px;background:var(--pb2);border-radius:2px;transition:transform .2s}
-.mob-nav-btn.on::after{transform:translateX(-50%) scaleX(1)}
-
-/* ── Tablet ── */
-@media(max-width:900px){
-  .focus-chart-wrap{grid-template-columns:1fr!important}
-  .d2{grid-template-columns:1fr}
-}
-
-/* ── Mobile 768 ── */
 @media(max-width:768px){
-  /* Sidebar becomes drawer */
-  .sb{position:fixed;left:0;top:0;bottom:0;z-index:50;
-    transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
-    width:260px!important}
-  .sb.open{transform:translateX(0);box-shadow:8px 0 32px rgba(0,0,0,.4)}
+  .sb{position:fixed;left:0;top:0;bottom:0;z-index:50;transform:translateX(-100%);transition:transform .25s}
+  .sb.open{transform:translateX(0)}
   .mob-overlay.open{display:block}
-
-  /* Hide hamburger, show bottom nav */
-  .hbg-btn{display:none!important}
-  .mob-nav{display:block}
-
-  /* Main fills full width, add bottom padding for floating nav bar */
+  .hbg-btn{display:block}
   .main{width:100%}
-  #sa.on{padding-bottom:90px}
-
-  /* Topbar: compact, allow wrap */
-  .topbar{padding:.65rem 1rem;gap:5px;flex-wrap:wrap}
-  .tb-title{font-size:14px}
-  .tb-sub{font-size:10px}
-  .tb-right{gap:5px}
-  .tb-right .pch{display:none}/* hide progress chip, show in view */
-
-  /* View padding */
-  .view.on{padding:.75rem}
-  .vi{gap:.75rem;padding-bottom:1rem}
-
-  /* Login card */
-  .lc{margin:1rem;padding:1.75rem 1.25rem}
-  .lt{font-size:20px}
-
-  /* Scrollable crit table */
-  .cr{padding:9px 12px;gap:7px;min-height:auto}
-  .clb{font-size:11px}
-
-  /* Rating buttons - bigger touch targets */
-  .rb{width:38px;height:34px;font-size:11px}
-  .ra{gap:3px}
-
-  /* Note col on mobile: stack below ratings */
-  .note-col-hd{display:none}
-  .cr{flex-wrap:wrap}
-  .note-cell{min-width:unset;max-width:unset;width:100%;margin-top:4px}
-
-  /* Person card header */
-  .pch2{padding:10px 12px;gap:9px}
-  .rts{padding:5px 12px;gap:4px}
-
-  /* Category chips */
-  .cbr{padding:8px 10px;gap:5px}
-  .chip{font-size:10px}
-
-  /* Grid */
-  .ggrid{grid-template-columns:1fr repeat(5,52px)}
-  .gghc{padding:7px 10px;font-size:10px}
-  .gghr{padding:6px 4px}
-  .gghl{font-size:13px}
-  .gghln{font-size:7px}
-  .gcav{width:16px;height:16px;font-size:7px}
-
-  /* Dashboard filters wrap */
-  .db-filter{gap:5px;padding:8px 10px}
-  .db-ftab{padding:4px 10px;font-size:10px}
-
-  /* Overlay modals */
-  .mbox{margin:.5rem;padding:1.25rem;max-height:85vh}
-  .mbox.wm{padding:1.25rem}
-  .rsn-modal{max-width:100%!important}
-
-  /* Feedback wall: 1 col */
-  .fw-wrap{grid-template-columns:1fr!important}
-
-  /* Score summary rank row */
-  .sc-rank-row{gap:6px;padding:8px 10px}
-  .sc-rank-card{min-width:90px;padding:10px 8px 8px}
-  .sc-rank-score{font-size:15px}
-
-  /* Action buttons compact */
-  .btn{padding:6px 12px;font-size:11px}
-  .save-gate-tip{font-size:10px;padding:3px 7px}
-
-  /* Legend wrap */
-  .lgd{padding:7px 10px;gap:4px}
-  .lgi{font-size:10px}
+  .d2{grid-template-columns:1fr}
+  .fg{grid-template-columns:repeat(3,1fr)}
+  .ggrid{grid-template-columns:1fr repeat(5,65px)}
 }
-
-/* ── Small phone 420 ── */
 @media(max-width:420px){
   .fg{grid-template-columns:repeat(2,1fr)}
-  .rb{width:34px;height:32px;font-size:10px}
+  .rb{width:30px;height:27px;font-size:9px}
   .ra{gap:2px}
-  .tb-title{font-size:13px}
-  .topbar{padding:.5rem .75rem}
-  .view.on{padding:.625rem}
-  .pn{font-size:12px}
-  .cr{padding:8px 10px}
-  .note-cell{font-size:10px}
-  .mob-nav-btn{padding:5px 8px;min-width:54px;font-size:7px}
-  .mob-nav-btn .mn-ico{font-size:18px}
-  .db-ftab{padding:3px 8px;font-size:9px}
 }
 </style>
 </head>
 <body>
 
-<!-- MOBILE BOTTOM NAV -->
-<nav class="mob-nav" id="mobNav">
-  <div class="mob-nav-inner">
-    <button class="mob-nav-btn on" id="mn-self" onclick="showTab('self')">
-      <span class="mn-ico">&#128302;</span>
-      <span>ตนเอง</span>
-      <span class="mn-dot"></span>
-    </button>
-    <button class="mob-nav-btn" id="mn-person" onclick="showTab('person')">
-      <span class="mn-ico">&#128100;</span>
-      <span>รายบุคคล</span>
-      <span class="mn-dot"></span>
-    </button>
-    <button class="mob-nav-btn" id="mn-grid" onclick="showTab('grid')">
-      <span class="mn-ico">&#128203;</span>
-      <span>รายหัวข้อ</span>
-      <span class="mn-dot"></span>
-    </button>
-    <button class="mob-nav-btn" id="mn-dash" onclick="showTab('dash')">
-      <span class="mn-ico">&#128202;</span>
-      <span>Dashboard</span>
-      <span class="mn-dot"></span>
-    </button>
-  </div>
-</nav>
-
-<!-- MOBILE HAMBURGER (tablet fallback) -->
+<!-- MOBILE HAMBURGER -->
 <button class="hbg-btn" id="hbgBtn"><span></span><span></span><span></span></button>
 <div class="mob-overlay" id="mobOvl"></div>
 
@@ -1065,11 +930,8 @@ button,input,select{font-family:var(--fb)}
             <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> Low</div>
             <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> Improve</div>
           </div>
-          <div id="gridWrap">
-            <!-- Chip bar for grid view (person list, not sticky - gmb card below is sticky) -->
-            <div class="cbr" style="display:none"><div class="chw" id="gchips"></div><button class="ach" id="gadd" style="display:none">+ เพิ่มบุคคล</button></div>
-            <div id="gcontent"></div>
-          </div>
+          <div class="cbr"><span class="cbl">ผู้รับการประเมิน :</span><div class="chw" id="gchips"></div><button class="ach" id="gadd">+ เพิ่มบุคคล</button></div>
+          <div id="gcontent"></div>
         </div>
       </div>
       <!-- DASH -->
@@ -1312,8 +1174,6 @@ function showTab(t){
   ['self','person','grid','dash'].forEach(function(x){
     h('t-'+x).classList.toggle('on',x===t);
     h('v-'+x).classList.toggle('on',x===t);
-    /* sync bottom nav */
-    var mb=h('mn-'+x);if(mb)mb.classList.toggle('on',x===t);
   });
   /* update topbar */
   if(h('tbtitle'))h('tbtitle').textContent=TAB_TITLES[t]||t;
@@ -1339,27 +1199,37 @@ function setRating(pid,cid,r,isSelf){
   if(isSelf){selfSc[cid]=newR;}
   else{var k=sk(pid,cid);othSc[k]=newR;}
   autoSave();
-  /* No auto-open reason popup — user taps "+ เหตุผล" manually */
+  /* No auto-open reason popup. Inline definition is shown via toggleDef().
+     User taps "+ เหตุผล" manually to add a reason. */
   renderTab();
 }
-/* Toggle inline FOCUS definition under a crit row (mobile-friendly) */
-function toggleDef(pid,cid,r){
-  var elId='idef_'+pid+'_'+cid;
+/* Toggle the inline FOCUS definition box under a crit row.
+ * Only used on touch/non-hover devices (mobile) -- desktop relies on the
+ * CSS :hover popup (.rpop) attached to each rating button instead.
+ * target = 'self' for self-assessment, or pid for person evaluation. */
+var _openDefKey=null;
+var _isHoverDevice=window.matchMedia&&window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+function toggleDef(target,cid,r){
+  if(_isHoverDevice)return; /* desktop: definition already shown via hover popup */
+  var key=target+'_'+cid;
+  var elId='idef_'+key;
   var el=document.getElementById(elId);
   if(!el)return;
-  var showing=el.style.display!=='none';
-  /* close all others first */
-  document.querySelectorAll('.idef-box').forEach(function(x){x.style.display='none';});
-  if(showing){return;}
+  /* close any other open def box first */
+  document.querySelectorAll('.idef-box').forEach(function(x){if(x.id!==elId)x.style.display='none';});
+  if(_openDefKey===key){
+    /* same box -> toggle closed */
+    el.style.display='none';_openDefKey=null;return;
+  }
   var crit=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){crit=CRITERIA[i];break;}}
   var fd=crit?FDEF[crit.foc]:null;
-  if(!fd||!r)return;
+  if(!fd||!r){el.style.display='none';return;}
   el.innerHTML='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px">'
     +'<span style="padding:2px 8px;border-radius:5px;background:'+fd.bg+';color:'+fd.cl+';font-size:10px;font-weight:700">'+crit.foc+' \u00B7 '+fd.nm+'</span>'
     +'<span style="padding:2px 10px;border-radius:5px;background:'+RCOL[r]+';color:#fff;font-size:11px;font-weight:700">'+r+' \u2013 '+RNAME[r]+'</span>'
     +'</div>'
     +'<div style="font-size:12px;color:var(--t0);line-height:1.65">'+fd.df[r]+'</div>';
-  el.style.display='block';
+  el.style.display='block';_openDefKey=key;
 }
 function ftag(f){
   var fd=FDEF[f];if(!fd)return '<span style="font-size:9px">'+f+'</span>';
@@ -1370,21 +1240,23 @@ function rbHTML(pid,cid,isSelf){
   var fd=fl?FDEF[fl]:null;
   var locked=isSelf?(sSub||sSaved):(oSub||oSaved);
   var sel=(isSelf?gSelf(cid):gS(pid,cid));
-  var hasNote=(!isSelf)&&(!!rsnNotes[pid+'|'+cid]);
+  var defTarget=isSelf?'self':pid;
 
+  /* rating buttons:
+     - desktop (hover-capable): hovering a button shows the FOCUS definition in a popup above it
+     - mobile/touch: tapping a button sets the rating AND expands an inline definition box below the row
+     Both behaviors are wired on every button; CSS @media(hover:hover) decides whether the popup appears. */
   var html='<div class="ra">';
   RATINGS.forEach(function(r){
     var isSel=sel===r;
-    /* desktop hover popup */
-    var pop='<div class="rph"><div class="rpb" style="background:'+RCOL[r]+'">'+r+'</div><div class="rpn">'+r+' \u2013 '+RNAME[r]+'</div></div>';
-    if(fd){pop+='<div class="rps"></div><div class="rpf"><span class="rpft" style="background:'+fd.bg+';color:'+fd.cl+'">'+fl+'</span><span style="color:'+fd.cl+'">'+fd.nm+'</span></div><div class="rpd">'+fd.df[r]+'</div>';}
     var dis=(locked&&!isSel)?' disabled':'';
-    /* onclick: set rating + show inline def */
-    var defTarget=isSelf?'self':pid;
-    var oc=locked?''
+    var oc=locked
+      ?'toggleDef(\''+defTarget+'\',\''+cid+'\',\''+r+'\')' /* locked: still allow viewing def via tap */
       :'setRating(\''+pid+'\',\''+cid+'\',\''+r+'\','+isSelf+');toggleDef(\''+defTarget+'\',\''+cid+'\',\''+r+'\')';
-    html+='<div class="rbw"><button class="rb r'+r+(isSel?' sel':'')+'"'+dis+' onclick="'+oc+'">'+r+'</button>'
-      +'<div class="rpop">'+pop+'</div></div>';
+    /* desktop hover popup content */
+    var pop='<div class="rph"><div class="rpb" style="background:'+RCOL[r]+'">'+r+'</div><div class="rpn">'+r+' \u2013 '+RNAME[r]+'</div></div>';
+    if(fd)pop+='<div class="rps"></div><div class="rpf"><span class="rpft" style="background:'+fd.bg+';color:'+fd.cl+'">'+fl+'</span><span style="color:'+fd.cl+'">'+fd.nm+'</span></div><div class="rpd">'+fd.df[r]+'</div>';
+    html+='<div class="rbw"><button class="rb r'+r+(isSel?' sel':'')+'"'+dis+' onclick="'+oc+'">'+r+'</button><div class="rpop">'+pop+'</div></div>';
   });
   html+='</div>';
   return html;
@@ -1766,13 +1638,11 @@ function renderSelf(){
     html+='</div>';
     html+='<div class="crs'+(co?' op':'')+'">';
     cc.forEach(function(c){
-      var selfDefKey='idef_self_'+c.id;
       html+='<div class="cr">';
       html+='<div class="cl">'+ftag(c.foc)+'<div class="ct"><div class="clb">'+c.lb+'</div></div></div>';
       html+=rbHTML('self',c.id,true);
       html+='</div>';
-      /* inline def box — shown when rating button tapped */
-      html+='<div id="'+selfDefKey+'" class="idef-box" style="display:none;margin:0 16px 8px;padding:10px 12px;background:var(--s1);border-left:3px solid var(--pb);border-radius:0 var(--r) var(--r) 0"></div>';
+      html+='<div id="idef_self_'+c.id+'" class="idef-box"></div>';
     });
     html+='</div></div>';
   });
@@ -1833,10 +1703,8 @@ function renderPerson(){
       html+='<div class="note-col-hd">เหตุผล / ข้อสังเกต</div>';
       html+='</div>';
       cc.forEach(function(c){
-        var defKey='idef_'+p.empId+'_'+c.id;
         html+='<div class="cr"><div class="cl">'+ftag(c.foc)+'<div class="ct"><div class="clb">'+c.lb+'</div></div></div>'+rbHTML(p.empId,c.id,false)+noteCell(p.empId,c.id,oSub||oSaved)+'</div>';
-        /* inline definition box - hidden by default, shown on tap */
-        html+='<div id="'+defKey+'" class="idef-box" style="display:none;margin:0 16px 8px;padding:10px 12px;background:var(--s1);border-left:3px solid var(--pb);border-radius:0 var(--r) var(--r) 0"></div>';
+        html+='<div id="idef_'+p.empId+'_'+c.id+'" class="idef-box"></div>';
       });
       html+='</div></div>';
     });
@@ -1958,52 +1826,33 @@ function renderGrid(){
   function placed(cid,r){return persons.filter(function(p){return gS(p.empId,cid)===r;});}
   var sumHtml2=oSaved?scoreSummaryCard():'';
   var html=sumHtml2+'<div class="gm">';
-  /* ── Sticky selector card ── */
-  html+='<div class="gmb" style="position:sticky;top:0;z-index:20;background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd1);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)">';
-  html+='<div class="gmt">';
-  /* คำอธิบาย 3 ข้อ */
-  html+='<div style="font-size:10px;color:var(--t2);line-height:1.8;margin-bottom:8px">';
-  html+='<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px">'
-    +'<span style="background:var(--blt);color:var(--pb);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700">1</span>'
-    +'\u0e25\u0e32\u0e01\u0e23\u0e32\u0e22\u0e0a\u0e37\u0e48\u0e2d\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e08\u0e31\u0e14\u0e40\u0e23\u0e35\u0e22\u0e07\u0e25\u0e33\u0e14\u0e31\u0e1a</span>';
-  html+='<span style="display:inline-flex;align-items:center;gap:4px;margin-right:10px">'
-    +'<span style="background:var(--blt);color:var(--pb);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700">2</span>'
-    +'\u0e01\u0e14\u0e04\u0e49\u0e32\u0e07 5 \u0e27\u0e34 = \u0e42\u0e2b\u0e21\u0e14\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e2b\u0e25\u0e32\u0e22\u0e04\u0e19</span>';
-  html+='<span style="display:inline-flex;align-items:center;gap:4px">'
-    +'<span style="background:var(--blt);color:var(--pb);border-radius:4px;padding:1px 5px;font-size:9px;font-weight:700">3</span>'
-    +'\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e23\u0e32\u0e22\u0e0a\u0e37\u0e48\u0e2d \u2192 \u0e40\u0e25\u0e37\u0e2d\u0e01\u0e0a\u0e48\u0e2d\u0e07\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19</span>';
-  html+='</div>';
-  /* Dropdown */
+  /* bank */
+  html+='<div class="gmb"><div class="gmt">';
+  html+='<div class="gml"><b>ลากชื่อ \u2192 ตาราง</b> \u00B7 กดค้าง 0.5 วิ = เลือกหลายคน \u00B7 ลากสลับลำดับ</div>';
   html+='<select class="gcatsel" id="gcatsel">';
   CATS.forEach(function(c){html+='<option value="'+c+'"'+(c===gmCat?' selected':'')+'>'+CAT_META[c].lb+'</option>';});
-  html+='</select></div>';
-  /* chips */
-  html+='<div class="gmc" id="gmchips2">';
+  html+='</select></div><div class="gmc" id="gmchips2">';
   persons.forEach(function(p,i){
     var allDone=cc.every(function(c){return gS(p.empId,c.id);});
     var isSel=!!gmSel[p.empId];
     var ph=getPhoto(p.empId);
     var avH=ph?'<div class="gcav"><img src="'+ph+'" alt="'+p.name+'"></div>':'<div class="gcav" style="background:'+p.color+'">'+ini(p.name)+'</div>';
     var drag=!locked?'draggable="true"':'';
-    html+='<div class="gchip'+(isSel?' gsel':'')+'" '+drag+' data-idx="'+i+'" data-pid="'+p.empId+'" id="gc_'+p.empId+'" onclick="gmTapChip(\''+p.empId+'\')">';
+    html+='<div class="gchip'+(isSel?' gsel':'')+(allDone?' gdone':'')+'" '+drag+' data-idx="'+i+'" data-pid="'+p.empId+'" id="gc_'+p.empId+'">';
     html+=avH+'<span>'+p.name.split(' ')[0]+'<span style="font-size:9px;color:var(--t2);margin-left:2px">('+p.nick+')</span></span>';
     if(allDone)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2713</span>';
     if(isSel)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2714</span>';
     html+='</div>';
   });
-  html+='</div>';/* end gmchips2 */
-  /* Bottom row of sticky card: add button + selection status */
-  var selNow=Object.keys(gmSel).length;
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px 4px;flex-wrap:wrap;gap:6px">';
-  html+=(!locked)?'<button class="ach" onclick="openAdd()">+ \u0e40\u0e1e\u0e34\u0e48\u0e21\u0e1a\u0e38\u0e04\u0e04\u0e25</button>':'<span></span>';
-  if(selNow>0){
-    html+='<div style="display:flex;align-items:center;gap:6px">'
-      +'<span style="background:var(--pb);color:#fff;padding:2px 9px;border-radius:10px;font-size:10px;font-weight:700">'+selNow+' \u0e04\u0e19 \u2193 \u0e01\u0e14\u0e0a\u0e48\u0e2d\u0e07\u0e04\u0e30\u0e41\u0e19\u0e19</span>'
-      +'<button onclick="gmSel={};gmSM=false;renderGrid()" style="background:rgba(163,45,45,.1);border:1px solid rgba(163,45,45,.25);color:var(--I);border-radius:6px;padding:2px 8px;font-size:10px;cursor:pointer">\u00d7 \u0e22\u0e01\u0e40\u0e25\u0e34\u0e01</button>'
-      +'</div>';
+  html+='</div></div>';
+  /* sel bar */
+  if(gmSM){
+    html+='<div class="gsbar"><span class="gsi">โหมดเลือกหลายคน: <b>'+Object.keys(gmSel).length+' คน</b></span>';
+    html+='<button class="smb smo" onclick="gmSelAll()">เลือกทั้งหมด</button>';
+    html+='<button class="smb smo" onclick="gmClearSel()">ล้าง</button>';
+    html+='<button class="smb smd" onclick="gmExitSel()">ออก</button>';
+    html+='</div>';
   }
-  html+='</div>';
-  html+='</div>';/* end gmb */
   /* grid */
   html+='<div class="ggrid">';
   html+='<div class="gghc" style="background:'+m.bg+';color:'+m.cl+'">'+m.lb+'</div>';
@@ -2015,12 +1864,22 @@ function renderGrid(){
   cc.forEach(function(c){
     var fd=FDEF[c.foc];
     var ftStyle=fd?'background:'+fd.bg+';color:'+fd.cl:'background:transparent;color:var(--t2)';
-    html+='<div class="ggcc"><span style="'+ftStyle+';width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+c.foc+'</span>'+c.lb+'</div>';
+    /* who has been evaluated already on this criterion (any rating) */
+    var doneList=persons.filter(function(p){return !!gS(p.empId,c.id);});
+    html+='<div class="ggcc"><span style="'+ftStyle+';width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+c.foc+'</span>'+c.lb;
+    /* evaluated-so-far indicator */
+    html+='<div class="ggcc-done">';
+    doneList.slice(0,5).forEach(function(p){
+      var ph3=getPhoto(p.empId);
+      var av3=ph3?'<img src="'+ph3+'" alt="'+p.name+'">':'<span style="background:'+p.color+';width:100%;height:100%;display:flex;align-items:center;justify-content:center">'+ini(p.name)+'</span>';
+      html+='<div class="ggcc-done-av" title="'+p.name+' \u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e41\u0e25\u0e49\u0e27">'+av3+'</div>';
+    });
+    html+='<span class="ggcc-done-cnt">'+doneList.length+'/'+persons.length+' \u0e04\u0e19</span>';
+    html+='</div>';
+    html+='</div>';
     RATINGS.forEach(function(r){
       var pl=placed(c.id,r);
-      /* mobile: highlight drop zone when chip is selected */
-      var dzHighlight=gmDP&&gmDP!=='__multi__'?'border:2px dashed '+RCOL[r]+';background:'+RCOL[r]+'14':'';
-      html+='<div class="gdrop" data-cid="'+c.id+'" data-r="'+r+'" style="'+dzHighlight+';min-height:48px;cursor:'+(gmDP?'pointer':'default')+'">';
+      html+='<div class="gdrop" data-cid="'+c.id+'" data-r="'+r+'">';
       pl.forEach(function(p){
         var ph2=getPhoto(p.empId);
         var avPl=ph2?'<div class="gplav"><img src="'+ph2+'" alt="'+p.name+'"></div>':'<span style="font-size:8px">'+ini(p.name)+'</span>';
@@ -2034,81 +1893,81 @@ function renderGrid(){
   /* bind events after render */
   var catSelEl=document.getElementById('gcatsel');
   if(catSelEl)catSelEl.addEventListener('change',function(){gmCat=this.value;renderGrid();});
-  /* ── GRID INTERACTION ── */
-  /* Chips use onclick="gmTapChip(id)" — already in HTML */
-
-  /* Drop zones: unified handler works for both touch and mouse */
+  /* gchip events */
+  persons.forEach(function(p,i){
+    var el=document.getElementById('gc_'+p.empId);if(!el||locked)return;
+    el.addEventListener('mousedown',function(e){if(gmSM){toggleSel(p.empId);return;}gmLPT=setTimeout(function(){clearTimeout(gmLPT);gmLPT=null;gmEnterSel(p.empId);},500);});
+    el.addEventListener('mouseup',function(){if(gmLPT){clearTimeout(gmLPT);gmLPT=null;}});
+    el.addEventListener('mousemove',function(){if(gmLPT&&!gmSM){clearTimeout(gmLPT);gmLPT=null;}});
+    el.addEventListener('dragstart',function(e){
+      if(gmSM){if(!gmSel[p.empId])gmSel[p.empId]=true;gmDP='__multi__';gmRI=null;}
+      else{gmDP=p.empId;gmRI=i;}
+      e.dataTransfer.effectAllowed='move';
+      setTimeout(function(){el.classList.add('gdg');},0);
+    });
+    el.addEventListener('dragend',function(){
+      el.classList.remove('gdg');
+      document.querySelectorAll('.gchip').forEach(function(x){x.classList.remove('gdt');});
+      hideDz();
+    });
+    el.addEventListener('dragover',function(e){
+      e.preventDefault();
+      if(gmRI===null||gmRI===i)return;
+      document.querySelectorAll('.gchip').forEach(function(x){x.classList.remove('gdt');});
+      el.classList.add('gdt');
+    });
+    el.addEventListener('dragleave',function(){el.classList.remove('gdt');});
+    el.addEventListener('drop',function(e){
+      e.stopPropagation();hideDz();
+      document.querySelectorAll('.gchip').forEach(function(x){x.classList.remove('gdg','gdt');});
+      if(gmSM||gmRI===null||gmRI===i){gmRI=null;return;}
+      var a=persons.slice();var mv=a.splice(gmRI,1)[0];a.splice(i,0,mv);persons=a;gmRI=null;gmDP=null;renderTab();
+    });
+  });
+  /* drop zones */
   document.querySelectorAll('.gdrop').forEach(function(dz){
     var cid=dz.dataset.cid;var r=dz.dataset.r;
-
-    /* ─ TAP / CLICK to assign (mobile + desktop) ─ */
-    dz.addEventListener('click',function(e){
-      var selPids=Object.keys(gmSel);
-      if(!selPids.length)return; /* nothing selected */
-      e.stopPropagation();
-      /* visual flash */
-      var origBg=dz.style.background;
-      dz.style.background=RCOL[r]+'35';
-      setTimeout(function(){dz.style.background=origBg;},350);
-      /* save scores */
-      selPids.forEach(function(pid){othSc[sk(pid,cid)]=r;});
-      autoSave();
-      var pids=selPids.slice();
-      gmSel={};gmSM=false;gmDP=null;
-      if(pids.length===1)openReason(pids[0],cid,r,function(){renderTab();});
-      else openBatchReason(pids,cid,r,function(){renderTab();});
-    });
-
-    /* ─ DRAG OVER / DROP (desktop) ─ */
     dz.addEventListener('dragover',function(e){
       if(!gmDP)return;e.preventDefault();
       dz.style.background=RCOL[r]+'18';
+      var crit=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){crit=CRITERIA[i];break;}}
+      var fd=crit?FDEF[crit.foc]:null;
+      if(!fd){h('dzc').classList.remove('on');return;}
+      h('dzc').innerHTML='<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div style="width:24px;height:24px;border-radius:6px;background:'+RCOL[r]+';display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:12px;font-weight:700;color:#fff">'+r+'</div><div style="font-size:12px;font-weight:700;color:var(--t0)">'+r+' \u2013 '+RNAME[r]+'</div></div><div style="height:1px;background:var(--b0);margin-bottom:6px"></div><div style="font-size:9px;font-weight:700;color:'+fd.cl+';margin-bottom:4px">'+crit.foc+' \u00B7 '+fd.nm+'</div><div style="font-size:11px;color:var(--t1);line-height:1.5">'+fd.df[r]+'</div>';
+      var l=e.clientX+14,t=e.clientY-10;
+      if(l+235>window.innerWidth)l=e.clientX-240;if(t+155>window.innerHeight)t=window.innerHeight-160;
+      h('dzc').style.left=l+'px';h('dzc').style.top=t+'px';h('dzc').classList.add('on');
     });
-    dz.addEventListener('dragleave',function(){dz.style.background='';});
+    dz.addEventListener('dragleave',function(){dz.style.background='';hideDz();});
     dz.addEventListener('drop',function(e){
       e.preventDefault();dz.style.background='';hideDz();
       document.querySelectorAll('.gchip').forEach(function(x){x.classList.remove('gdg');});
       if(!gmDP)return;
-      var dpPids=gmDP==='__multi__'?Object.keys(gmSel):[gmDP];
-      dpPids.forEach(function(pid){othSc[sk(pid,cid)]=r;});
-      autoSave();
-      var pids=dpPids.slice();gmDP=null;gmSM=false;gmSel={};
-      if(pids.length===1)openReason(pids[0],cid,r,function(){renderTab();});
-      else openBatchReason(pids,cid,r,function(){renderTab();});
+      if(gmDP==='__multi__'){
+        var pids=Object.keys(gmSel);
+        /* Score all selected persons */
+        pids.forEach(function(pid){othSc[sk(pid,cid)]=r;});
+        autoSave();gmDP=null;gmSM=false;gmSel={};
+        /* Open SINGLE batch popup for ALL selected persons at once */
+        openBatchReason(pids,cid,r,function(){renderTab();});
+      }else{
+        var pid=gmDP;gmDP=null;gmRI=null;
+        othSc[sk(pid,cid)]=r;autoSave();
+        /* Single person -> single popup */
+        openReason(pid,cid,r,function(){renderTab();});
+      }
     });
   });
-
-  /* Desktop chip drag events */
-  persons.forEach(function(p,i){
-    var el=document.getElementById('gc_'+p.empId);if(!el||locked)return;
-    el.addEventListener('mousedown',function(){
-      gmLPT=setTimeout(function(){clearTimeout(gmLPT);gmLPT=null;gmEnterSel(p.empId);},5000);
-    });
-    el.addEventListener('mouseup',function(){if(gmLPT){clearTimeout(gmLPT);gmLPT=null;}});
-    el.addEventListener('mousemove',function(){if(gmLPT){clearTimeout(gmLPT);gmLPT=null;}});
-    el.addEventListener('dragstart',function(e){
-      gmSel[p.empId]=true;gmSM=true;gmDP='__multi__';gmRI=i;
-      e.dataTransfer.effectAllowed='move';
-      setTimeout(function(){el.classList.add('gdg');},0);
-    });
-    el.addEventListener('dragend',function(){el.classList.remove('gdg');hideDz();});
-  });
-
-  /* Placed chips — tap to remove */
+  /* placed chips - remove on click */
   document.querySelectorAll('.gpl').forEach(function(btn){
     if(locked)return;
-    btn.addEventListener('click',function(e){
-      e.stopPropagation();
+    btn.addEventListener('click',function(){
       var pid=this.dataset.pid;var cid=this.dataset.cid;
       delete othSc[sk(pid,cid)];renderTab();
     });
   });
-
-  /* gmb card handles selection state via renderGrid re-render */
 }
-
 function gmEnterSel(pid){gmSM=true;gmSel={};gmSel[pid]=true;renderGrid();}
-function gmTapChip(pid){if(gmSel[pid]){delete gmSel[pid];}else{gmSel[pid]=true;gmSM=true;}if(!Object.keys(gmSel).length){gmSM=false;gmDP=null;}renderGrid();}
 function gmExitSel(){gmSM=false;gmSel={};renderGrid();}
 function gmSelAll(){persons.forEach(function(p){gmSel[p.empId]=true;});renderGrid();}
 function gmClearSel(){gmSel={};renderGrid();}
@@ -2120,62 +1979,72 @@ function hideDz(){h('dzc').classList.remove('on');}
    DASHBOARD v2 - 5 SECTIONS
 ------------------------------------ */
 var dbFilter='overall'; /* overall | self | other | p | k | s */
-
-/* ============================================================
-   DATA MODEL:
-   - selfSc[cid]                        = CU ประเมินตัวเอง
-   - othSc[evaluateeId+'|'+cid]         = CU ประเมินคนอื่น (key=evaluatee)
-   
-   สำหรับ Dashboard: ต้องรู้ว่า CU ได้รับการประเมินจากใคร
-   ในระบบ mockup นี้ CU เป็นทั้งผู้ประเมินและผู้ถูกประเมิน
-   
-   สูตรคำนวณ:
-   - ตนเอง    = selfSc[cid] (CU ประเมินตัวเอง)
-   - ผู้อื่น   = othSc ที่คนอื่นประเมิน CU 
-                 (ใน mockup = othSc ทุก key ที่ evaluatee = EMP ใน persons ของ CU)
-   - Overall   = (selfAvg + othersAvg) / 2
-   - ระดับ ป/ก/ส = กรองตาม role ของ evaluator (ผู้ประเมิน)
-   ============================================================ */
-
-function getRoleLevel(role){
-  if(!role)return'';
-  if(role.indexOf('\u0e1b\u0e0f\u0e34\u0e1a\u0e31\u0e15\u0e34\u0e01\u0e32\u0e23')>=0)return'p';
-  if(role.indexOf('\u0e40\u0e0a\u0e35\u0e48\u0e22\u0e27\u0e0a\u0e32\u0e0d')>=0)return'p'; /* เชี่ยวชาญ = ป */
-  if(role.indexOf('\u0e01\u0e25\u0e32\u0e07')>=0)return'k';
-  if(role.indexOf('\u0e2a\u0e39\u0e07')>=0)return's';
-  return'p'; /* default */
+var dbScale=5; /* 5 or 7.5 -- display scale for numeric scores, managers+ only */
+function scaleScore(v){return v?(v/5*dbScale):v;}
+function canChooseScale(){
+  return CU&&['ผู้บริหารระดับกลาง','ผู้บริหารระดับสูง','ผู้ช่วยผู้อำนวยการกลุ่ม','ผู้อำนวยการกลุ่ม'].indexOf(CU.role)>=0;
 }
 
-/* --- getScore: คะแนนของ empId ใน cid ตาม filter ---
- * self   = selfSc[cid]                       (CU ประเมินตัวเอง)
- * other  = othSc[empId|cid]                  (CU ประเมิน empId)
- * overall= avg(self, other)
- * p/k/s  = othSc กรองตาม role ของ CU (ผู้ประเมิน) */
-function getScore(empId,cid,filter){
-  var selfVal=selfSc[cid]||null;
-  var othVal=othSc[empId+'|'+cid]||null;
-  if(filter==='self')return selfVal;
-  if(filter==='other')return othVal;
-  if(filter==='overall')return othVal||selfVal;
-  /* role filter: check CU's role as evaluator */
-  if(!othVal)return null;
-  var cuLevel=CU?getRoleLevel(CU.role):'';
-  if(filter===cuLevel)return othVal;
+/* --- REAL DATA SCORING - no mock fallback --- */
+/* ─── SCORING LOGIC ───
+ * Overall  = avg( selfScore(cid), othScores(cid from all evaluators) ) / 2 groups
+ *            i.e. (selfAvg + othersAvg) / 2   (each group weighted equally)
+ * ตนเอง   = selfSc[cid]  (own self-assessment only)
+ * ผู้อื่น  = othSc[pid|cid] for all evaluators pid != CU.empId
+ * ระดับ ป  = othSc from evaluators whose role contains "ปฏิบัติการ"
+ * ระดับ ก  = othSc from evaluators whose role contains "กลาง"
+ * ระดับ ส  = othSc from evaluators whose role contains "สูง" or "เชี่ยวชาญ"
+ * ─────────────────────────────────── */
+
+/* Get the role of an evaluator (the person who did the rating) */
+function getEvalRole(evalId){
+  for(var i=0;i<ALL_EMP.length;i++){if(ALL_EMP[i].empId===evalId)return ALL_EMP[i].role||'';}
+  return '';
+}
+
+/* Get all other-evaluation scores for target empId on criterion cid, filtered by evaluator role */
+function getOthScores(empId,cid,roleFilter){
+  /* othSc keys = evaluatorId|cid  — but our data model stores pid|cid where pid=evaluatee */
+  /* In this system: othSc[evaluatee|cid] — single score per criterion per evaluatee */
+  /* So "others" = the one score in othSc[empId|cid], from the logged-in evaluator */
+  var k=empId+'|'+cid;
+  var sc=othSc[k]||null;
+  if(!sc)return null;
+  if(!roleFilter)return sc;
+  /* For role-filtered views: score is attributed to CU (the evaluator) */
+  var evalRole=CU?CU.role:'';
+  if(roleFilter==='p'&&evalRole.indexOf('\u0e1b\u0e0f\u0e34\u0e1a\u0e31\u0e15\u0e34\u0e01\u0e32\u0e23')>=0)return sc;
+  if(roleFilter==='k'&&evalRole.indexOf('\u0e01\u0e25\u0e32\u0e07')>=0)return sc;
+  if(roleFilter==='s'&&(evalRole.indexOf('\u0e2a\u0e39\u0e07')>=0||evalRole.indexOf('\u0e40\u0e0a\u0e35\u0e48\u0e22\u0e27\u0e0a\u0e32\u0e0d')>=0))return sc;
   return null;
 }
 
-/* --- avgScore2: เฉลี่ยสำหรับกลุ่ม empIds + criteria ตาม filter ---
- * overall = (avg ตนเอง + avg ผู้อื่น) / 2  (สองกลุ่ม weight เท่ากัน)
- * self    = เฉลี่ย selfSc เท่านั้น
- * other   = เฉลี่ย othSc ทุก evaluatee ใน empIds
- * p/k/s   = เฉลี่ย othSc กรองตาม role ของ CU */
+/* Get score for an empId on a criterion with a given filter
+ * Note: for "self" filter we use selfSc (evaluating CU's own score)
+ *       for "other/overall" we look at othSc[empId|cid] */
+function getScore(empId,cid,filter){
+  var selfVal=selfSc[cid]||null;          /* CU's self-assessment on this criterion */
+  var othVal=othSc[empId+'|'+cid]||null; /* score others gave to empId on this criterion */
+  if(filter==='self')return selfVal;
+  if(filter==='other')return othVal;
+  if(filter==='overall'){
+    /* overall = combine both groups: use othVal if available, selfVal as supplement */
+    return othVal||selfVal;
+  }
+  /* role filters — apply to the evaluator (CU) perspective */
+  return getOthScores(empId,cid,filter);
+}
+
+/* Average for a list of empIds + criteria, respecting filter
+ * For 'overall': average of (selfAvg group + othersAvg group) / 2
+ * so neither group dominates when counts differ */
 function avgScore2(empIds,crits,filter){
   if(filter==='overall'){
-    /* กลุ่มที่ 1: ตนเอง */
+    /* Self group: CU's own self-assessment averaged */
     var sT=0,sN=0;
     crits.forEach(function(c){var s=selfSc[c.id];if(s){sT+=RVAL[s];sN++;}});
     var selfAvg=sN?sT/sN:null;
-    /* กลุ่มที่ 2: ผู้อื่นประเมิน (othSc ทุก evaluatee) */
+    /* Others group: scores empIds received */
     var oT=0,oN=0;
     empIds.forEach(function(id){
       crits.forEach(function(c){
@@ -2184,13 +2053,12 @@ function avgScore2(empIds,crits,filter){
       });
     });
     var othAvg=oN?oT/oN:null;
-    /* Overall = เฉลี่ยสองกลุ่ม */
     if(selfAvg!==null&&othAvg!==null)return(selfAvg+othAvg)/2;
     if(selfAvg!==null)return selfAvg;
     if(othAvg!==null)return othAvg;
     return 0;
   }
-  /* filter อื่น: หา avg ตรงๆ */
+  /* Other filters: straightforward average */
   var t=0,n=0;
   empIds.forEach(function(id){
     crits.forEach(function(c){
@@ -2200,39 +2068,45 @@ function avgScore2(empIds,crits,filter){
   });
   return n?t/n:0;
 }
-
-/* --- avgForPerson: คะแนนรวมของพนักงาน 1 คนตาม filter --- */
-function avgForPerson(empId,crits,filter){
-  return avgScore2([empId],crits,filter);
-}
-
-/* --- COUNT data points --- */
+/* --- COUNT how many criteria have real data --- */
 function dataCount(empIds,crits,filter){
   var n=0;
   empIds.forEach(function(id){crits.forEach(function(c){if(getScore(id,c.id,filter))n++;});});
   return n;
 }
-
-/* --- hasData --- */
-function hasData(filter){
-  if(filter==='self')return Object.keys(selfSc).some(function(k){return selfSc[k];});
-  if(filter==='other'||filter==='p'||filter==='k'||filter==='s')
-    return Object.keys(othSc).some(function(k){return othSc[k];});
-  return Object.keys(selfSc).some(function(k){return selfSc[k];})||
-         Object.keys(othSc).some(function(k){return othSc[k];});
-}
-
-/* --- self average (for own card) --- */
+/* --- SELF data only (for own assessment section) --- */
 function avgSelf(crits){
   var t=0,n=0;
   crits.forEach(function(c){var s=selfSc[c.id];if(s){t+=RVAL[s];n++;}});
   return n?t/n:0;
 }
-var prevSc={};
+/* --- Previous round: stored in prevSc (empty until user fills 2nd round) --- */
+/* In mockup: previous round = round selector; if only 1 round, prev = null */
+var prevSc={}; /* will hold pid|cid -> rating for previous round */
 function avgPrev(empIds,crits){
   var t=0,n=0;
-  empIds.forEach(function(id){crits.forEach(function(c){var s=prevSc[id+'|'+c.id]||null;if(s){t+=RVAL[s];n++;}});});
+  empIds.forEach(function(id){
+    crits.forEach(function(c){
+      var s=prevSc[id+'|'+c.id]||null;
+      if(s){t+=RVAL[s];n++;}
+    });
+  });
   return n?t/n:0;
+}
+/* Check if any real data exists for a given filter */
+function hasData(filter){
+  if(filter==='self')return Object.keys(selfSc).some(function(k){return selfSc[k];});
+  if(filter==='other'||filter==='p'||filter==='k'||filter==='s')
+    return Object.keys(othSc).some(function(k){return othSc[k];});
+  /* overall: either self or other */
+  return Object.keys(selfSc).some(function(k){return selfSc[k];})||
+         Object.keys(othSc).some(function(k){return othSc[k];});
+}
+/* Count data points */
+function dataCount(empIds,crits,filter){
+  var n=0;
+  empIds.forEach(function(id){crits.forEach(function(c){if(getScore(id,c.id,filter))n++;});});
+  return n;
 }
 /* Zone chart y-position helper */
 function yPct(v){return v?Math.max(3,Math.min(94,(1-(v-1)/4)*88+2)):50;}
@@ -2246,7 +2120,7 @@ function renderDash(){
   /* --- 1. FILTER --- */
   html+='<div class="card"><div class="db-filter">';
   html+='<span class="db-filter-lbl">&#128269; แสดงผล:</span>';
-  [['overall','\uD83C\uDF10 Overall'],['self','\uD83E\uDDD1\u200D\uD83D\uDCBB ตนเอง'],['other','\uD83D\uDC65 ผู้อื่น'],['p','\uD83C\uDFE2 ระดับ ป'],['k','\uD83D\uDCCB ระดับ ก'],['s','\uD83D\uDC51 ระดับ ส']].forEach(function(f){
+  [['overall','\uD83C\uDF10 Overall'],['self','\uD83E\uDDD1 ตนเอง'],['other','\uD83D\uDC65 ผู้อื่น'],['p','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e1b'],['k','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e01'],['s','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e2a']].forEach(function(f){
     html+='<button class="db-ftab'+(dbFilter===f[0]?' on':'')+'" onclick="dbFilter=\''+f[0]+'\';renderDash()">'+f[1]+'</button>';
   });
   /* data status indicator */
@@ -2255,18 +2129,17 @@ function renderDash(){
   var totalPossible=(persons.length+1)*CRITERIA.length;
   var totalDone=selfDone+otherDone;
   html+='<div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+  if(canChooseScale()){
+    html+='<span style="font-size:10px;color:var(--t2)">\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e15\u0e47\u0e21:</span>';
+    html+='<select id="dbScaleSel" style="padding:3px 8px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:11px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer" onchange="dbScale=parseFloat(this.value);renderDash()">';
+    html+='<option value="5"'+(dbScale===5?' selected':'')+'>5.00</option>';
+    html+='<option value="7.5"'+(dbScale===7.5?' selected':'')+'>7.50</option>';
+    html+='</select>';
+  }
   html+='<span style="font-size:10px;color:var(--t2)">ข้อมูลที่มี:</span>';
   html+='<span style="font-size:10px;font-weight:600;color:'+(selfDone>0?'var(--E)':'var(--t2)')+'">'+(selfDone>0?'&#10003;':'\u2013')+' ตนเอง ('+selfDone+'/'+CRITERIA.length+')</span>';
-  html+='<span style="font-size:10px;font-weight:600;color:'+(otherDone>0?'var(--G)':'var(--t2)')+'">'+(otherDone>0?'&#10003;':'\u2013')+' \u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19 ('+otherDone+'/'+(persons.length*CRITERIA.length)+')</span>';
+  html+='<span style="font-size:10px;font-weight:600;color:'+(otherDone>0?'var(--G)':'var(--t2)')+'">'+(otherDone>0?'&#10003;':'\u2013')+' ผู้อื่น ('+otherDone+'/'+(persons.length*CRITERIA.length)+')</span>';
   html+='</div>';
-  /* Filter description */
-  var filterDesc={'overall':'Overall = (คะแนนตนเอง + คะแนนผู้อื่น) \u00F7 2',
-    'self':'\u0e41\u0e2a\u0e14\u0e07\u0e40\u0e09\u0e1e\u0e32\u0e30\u0e04\u0e30\u0e41\u0e19\u0e19\u0e17\u0e35\u0e48\u0e15\u0e19\u0e40\u0e2d\u0e07\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19',
-    'other':'\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22\u0e04\u0e30\u0e41\u0e19\u0e19\u0e17\u0e35\u0e48\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e43\u0e2b\u0e49 (\u0e44\u0e21\u0e48\u0e19\u0e31\u0e1a\u0e15\u0e19\u0e40\u0e2d\u0e07)',
-    'p':'\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22\u0e08\u0e32\u0e01\u0e04\u0e30\u0e41\u0e19\u0e19\u0e17\u0e35\u0e48\u0e1c\u0e39\u0e49\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e1b\u0e0f\u0e34\u0e1a\u0e31\u0e15\u0e34\u0e01\u0e32\u0e23\u0e43\u0e2b\u0e49\u0e40\u0e1b\u0e47\u0e19\u0e1c\u0e39\u0e49\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19',
-    'k':'\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22\u0e08\u0e32\u0e01\u0e04\u0e30\u0e41\u0e19\u0e19\u0e17\u0e35\u0e48\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e2b\u0e32\u0e23\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e01\u0e25\u0e32\u0e07\u0e43\u0e2b\u0e49\u0e40\u0e1b\u0e47\u0e19\u0e1c\u0e39\u0e49\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19',
-    's':'\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22\u0e08\u0e32\u0e01\u0e04\u0e30\u0e41\u0e19\u0e19\u0e17\u0e35\u0e48\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e2b\u0e32\u0e23\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e2a\u0e39\u0e07\u0e43\u0e2b\u0e49\u0e40\u0e1b\u0e47\u0e19\u0e1c\u0e39\u0e49\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19'};
-  html+='<div style="width:100%;font-size:10px;color:var(--pb);font-weight:600;padding:4px 0 0;border-top:1px solid var(--b0);margin-top:4px">&#8505; '+(filterDesc[dbFilter]||'')+'</div>';
   html+='</div></div>';
 
   /* empty state check */
@@ -2276,15 +2149,18 @@ function renderDash(){
   html+='<div class="card">';
   html+='<div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#11088;</div>';
   html+='<div class="db-sh-ttl">\u0e1c\u0e25\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19 Singhaway Values</div>';
+  if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
   html+='</div>';
   if(noData){
     html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน<br><span style="font-size:11px">กรอกคะแนนในหน้าประเมินก่อน แล้วกลับมาดูที่นี่</span></div>';
   } else {
     html+='<div style="overflow-x:auto;padding:4px"><table class="sw-table">';
     html+='<thead><tr>';
-    html+='<th class="lft" style="min-width:180px">\u0e2b\u0e31\u0e27\u0e02\u0e49\u0e2d / \u0e40\u0e01\u0e13\u0e11\u0e4c</th>';
-    html+='<th style="min-width:70px">\u0e04\u0e30\u0e41\u0e19\u0e19</th>';
-    html+='<th style="min-width:60px">\u0e23\u0e30\u0e14\u0e31\u0e1a</th>';
+    html+='<th class="lft" style="min-width:200px">หัวข้อ / เกณฑ์</th>';
+    html+='<th>FOCUS</th>';
+    html+='<th style="min-width:70px">คะแนน</th>';
+    html+='<th style="min-width:80px">ระดับ</th>';
+    html+='<th style="min-width:60px">จำนวนข้อมูล</th>';
     html+='</tr></thead><tbody>';
     CATS.forEach(function(cat){
       var m=CAT_META[cat];
@@ -2293,23 +2169,32 @@ function renderDash(){
       var catAvg=avgScore2(ids,cc,dbFilter);
       var catL=s2l(catAvg);
       var cnt=dataCount(ids,cc,dbFilter);
-      html+='<tr class="cat-hdr"><td class="lft" colspan="3" style="background:'+m.bg+';color:'+m.cl+';font-size:11px;font-weight:700"><span style="margin-right:6px">&#9654;</span>'+m.lb+'</td></tr>';
+      html+='<tr class="cat-hdr"><td class="lft" colspan="2" style="background:'+m.bg+';color:'+m.cl+';font-size:11px;font-weight:700"><span style="margin-right:6px">&#9654;</span>'+m.lb+'</td>';
+      html+='<td style="background:'+m.bg+'">'+( catAvg?'<b style="color:'+catL.c+';font-family:var(--fh)">'+scaleScore(catAvg).toFixed(2)+'</b>':'\u2013')+'</td>';
+      html+='<td style="background:'+m.bg+'">'+( catAvg?'<span class="rb-inl" style="background:'+RCOL[catL.l]+'">'+catL.l+'</span>':'\u2013')+'</td>';
+      html+='<td style="background:'+m.bg+';font-size:10px;color:var(--t2)">'+cnt+' ข้อมูล</td></tr>';
       cc.forEach(function(c){
+        var fd=FDEF[c.foc];
         var avg=avgScore2(ids,[c],dbFilter);
         var lbl=s2l(avg);
+        var cnt2=dataCount(ids,[c],dbFilter);
         html+='<tr class="crit-row">';
         html+='<td class="lft" style="padding-left:20px;font-size:11px;color:var(--t0)">'+c.lb+'</td>';
-        html+='<td>'+( avg?'<b style="color:'+lbl.c+';font-family:var(--fh)">'+avg.toFixed(2)+'</b>':'\u2013')+'</td>';
+        html+='<td><span style="padding:1px 6px;border-radius:4px;background:'+(fd?fd.bg:'transparent')+';color:'+(fd?fd.cl:'var(--t2)')+';font-size:10px;font-weight:700">'+c.foc+'</span></td>';
+        html+='<td>'+( avg?'<b style="color:'+lbl.c+';font-family:var(--fh)">'+scaleScore(avg).toFixed(2)+'</b>':'\u2013')+'</td>';
         html+='<td>'+( avg?'<span class="rb-inl" style="background:'+RCOL[lbl.l]+'">'+lbl.l+'</span>':'\u2013')+'</td>';
+        html+='<td style="font-size:10px;color:var(--t2)">'+cnt2+'/'+ids.length+' คน</td>';
         html+='</tr>';
       });
     });
     /* Summary */
     var ids2=dbFilter==='self'?selfId:allIds;
     var totAvg=avgScore2(ids2,CRITERIA,dbFilter);var totL=s2l(totAvg);
-    html+='<tr class="sum-row"><td class="lft">Summary</td>';
-    html+='<td>'+( totAvg?'<span style="color:#FFD080;font-weight:700">'+totAvg.toFixed(2)+'</span>':'\u2013')+'</td>';
+    var totCnt=dataCount(ids2,CRITERIA,dbFilter);
+    html+='<tr class="sum-row"><td class="lft" colspan="2">Summary</td>';
+    html+='<td>'+( totAvg?'<span style="color:#FFD080;font-weight:700">'+scaleScore(totAvg).toFixed(2)+'</span>':'\u2013')+'</td>';
     html+='<td>'+( totAvg?'<span class="rb-inl" style="background:'+RCOL[totL.l]+'">'+totL.l+'</span>':'\u2013')+'</td>';
+    html+='<td style="font-size:10px;color:#aaa">'+totCnt+' ข้อมูล</td>';
     html+='</tr>';
     html+='</tbody></table></div>';
   }
@@ -2328,32 +2213,30 @@ function renderDash(){
     var maxH=160;
     html+='<div style="padding:0 16px 16px"><div style="display:grid;grid-template-columns:3fr 1fr;gap:16px;align-items:end">';
     html+='<div>';
-    /* y-axis */
+    /* y-axis labels */
+    html+='<div style="display:flex;margin-bottom:4px;padding-left:32px">';
+    html+='<div style="flex:1"></div>';
+    html+='</div>';
     html+='<div style="display:flex;gap:6px;align-items:flex-end;height:200px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 8px 0 28px;position:relative">';
-    [5,4,3,2,1].forEach(function(v){
+    /* Y-axis */
+    [5,4,3,2,1].forEach(function(v,i){
       var top=(1-v/5)*100;
       html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:9px;color:var(--t2);width:22px;text-align:right">'+v+'</div>';
       html+='<div style="position:absolute;left:28px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
     });
-    var FC=['#2E4265','#8599AB','#A8B5C2','#D5D5D6','#8FA3BC'];
-    fkeys.forEach(function(f,fi){
+    /* bars per FOCUS letter */
+    fkeys.forEach(function(f){
       var fd=FDEF[f];
       var cur=avgScore2(ids3,CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);
-      var barH=cur?Math.max(22,Math.round(cur/5*maxH)):0;
+      var barH=cur?Math.max(6,Math.round(cur/5*maxH)):0;
       var lbl=s2l(cur);
-      /* use fd.cl as bar color — matches FDEF theme */
-      var barColor=FC[fi]||fd.cl;
-      var barColorLight=barColor+'44';
-      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:0">';
-      /* level badge above bar */
-      html+='<div style="height:20px;display:flex;align-items:center;justify-content:center">';
-      if(cur)html+='<span style="padding:1px 5px;border-radius:4px;background:'+RCOL[lbl.l]+';color:#fff;font-size:9px;font-weight:700">'+lbl.l+'</span>';
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
+      html+='<div style="font-size:11px;font-weight:700;color:'+(cur?lbl.c:'var(--t2)')+'">'+( cur?cur.toFixed(2):'\u2013')+'</div>';
+      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:4px 4px 0 0;min-height:'+( cur?'6':'0')+'px;position:relative">';
+      if(cur)html+='<div style="position:absolute;top:-20px;left:50%;transform:translateX(-50%);padding:1px 6px;border-radius:5px;background:'+RCOL[lbl.l]+';color:#fff;font-size:9px;font-weight:700">'+lbl.l+'</div>';
       html+='</div>';
-      html+='<div style="width:100%;height:'+barH+'px;background:'+barColor+';border-radius:4px 4px 0 0;min-height:'+(cur?'6':'0')+'px;display:flex;align-items:center;justify-content:center">';
-      if(cur&&barH>=16)html+='<span style="color:#fff;font-size:10px;font-weight:700;font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
-      html+='</div>';
-      html+='<div style="font-size:13px;font-weight:700;color:'+barColor+';margin-top:4px">'+f+'</div>';
-      /* removed fd.nm label */
+      html+='<div style="font-size:10px;font-weight:700;color:'+fd.cl+'">'+f+'</div>';
+      html+='<div style="font-size:8px;color:var(--t2);text-align:center;max-width:60px;word-break:break-word">'+fd.nm+'</div>';
       html+='</div>';
     });
     html+='</div></div>';
@@ -2423,6 +2306,7 @@ function renderDash(){
     html+='<div class="card">';
     html+='<div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128200;</div>';
     html+='<div class="db-sh-ttl">Score Overview \u2014 สรุปรายบุคคล</div>';
+    if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px;margin-right:6px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
     html+='<span style="font-size:10px;color:var(--t2)">เรียงตามระดับ ส &gt; ก &gt; ป \u00B7 คะแนนมาก&gt;น้อย</span></div>';
     html+='<div style="padding:14px 16px">';
     if(noData){
@@ -2549,9 +2433,9 @@ function scoreOverviewSection(){
       +'<div style="font-size:9px;color:var(--t2)">'+p.empId+' \u00B7 '+(p.dept||p.div)+'</div></div></div></td>';
     html+='<td><span style="font-size:9px;color:var(--t2)">#'+roleRank+'</span></td>';
     pcAs.forEach(function(a){var l=s2l(a);html+='<td>'+(a?'<span class="rb-inl" style="background:'+RCOL[l.l]+';font-size:10px">'+l.l+'</span>':'\u2013')+'</td>';});
-    html+='<td>'+(swM?'<b style="color:'+s2l(swM).c+'">'+swM.toFixed(2)+'</b>':'\u2013')+'</td>';
+    html+='<td>'+(swM?'<b style="color:'+s2l(swM).c+'">'+scaleScore(swM).toFixed(2)+'</b>':'\u2013')+'</td>';
     pfAs.forEach(function(a){var l=s2l(a);html+='<td>'+(a?'<span class="rb-inl" style="background:'+RCOL[l.l]+';font-size:10px">'+l.l+'</span>':'\u2013')+'</td>';});
-    html+='<td>'+(focM?'<b style="color:'+s2l(focM).c+'">'+focM.toFixed(2)+'</b>':'\u2013')+'</td>';
+    html+='<td>'+(focM?'<b style="color:'+s2l(focM).c+'">'+scaleScore(focM).toFixed(2)+'</b>':'\u2013')+'</td>';
     html+='<td>'+(ovAll?'<span class="scbd" style="background:'+RCOL[ovL.l]+'">'+ovL.l+'</span>':'\u2013')+'</td>';
     html+='</tr>';
   });
