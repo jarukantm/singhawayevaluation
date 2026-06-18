@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>Singhaway FOCUS Platform</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -682,13 +682,21 @@ button,input,select{font-family:var(--fb)}
   .cr{flex-wrap:wrap;align-items:flex-start;padding:12px 14px;gap:8px 0;min-height:0}
   .cl{flex:1 1 100%;width:100%}
   .clb{font-size:13px}
-  .ra{flex:1 1 auto;order:2;gap:5px;margin-top:2px}
-  .rb{width:auto;flex:1;min-width:0;height:36px;font-size:12px}
+  .ra{flex:1 1 100%;width:100%;order:2;gap:6px;margin-top:2px}
+  .rbw{flex:1;min-width:0}
+  .rb{width:100%;flex:1;min-width:0;height:38px;font-size:13px}
   .note-cell,.note-col-hd{order:3;flex:1 1 100%;width:100%;max-width:none;min-width:0;margin-top:4px}
+
+  /* ── Prevent iOS/Android auto-zoom on input focus ──
+     Mobile browsers zoom in when a focused text field has font-size < 16px.
+     Forcing 16px here (mobile only) keeps desktop's tighter, denser sizing
+     untouched while eliminating the zoom-jump on every tap-to-type. */
+  input,textarea,select{font-size:16px!important}
+  .gcatsel{font-size:16px!important;padding:8px 12px}
 }
 @media(max-width:420px){
   .fg{grid-template-columns:repeat(2,1fr)}
-  .rb{height:33px;font-size:11px}
+  .rb{height:34px;font-size:12px}
   .ra{gap:4px}
   .cr{padding:10px 12px}
 }
