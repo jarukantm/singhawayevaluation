@@ -113,7 +113,21 @@ button,input,select{font-family:var(--fb)}
 /* ═══ SIDEBAR (Cryptowall style) ═══ */
 .sb{width:var(--sb-w);background:var(--sb-bg);display:flex;flex-direction:column;
   height:100vh;flex-shrink:0;position:relative;z-index:50;
-  box-shadow:4px 0 20px rgba(0,0,0,.25)}
+  box-shadow:4px 0 20px rgba(0,0,0,.25);transition:width .2s ease}
+/* ── Collapsed state: icon-only rail ── */
+.sb.collapsed{width:64px}
+.sb.collapsed .sb-logo-text,.sb.collapsed .sb-user-text,.sb.collapsed .sb-sec-lbl,
+.sb.collapsed .nb-txt{display:none}
+.sb.collapsed .sb-logo-row{justify-content:center}
+.sb.collapsed .sb-user-row{justify-content:center}
+.sb.collapsed .nb{justify-content:center;padding:9px}
+.sb.collapsed .sb-logout{justify-content:center;font-size:15px}
+.sb.collapsed .sb-collapse-btn{transform:rotate(180deg)}
+.sb-collapse-btn{flex-shrink:0;width:22px;height:22px;border-radius:6px;border:none;
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);cursor:pointer;
+  font-size:9px;display:flex;align-items:center;justify-content:center;
+  transition:.2s;margin-left:auto}
+.sb-collapse-btn:hover{background:rgba(255,255,255,.18);color:#fff}
 /* Logo area */
 .sb-logo{padding:1.25rem 1.1rem 1rem;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
 .sb-logo-row{display:flex;align-items:center;gap:9px}
@@ -280,6 +294,11 @@ button,input,select{font-family:var(--fb)}
 .note-cell.note-has{color:var(--t0);border:1.5px solid rgba(13,110,231,.2);background:rgba(13,110,231,.05);position:relative;padding-right:22px}
 .note-cell.note-has:hover{border-color:var(--pb);background:rgba(13,110,231,.1)}
 .note-cell.note-has .note-edit-ico{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--pb);opacity:.7}
+.note-cell.note-has .note-clear-ico{position:absolute;right:5px;top:50%;transform:translateY(-50%);
+  width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;color:var(--I);background:rgba(163,45,45,.1);cursor:pointer;
+  transition:.12s;line-height:1}
+.note-cell.note-has .note-clear-ico:hover{background:rgba(163,45,45,.22);transform:translateY(-50%) scale(1.1)}
 .note-cell.note-view{color:var(--t1);border:1px solid var(--b0);background:var(--s1);cursor:default}
 .note-cell.note-empty{color:var(--t2);cursor:default;font-size:12px;border:none;background:transparent}
 .note-txt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -600,6 +619,31 @@ button,input,select{font-family:var(--fb)}
 .sw-table .cat-hdr td{background:var(--s2);font-weight:700;font-size:11px}
 .sw-table .sum-row td{background:var(--navy);color:#fff;font-family:var(--fh);font-weight:700}
 .rb-inl{display:inline-block;padding:2px 8px;border-radius:5px;font-size:11px;font-weight:700;color:#fff;min-width:26px;text-align:center}
+
+/* ── Singhaway table: mobile card-list (replaces the table on narrow screens) ──
+   Default: hidden (desktop shows the <table> instead). Media query below
+   flips which one is visible so nothing needs horizontal scrolling on mobile. */
+.sw-card-list{display:none}
+.sw-card-cathdr{display:flex;align-items:center;justify-content:space-between;
+  padding:8px 12px;font-size:12px;font-weight:700;border-radius:var(--r);margin:10px 0 6px}
+.sw-card-cathdr:first-child{margin-top:0}
+.sw-card-cat-score{font-size:13px;display:flex;align-items:center;gap:6px}
+.sw-card{background:var(--s1);border:1px solid var(--b0);border-radius:var(--r);
+  padding:9px 12px;margin-bottom:6px}
+.sw-card-top{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.sw-card-foc{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.sw-card-lbl{font-size:13px;color:var(--t0);line-height:1.4;flex:1}
+.sw-card-bottom{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sw-card-score{font-size:15px;font-family:var(--fh)}
+.sw-card-cnt{font-size:11px;color:var(--t2);margin-left:auto}
+.sw-card-sum{background:var(--navy);border-color:var(--navy)}
+.sw-card-sum .sw-card-score{color:#fff}
+
+@media(max-width:600px){
+  .sw-table-wrap{display:none}
+  .sw-card-list{display:block;padding:10px 14px}
+}
 .cmp-up{color:#1D9E75;font-size:10px;font-weight:700}
 .cmp-dn{color:#A32D2D;font-size:10px;font-weight:700}
 .cmp-neu{color:#5B6F95;font-size:10px}
@@ -663,7 +707,11 @@ button,input,select{font-family:var(--fb)}
   width:16px;height:2px;background:var(--pb2);border-radius:2px;transition:transform .2s}
 .mob-nav-btn.on::after{transform:translateX(-50%) scaleX(1)}
 
-@media(max-width:768px){
+/* ── MOBILE LAYOUT THRESHOLD ──
+   680px (not 768px) so iPads -- including iPad Mini at 768px portrait --
+   keep the desktop sidebar + layout. Only phones (max ~480px) and small
+   foldables fall under this breakpoint. */
+@media(max-width:680px){
   .sb{position:fixed;left:0;top:0;bottom:0;z-index:50;transform:translateX(-100%);transition:transform .25s}
   .sb.open{transform:translateX(0)}
   .mob-overlay.open{display:block}
@@ -699,6 +747,30 @@ button,input,select{font-family:var(--fb)}
   .rb{height:34px;font-size:12px}
   .ra{gap:4px}
   .cr{padding:10px 12px}
+}
+
+/* ── PDF EXPORT (print stylesheet) ──
+ * "Export PDF" calls window.print(); the browser's print/Save-as-PDF dialog
+ * handles the actual file creation -- no external library needed. This
+ * stylesheet strips away anything that isn't part of the printable report
+ * (sidebar, bottom nav, buttons, dropdowns) and lets only the Dashboard
+ * content flow as a normal printable document.
+ * The .printing-dash class is toggled on <body> by exportDashPDF() right
+ * before calling print(), and removed again on the 'afterprint' event. */
+@media print{
+  body.printing-dash .sb,body.printing-dash .mob-nav,body.printing-dash .hbg-btn,
+  body.printing-dash .mob-overlay,body.printing-dash .topbar,
+  body.printing-dash .db-filter button,body.printing-dash #dbScaleSel,
+  body.printing-dash #dbRoundSel,body.printing-dash .db-pdf-btn,
+  body.printing-dash .sb-collapse-btn{display:none!important}
+  body.printing-dash .main{width:100%!important}
+  body.printing-dash .view{overflow:visible!important;padding:0!important;display:block!important}
+  body.printing-dash .views{overflow:visible!important}
+  body.printing-dash #sa{padding-bottom:0!important}
+  body.printing-dash .card{box-shadow:none!important;border:1px solid #ccc!important;
+    page-break-inside:avoid;margin-bottom:14px}
+  body.printing-dash .vi{width:100%!important}
+  body.printing-dash{background:#fff!important}
 }
 </style>
 </head>
@@ -804,6 +876,19 @@ button,input,select{font-family:var(--fb)}
       </div>
     </div>
   </div>
+  <!-- CLOSE ROUND (Admin) -->
+  <div class="ovl" id="closeRoundOvl">
+    <div class="mbox subm">
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128197; ปิดรอบประเมินปัจจุบัน?</div>
+      <div class="wb"><span>&#9888;&#65039;</span><span>คะแนนของรอบ "<b id="crCurLabel"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
+      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px">ชื่อรอบถัดไป</div>
+      <input type="text" class="lin" id="crNextLabel" style="color:var(--t0);background:var(--s1);border-color:var(--b1);margin-bottom:14px" placeholder="เช่น รอบที่ 2">
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn bo" id="crCancelBtn">ยกเลิก</button>
+        <button class="btn bt" id="crConfirmBtn">&#10003; ยืนยันปิดรอบ</button>
+      </div>
+    </div>
+  </div>
   <!-- DRILL -->
   <div class="ovl" id="drillovl">
     <div class="mbox dm">
@@ -848,8 +933,9 @@ button,input,select{font-family:var(--fb)}
       </div>
 
       <!-- ④ Existing note indicator (shown if note already exists) -->
-      <div id="rsnExistingNote" style="display:none;padding:8px 12px;background:rgba(13,110,231,.06);border:1px solid rgba(13,110,231,.2);border-radius:var(--r);margin-bottom:10px;font-size:11px;color:var(--blue)">
-        <span style="font-weight:700">&#128204; เหตุผลเดิม:</span> <span id="rsnExistingText"></span>
+      <div id="rsnExistingNote" style="display:none;padding:8px 12px;background:rgba(13,110,231,.06);border:1px solid rgba(13,110,231,.2);border-radius:var(--r);margin-bottom:10px;font-size:11px;color:var(--blue);display:flex;align-items:flex-start;gap:8px">
+        <div style="flex:1;min-width:0"><span style="font-weight:700">&#128204; เหตุผลเดิม:</span> <span id="rsnExistingText"></span></div>
+        <button id="rsnClearBtn" type="button" title="ล้างเหตุผล" style="flex-shrink:0;width:20px;height:20px;border-radius:50%;border:none;background:rgba(163,45,45,.12);color:var(--I);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">&#10005;</button>
       </div>
 
       <!-- ⑤ Textarea -->
@@ -898,8 +984,7 @@ button,input,select{font-family:var(--fb)}
       <div id="batchPersonList" style="display:flex;flex-direction:column;gap:8px;max-height:48vh;overflow-y:auto;padding-right:2px;margin-bottom:14px"></div>
 
       <!-- Single action footer — ไม่มีปุ่ม Skip แยก -->
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid var(--b0)">
-        <div style="font-size:10px;color:var(--t2)">&#128161; ปล่อยช่องว่างไว้ได้ — ระบบจะไม่บันทึกช่องที่ว่าง</div>
+      <div style="display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid var(--b0)">
         <div style="display:flex;gap:8px">
           <button class="btn bo" id="batchskipbtn" style="min-width:80px">ข้าม</button>
           <button class="btn bt" id="batchsavebtn" style="min-width:110px">&#10003; บันทึก</button>
@@ -928,16 +1013,17 @@ button,input,select{font-family:var(--fb)}
     <div class="sb-logo">
       <div class="sb-logo-row">
         <div class="sb-star">&#9733;</div>
-        <div>
+        <div class="sb-logo-text">
           <div class="sb-brand">Singhaway <span>FOCUS</span></div>
           <div class="sb-ver">Evaluation Platform v6.0</div>
         </div>
+        <button class="sb-collapse-btn" id="sbCollapseBtn" title="\u0e22\u0e48\u0e2d/\u0e02\u0e22\u0e32\u0e22\u0e40\u0e21\u0e19\u0e39">&#9664;</button>
       </div>
     </div>
     <div class="sb-user">
       <div class="sb-user-row">
         <div class="sb-av" id="sbav"></div>
-        <div>
+        <div class="sb-user-text">
           <div class="sb-uname" id="sbuname"></div>
           <div class="sb-urole" id="sbrole"></div>
         </div>
@@ -945,17 +1031,17 @@ button,input,select{font-family:var(--fb)}
     </div>
     <nav class="sb-nav">
       <div class="sb-sec-lbl">ประเมินตนเอง</div>
-      <button class="nb on" id="t-self" onclick="showTab('self')"><div class="ni">&#128221;</div>ประเมินตนเอง</button>
+      <button class="nb on" id="t-self" onclick="showTab('self')" title="ประเมินตนเอง"><div class="ni">&#128221;</div><span class="nb-txt">ประเมินตนเอง</span></button>
       <div class="sb-sep"></div>
       <div class="sb-sec-lbl">ประเมินผู้อื่น</div>
-      <button class="nb" id="t-person" onclick="showTab('person')"><div class="ni">&#128100;</div>รายบุคคล</button>
-      <button class="nb" id="t-grid" onclick="showTab('grid')"><div class="ni">&#128203;</div>รายหัวข้อ</button>
+      <button class="nb" id="t-person" onclick="showTab('person')" title="รายบุคคล"><div class="ni">&#128100;</div><span class="nb-txt">รายบุคคล</span></button>
+      <button class="nb" id="t-grid" onclick="showTab('grid')" title="รายหัวข้อ"><div class="ni">&#128203;</div><span class="nb-txt">รายหัวข้อ</span></button>
       <div class="sb-sep"></div>
       <div class="sb-sec-lbl">ภาพรวม</div>
-      <button class="nb" id="t-dash" onclick="showTab('dash')"><div class="ni">&#128202;</div>ภาพรวมผลประเมิน</button>
+      <button class="nb" id="t-dash" onclick="showTab('dash')" title="ภาพรวมผลประเมิน"><div class="ni">&#128202;</div><span class="nb-txt">ภาพรวมผลประเมิน</span></button>
     </nav>
     <div class="sb-foot">
-      <button class="sb-logout" id="loutbtn" onclick="doLogout()">&#128682; ออกจากระบบ</button>
+      <button class="sb-logout" id="loutbtn" onclick="doLogout()" title="ออกจากระบบ">&#128682;<span class="nb-txt">ออกจากระบบ</span></button>
     </div>
   </aside>
 
@@ -1036,6 +1122,90 @@ button,input,select{font-family:var(--fb)}
           <div id="dbody"></div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ADMIN SHELL ══════════
+     Completely separate from the employee app shell (#sa) above.
+     No self/person/grid evaluation tabs -- Admin only manages the
+     system: round lifecycle, completion tracking, org-wide scores. -->
+<div class="scr" id="saAdmin">
+  <!-- ADMIN: CLOSE ROUND (reuses the same modal markup/logic as the employee dashboard) -->
+  <div class="ovl" id="closeRoundOvlA">
+    <div class="mbox subm">
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128197; ปิดรอบประเมินปัจจุบัน?</div>
+      <div class="wb"><span>&#9888;&#65039;</span><span>คะแนนของรอบ "<b id="crCurLabelA"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
+      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px">ชื่อรอบถัดไป</div>
+      <input type="text" class="lin" id="crNextLabelA" style="color:var(--t0);background:var(--s1);border-color:var(--b1);margin-bottom:14px" placeholder="เช่น รอบที่ 2">
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn bo" id="crCancelBtnA">ยกเลิก</button>
+        <button class="btn bt" id="crConfirmBtnA">&#10003; ยืนยันปิดรอบ</button>
+      </div>
+    </div>
+  </div>
+  <!-- ADMIN: NOTIFY (demo only -- no real email/LINE backend yet) -->
+  <div class="ovl" id="notifyOvl">
+    <div class="mbox subm">
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128276; ส่งแจ้งเตือน</div>
+      <div id="notifyBody" style="font-size:13px;color:var(--t1);margin-bottom:1.25rem"></div>
+      <div class="wb" style="background:rgba(186,117,23,.08);border-color:rgba(186,117,23,.25);color:var(--L)"><span>&#9888;&#65039;</span><span>นี่คือ Demo จำลองการแจ้งเตือน \u2014 ยังไม่ได้เชื่อมต่อระบบอีเมล/LINE จริง</span></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+        <button class="btn bo" onclick="cov('notifyOvl')">ปิด</button>
+        <button class="btn bt" id="notifyConfirmBtn">&#10003; ส่งแจ้งเตือน (Demo)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN SIDEBAR -->
+  <aside class="sb" id="sbAdmin">
+    <div class="sb-logo">
+      <div class="sb-logo-row">
+        <div class="sb-star" style="background:linear-gradient(135deg,#2A3F5F,#0D1B2A)">&#128081;</div>
+        <div class="sb-logo-text">
+          <div class="sb-brand">Singhaway <span>FOCUS</span></div>
+          <div class="sb-ver">System Admin</div>
+        </div>
+        <button class="sb-collapse-btn" id="sbCollapseBtnA" title="\u0e22\u0e48\u0e2d/\u0e02\u0e22\u0e32\u0e22\u0e40\u0e21\u0e19\u0e39">&#9664;</button>
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-user-row">
+        <div class="sb-av" style="background:#0D1B2A;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700">A</div>
+        <div class="sb-user-text">
+          <div class="sb-uname">ผู้ดูแลระบบ</div>
+          <div class="sb-urole">System Admin</div>
+        </div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec-lbl">ติดตามการประเมิน</div>
+      <button class="nb on" id="at-status" onclick="showAdminTab('status')" title="สถานะการประเมิน"><div class="ni">&#9989;</div><span class="nb-txt">สถานะการประเมิน</span></button>
+      <div class="sb-sep"></div>
+      <div class="sb-sec-lbl">ภาพรวมคะแนน</div>
+      <button class="nb" id="at-scores" onclick="showAdminTab('scores')" title="คะแนนรายบุคคล"><div class="ni">&#128202;</div><span class="nb-txt">คะแนนรายบุคคล</span></button>
+      <div class="sb-sep"></div>
+      <div class="sb-sec-lbl">ระบบ</div>
+      <button class="nb" id="at-rounds" onclick="showAdminTab('rounds')" title="จัดการรอบประเมิน"><div class="ni">&#128197;</div><span class="nb-txt">จัดการรอบประเมิน</span></button>
+    </nav>
+    <div class="sb-foot">
+      <button class="sb-logout" id="loutbtnA" onclick="doLogout()" title="ออกจากระบบ">&#128682;<span class="nb-txt">ออกจากระบบ</span></button>
+    </div>
+  </aside>
+
+  <!-- ADMIN MAIN CONTENT -->
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-left">
+        <div class="tb-title" id="atbtitle">สถานะการประเมิน</div>
+        <div class="tb-sub" id="atbsub"></div>
+      </div>
+      <div class="tb-right"></div>
+    </div>
+    <div class="views">
+      <div class="view on" id="va-status"><div class="vi" id="adminStatusBody"></div></div>
+      <div class="view" id="va-scores"><div class="vi" id="adminScoresBody"></div></div>
+      <div class="view" id="va-rounds"><div class="vi" id="adminRoundsBody"></div></div>
     </div>
   </div>
 </div>
@@ -1137,7 +1307,13 @@ var USERS={
     pos:'\u0e1c\u0e08\u0e01.\u0e41\u0e1c\u0e19\u0e01\u0e2d\u0e19\u0e38\u0e23\u0e31\u0e01\u0e29\u0e4c\u0e17\u0e23\u0e31\u0e1e\u0e22\u0e32\u0e01\u0e23\u0e19\u0e49\u0e33',color:'#1D9E75'},
   'Parichat_l':{pass:'333333',empId:'EMP001',name:'\u0e1b\u0e32\u0e23\u0e34\u0e0a\u0e32\u0e15\u0e34 \u0e25\u0e34\u0e49\u0e21\u0e44\u0e1e\u0e1a\u0e39\u0e25\u0e22\u0e4c',nick:'\u0e0a\u0e32\u0e15\u0e34',
     role:'\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e2b\u0e32\u0e23\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e2a\u0e39\u0e07',dept:'',div:'\u0e1a\u0e23\u0e34\u0e2b\u0e32\u0e23\u0e17\u0e23\u0e31\u0e1e\u0e22\u0e32\u0e01\u0e23',
-    pos:'รก.ผจก.ฝ่ายบริหารทรัพยากร',color:'#185FA5'}
+    pos:'รก.ผจก.ฝ่ายบริหารทรัพยากร',color:'#185FA5'},
+  /* ── System Admin account ──
+   * Separate from the employee roster entirely -- no empId, not in
+   * ALL_EMP, never appears as an evaluator or evaluatee. Logging in here
+   * routes straight to the Admin shell (see doLogin) which has no
+   * self/person/grid evaluation tabs, only system-management views. */
+  'Admin':{pass:'admin123',isAdmin:true,name:'\u0e1c\u0e39\u0e49\u0e14\u0e39\u0e41\u0e25\u0e23\u0e30\u0e1a\u0e1a',nick:'Admin',role:'System Admin',color:'#0D1B2A'}
 };
 var ALL_EMP=[
   {empId:'EMP001',name:'ปาริชาติ ลิ้มไพบูลย์',nick:'ปลา',role:'ผู้บริหารระดับสูง',dept:'',div:'บริหารทรัพยากร',pos:'รก.ผจก.ฝ่ายบริหารทรัพยากร',color:'#185FA5'},
@@ -1160,6 +1336,24 @@ var sSaved=false,sSub=false,oSaved=false,oSub=false;
 var curTab='self',expd={},catOp={},orgExp={};
 var gmCat=CATS[0],gmSM=false,gmSel={},gmDP=null,gmRI=null,gmLPT=null;
 var subTgt=null,cdIdx=null,orgMode='dept',orgQ='';
+
+/* ── EVALUATION ROUNDS (history) ──
+ * MOCK DATA LAYER -- currently persisted to localStorage only. This is a
+ * placeholder until a real backend (Sheets/Firebase/API per the org's plan)
+ * is connected; the shape below (ROUNDS array + currentRound label) is
+ * designed to map directly onto a future API response with minimal change.
+ *
+ * Rounds are NOT calendar-locked -- the org's evaluation cycle runs roughly
+ * yearly but timing varies, so an Admin manually opens/closes each round.
+ * currentRound: the round currently being filled in (selfSc/othSc/rsnNotes
+ *   above always refer to THIS round while it's open).
+ * ROUNDS: closed/archived rounds, each a frozen snapshot:
+ *   {id, label, closedAt, selfSc, othSc, rsnNotes}
+ */
+var currentRound={id:'r1',label:'รอบที่ 1'};
+var ROUNDS=[]; /* closed rounds, most recent last */
+var dbRoundView='current'; /* 'current' or a closed round's id -- which round the Dashboard is viewing */
+function isAdmin(){return !!(CU&&CU.isAdmin);}
 
 /* UTILS */
 function ini(n){var p=n.trim().split(' ');return p.length>=2?p[0][0]+p[1][0]:n.slice(0,2).toUpperCase();}
@@ -1188,6 +1382,213 @@ function toast(ico,msg,sub,col){
   el.classList.add('on');if(ttimer)clearTimeout(ttimer);ttimer=setTimeout(function(){el.classList.remove('on');},3600);
 }
 
+/* ── Export Dashboard as PDF ──
+ * Uses the browser's native print dialog (Save as PDF) rather than a JS
+ * PDF library -- no external dependency, works offline, and respects the
+ * @media print stylesheet that hides the sidebar/nav/buttons so only the
+ * report content prints. body.printing-dash is removed again on
+ * 'afterprint' so the live app UI is unaffected once the dialog closes. */
+function exportDashPDF(){
+  document.body.classList.add('printing-dash');
+  setTimeout(function(){window.print();},50);
+}
+window.addEventListener('afterprint',function(){document.body.classList.remove('printing-dash');});
+
+/* ══════════════════════════ ADMIN MODULE ══════════════════════════
+ * MOCK DATA LAYER -- IMPORTANT LIMITATION:
+ * This app currently stores each person's scores only in their own
+ * browser's localStorage while they're logged in (selfSc/othSc are wiped
+ * on logout). There is no central place that records who has actually
+ * submitted their evaluation across the organization. Until a real
+ * backend exists, the Admin views below use DETERMINISTIC MOCK STATUS
+ * (seeded from empId, so it's stable across re-renders, not random each
+ * time) purely to demonstrate the intended UX. Every mock section is
+ * labeled "ข้อมูลตัวอย่าง (Demo)" so it's never mistaken for live data.
+ * When a backend is connected, mockCompletionFor() and mockScoreFor()
+ * are the two functions to replace with real API calls -- the rendering
+ * code around them does not need to change. */
+var curAdminTab='status';
+function showAdminTab(t){
+  curAdminTab=t;
+  ['status','scores','rounds'].forEach(function(x){
+    h('at-'+x).classList.toggle('on',x===t);
+    h('va-'+x).classList.toggle('on',x===t);
+  });
+  var titles={status:'สถานะการประเมิน',scores:'คะแนนรายบุคคล',rounds:'จัดการรอบประเมิน'};
+  h('atbtitle').textContent=titles[t];
+  renderAdminTab();
+}
+function renderAdminTab(){
+  if(curAdminTab==='status')renderAdminStatus();
+  else if(curAdminTab==='scores')renderAdminScores();
+  else if(curAdminTab==='rounds')renderAdminRounds();
+}
+/* simple deterministic hash so mock values are stable per empId, not
+   re-randomized on every render */
+function _seedFor(str){var h2=0;for(var i=0;i<str.length;i++){h2=(h2*31+str.charCodeAt(i))>>>0;}return h2;}
+function mockCompletionFor(empId){
+  var seed=_seedFor(empId+currentRound.id);
+  var selfDone=(seed%100)<78; /* ~78% completed self-assessment */
+  var receivedPct=(seed>>3)%101; /* 0-100% of expected evaluators have rated them */
+  return{selfDone:selfDone,receivedPct:receivedPct};
+}
+function mockScoreFor(empId){
+  var seed=_seedFor(empId+currentRound.id+'_score');
+  var avg=1.5+((seed%351)/100); /* spread roughly 1.50 - 5.00 */
+  var min=Math.max(1,avg-((seed>>4)%150)/100);
+  var max=Math.min(5,avg+((seed>>7)%120)/100);
+  return{avg:avg,min:min,max:max};
+}
+
+/* --- TAB 1: สถานะการประเมิน (completion tracker + demo notify) --- */
+function renderAdminStatus(){
+  var html='<div class="phd"><div><div class="ptitle">&#9989; สถานะการประเมิน</div></div></div>';
+  html+='<div class="wb" style="margin-bottom:14px"><span>&#8505;&#65039;</span><span>ข้อมูลตัวอย่าง (Demo) \u2014 ระบบยังไม่เชื่อมต่อกับฐานข้อมูลกลาง สถานะด้านล่างเป็นข้อมูลจำลองเพื่อสาธิตการใช้งาน</span></div>';
+  var rows=ALL_EMP.map(function(e){
+    var c=mockCompletionFor(e.empId);
+    return{e:e,c:c};
+  });
+  var selfDoneCnt=rows.filter(function(r){return r.c.selfDone;}).length;
+  html+='<div class="card" style="padding:14px 16px;margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">';
+  html+='<div><div style="font-size:11px;color:var(--t2)">ประเมินตนเองแล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+selfDoneCnt+' / '+rows.length+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">ยังไม่ประเมินตนเอง</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--I)">'+(rows.length-selfDoneCnt)+' คน</div></div>';
+  html+='<button class="btn bt" style="margin-left:auto;font-size:12px" onclick="notifyAllPending()">&#128276; ส่งแจ้งเตือนทุกคนที่ยังไม่ประเมิน</button>';
+  html+='</div>';
+  html+='<div class="card"><div style="overflow-x:auto"><table class="sw-table"><thead><tr>';
+  html+='<th class="lft">ชื่อ</th><th>ระดับ</th><th>ประเมินตนเอง</th><th style="min-width:140px">ได้รับการประเมินจากผู้อื่น</th><th>แจ้งเตือน</th>';
+  html+='</tr></thead><tbody>';
+  rows.forEach(function(r){
+    var e=r.e,c=r.c;
+    html+='<tr>';
+    html+='<td class="lft">'+e.name+' <span style="color:var(--t2);font-size:10px">('+e.nick+')</span></td>';
+    html+='<td style="font-size:11px;color:var(--t2)">'+e.role+'</td>';
+    html+='<td>'+(c.selfDone?'<span class="rb-inl" style="background:var(--E)">&#10003; แล้ว</span>':'<span class="rb-inl" style="background:var(--I)">ยังไม่ทำ</span>')+'</td>';
+    html+='<td><div style="display:flex;align-items:center;gap:6px;justify-content:center"><div style="flex:1;max-width:90px;height:6px;background:var(--s2);border-radius:3px;overflow:hidden"><div style="width:'+c.receivedPct+'%;height:100%;background:'+(c.receivedPct>=70?'var(--E)':c.receivedPct>=30?'var(--L)':'var(--I)')+'"></div></div><span style="font-size:10px;color:var(--t2);white-space:nowrap">'+c.receivedPct+'%</span></div></td>';
+    html+='<td><button class="btn bo" style="font-size:10px;padding:4px 10px" onclick="openNotifyDialog(\''+e.empId+'\')">&#128276; แจ้งเตือน</button></td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+  h('adminStatusBody').innerHTML=html;
+}
+function openNotifyDialog(empId){
+  var e=ALL_EMP.filter(function(x){return x.empId===empId;})[0];
+  if(!e)return;
+  h('notifyBody').innerHTML='ส่งการแจ้งเตือนไปยัง <b>'+e.name+'</b> ('+e.nick+') ให้ดำเนินการประเมินให้ครบถ้วนในรอบ <b>'+currentRound.label+'</b>?';
+  h('notifyConfirmBtn').onclick=function(){
+    cov('notifyOvl');
+    toast('&#128276;','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+e.name,'var(--E)');
+  };
+  h('notifyOvl').classList.add('on');
+}
+function notifyAllPending(){
+  var pending=ALL_EMP.filter(function(e){return !mockCompletionFor(e.empId).selfDone;});
+  if(!pending.length){toast('&#9989;','ทุกคนประเมินตนเองครบแล้ว','','var(--E)');return;}
+  h('notifyBody').innerHTML='ส่งการแจ้งเตือนไปยังพนักงานที่ยังไม่ประเมินตนเอง <b>'+pending.length+' คน</b> ให้ดำเนินการในรอบ <b>'+currentRound.label+'</b>?';
+  h('notifyConfirmBtn').onclick=function(){
+    cov('notifyOvl');
+    toast('&#128276;','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+pending.length+' คนที่ยังไม่ประเมินตนเอง','var(--E)');
+  };
+  h('notifyOvl').classList.add('on');
+}
+
+/* --- TAB 2: คะแนนรายบุคคล (sortable: score / Min / Max / letter grade / role level) --- */
+var adminScoreSort='score_desc';
+function renderAdminScores(){
+  var html='<div class="phd"><div><div class="ptitle">&#128202; คะแนนรายบุคคล</div></div><div><button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">&#128190; Export PDF</button></div></div>';
+  html+='<div class="wb" style="margin-bottom:14px"><span>&#8505;&#65039;</span><span>ข้อมูลตัวอย่าง (Demo) \u2014 คะแนนด้านล่างเป็นข้อมูลจำลองเพื่อสาธิตการใช้งาน ไม่ใช่คะแนนจริงจากการประเมิน</span></div>';
+  html+='<div class="card" style="padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+  html+='<span style="font-size:11px;font-weight:700;color:var(--t1)">เรียงตาม:</span>';
+  var sortOpts=[['score_desc','คะแนนมาก\u2192น้อย'],['score_asc','คะแนนน้อย\u2192มาก'],['letter','ระดับตัวอักษร E\u2192I'],['role','ระดับตำแหน่ง ส\u2192ก\u2192ป']];
+  sortOpts.forEach(function(o){
+    html+='<button class="db-ftab'+(adminScoreSort===o[0]?' on':'')+'" onclick="adminScoreSort=\''+o[0]+'\';renderAdminScores()">'+o[1]+'</button>';
+  });
+  html+='</div>';
+  var rows=ALL_EMP.map(function(e){var sc=mockScoreFor(e.empId);return{e:e,sc:sc,lbl:s2l(sc.avg)};});
+  var roleOrder={'ผู้บริหารระดับสูง':0,'เชี่ยวชาญ':0,'ผู้บริหารระดับกลาง':1,'ปฏิบัติการ':2};
+  if(adminScoreSort==='score_desc')rows.sort(function(a,b){return b.sc.avg-a.sc.avg;});
+  else if(adminScoreSort==='score_asc')rows.sort(function(a,b){return a.sc.avg-b.sc.avg;});
+  else if(adminScoreSort==='letter')rows.sort(function(a,b){return b.sc.avg-a.sc.avg;});
+  else if(adminScoreSort==='role')rows.sort(function(a,b){return(roleOrder[a.e.role]||9)-(roleOrder[b.e.role]||9)||b.sc.avg-a.sc.avg;});
+  /* org-wide stats */
+  var avgAll=rows.reduce(function(s,r){return s+r.sc.avg;},0)/rows.length;
+  var minAll=Math.min.apply(null,rows.map(function(r){return r.sc.min;}));
+  var maxAll=Math.max.apply(null,rows.map(function(r){return r.sc.max;}));
+  html+='<div class="card" style="padding:14px 16px;margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap">';
+  html+='<div><div style="font-size:11px;color:var(--t2)">ค่าเฉลี่ยรวม</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:'+s2l(avgAll).c+'">'+avgAll.toFixed(2)+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">Min</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--I)">'+minAll.toFixed(2)+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">Max</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+maxAll.toFixed(2)+'</div></div>';
+  html+='</div>';
+  html+='<div class="card"><div style="overflow-x:auto"><table class="sw-table"><thead><tr>';
+  html+='<th class="lft">ชื่อ</th><th>ระดับตำแหน่ง</th><th>คะแนนเฉลี่ย</th><th>Min</th><th>Max</th><th>ระดับ</th>';
+  html+='</tr></thead><tbody>';
+  rows.forEach(function(r){
+    html+='<tr>';
+    html+='<td class="lft">'+r.e.name+' <span style="color:var(--t2);font-size:10px">('+r.e.nick+')</span></td>';
+    html+='<td style="font-size:11px;color:var(--t2)">'+r.e.role+'</td>';
+    html+='<td><b style="color:'+r.lbl.c+';font-family:var(--fh)">'+r.sc.avg.toFixed(2)+'</b></td>';
+    html+='<td style="color:var(--t2)">'+r.sc.min.toFixed(2)+'</td>';
+    html+='<td style="color:var(--t2)">'+r.sc.max.toFixed(2)+'</td>';
+    html+='<td><span class="rb-inl" style="background:'+RCOL[r.lbl.l]+'">'+r.lbl.l+'</span></td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+  h('adminScoresBody').innerHTML=html;
+}
+
+/* --- TAB 3: จัดการรอบประเมิน (round lifecycle -- moved here from the
+   employee Dashboard since it's purely an Admin/system concern) --- */
+function renderAdminRounds(){
+  var html='<div class="phd"><div><div class="ptitle">&#128197; จัดการรอบประเมิน</div></div></div>';
+  html+='<div class="card" style="padding:16px;margin-bottom:14px">';
+  html+='<div style="font-size:12px;color:var(--t2);margin-bottom:4px">รอบปัจจุบัน</div>';
+  html+='<div style="font-family:var(--fh);font-size:20px;font-weight:800;color:var(--t0);margin-bottom:14px">'+currentRound.label+' <span style="font-size:12px;font-weight:600;color:var(--E)">(กำลังดำเนินการ)</span></div>';
+  html+='<button class="btn bt" onclick="openCloseRoundDialogAdmin()">&#10003; ปิดรอบ &amp; เริ่มรอบใหม่</button>';
+  html+='</div>';
+  html+='<div class="card"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#128193;</div><div class="db-sh-ttl">ประวัติรอบที่ปิดแล้ว</div></div>';
+  if(!ROUNDS.length){
+    html+='<div style="padding:1.5rem;text-align:center;color:var(--t2)">ยังไม่มีรอบที่ปิดแล้ว</div>';
+  } else {
+    html+='<div style="padding:6px 16px 16px">';
+    ROUNDS.slice().reverse().forEach(function(r){
+      var d=new Date(r.closedAt);
+      html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)">';
+      html+='<div><div style="font-weight:700;font-size:13px;color:var(--t0)">'+r.label+'</div><div style="font-size:10px;color:var(--t2)">ปิดรอบเมื่อ '+d.toLocaleDateString('th-TH')+'</div></div>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+  h('adminRoundsBody').innerHTML=html;
+}
+function openCloseRoundDialogAdmin(){
+  h('crCurLabelA').textContent=currentRound.label;
+  h('crNextLabelA').value=nextRoundLabelGuess();
+  h('closeRoundOvlA').classList.add('on');
+}
+if(h('crCancelBtnA'))h('crCancelBtnA').addEventListener('click',function(){h('closeRoundOvlA').classList.remove('on');});
+if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
+  var nextLabel=h('crNextLabelA').value.trim();
+  if(!nextLabel){h('crNextLabelA').focus();return;}
+  /* IMPORTANT LIMITATION: each employee's scores only ever exist in their
+     own browser session (wiped on logout, never aggregated anywhere
+     central) -- so there is no real org-wide score data for the Admin to
+     archive here. This action currently only advances the round
+     label/metadata, ready for when a real backend supplies aggregated
+     scores to archive. selfSc/othSc are stored empty as a placeholder so
+     the data shape matches what a real archived round will look like. */
+  ROUNDS.push({
+    id:'r_'+Date.now(),
+    label:currentRound.label,
+    closedAt:Date.now(),
+    selfSc:{},othSc:{},rsnNotes:{}
+  });
+  currentRound={id:'r_'+Date.now()+'_cur',label:nextLabel};
+  saveRoundsData();
+  h('closeRoundOvlA').classList.remove('on');
+  toast('&#128197;','ปิดรอบเรียบร้อย (Demo)','เริ่มรอบใหม่: '+nextLabel+' \u2014 ยังไม่มีข้อมูลคะแนนจริงให้เก็บประวัติ','var(--L)');
+  renderAdminTab();
+});
+
 /* LOGIN */
 h('eyb').addEventListener('click',function(){var el=h('lp');el.type=el.type==='password'?'text':'password';});
 function doLogin(){
@@ -1196,6 +1597,18 @@ function doLogin(){
   if(!ud||ud.pass!==p){h('lerr').style.display='block';h('lp').value='';return;}
   h('lerr').style.display='none';
   CU=Object.assign({},ud,{username:u});
+  loadRoundsData(); /* round/history is organizational state, shared across logins on this browser */
+  dbRoundView='current';
+  if(CU.isAdmin){
+    /* Admin is a system account, not part of the employee roster --
+       no self/person/grid evaluation tabs, route straight to the
+       Admin shell instead of the regular employee app. */
+    persons=[];
+    h('sl').classList.remove('on');
+    h('saAdmin').classList.add('on');
+    renderAdminTab();
+    return;
+  }
   persons=getDefaults(CU);
   persons.forEach(function(p2){expd[p2.empId]=false;CATS.forEach(function(c){catOp[p2.empId+c]=true;});});
   /* All person cards start collapsed so the user sees the full list (and count) before opening any */
@@ -1221,9 +1634,10 @@ function doLogout(){
   gmCat=CATS[0];gmSM=false;gmSel={};gmDP=null;gmRI=null;subTgt=null;cdIdx=null;orgMode='dept';orgQ='';
   h('lu').value='';h('lp').value='';h('lp').type='password';h('eyb').textContent='\uD83D\uDC41';h('lerr').style.display='none';
   /* close all overlays */
-  ['wovl','subovl','addovl','drillovl','rsnovl','batchrsnovl'].forEach(function(id){h(id).classList.remove('on');});
-  /* switch screens: hide app, show login */
+  ['wovl','subovl','addovl','drillovl','rsnovl','batchrsnovl','closeRoundOvl'].forEach(function(id){h(id).classList.remove('on');});
+  /* switch screens: hide app (employee or admin), show login */
   h('sa').classList.remove('on');
+  h('saAdmin').classList.remove('on');
   h('sl').classList.add('on');
 }
 /* loutbtn uses onclick="doLogout()" in HTML */
@@ -1404,9 +1818,13 @@ function noteCell(pid,cid,locked){
   }
   /* editable state */
   if(hasNote){
+    /* Body click opens the popup to edit; the small x clears the note directly
+       (only offered when the rating isn't L/I, since a reason is mandatory there). */
+    var clearBtn=required?''
+      :'<span class="note-clear-ico" onclick="event.stopPropagation();clearNoteDirect(\''+pid+'\',\''+cid+'\')" title="\u0e25\u0e49\u0e32\u0e07\u0e40\u0e2b\u0e15\u0e38\u0e1c\u0e25">&#10005;</span>';
     return '<div class="note-cell note-has" onclick="openReasonFromNote(\''+pid+'\',\''+cid+'\')" title="\u0e41\u0e01\u0e49\u0e44\u0e02: '+noteText+'">'
       +'<span class="note-txt">'+noteText+'</span>'
-      +'<span class="note-edit-ico">&#9998;</span>'
+      +(required?'<span class="note-edit-ico">&#9998;</span>':clearBtn)
       +'</div>';
   }
   if(required){
@@ -1514,6 +1932,15 @@ function openReasonFromNote(pid,cid){
   var r=gS(pid,cid)||'G';
   openReason(pid,cid,r,function(){renderTab();});
 }
+/* Quick-clear a saved reason directly from the table row's note preview,
+ * without opening the full reason popup. Blocked when the rating is L/I
+ * since a reason is mandatory for those levels (handled by hiding the
+ * clear button in noteCell() rather than checking here). */
+function clearNoteDirect(pid,cid){
+  delete rsnNotes[pid+'|'+cid];
+  autoSave();
+  renderTab();
+}
 
 h('rsnskipbtn').addEventListener('click',function(){
   var required=rsnCurrent&&(rsnCurrent.r==='L'||rsnCurrent.r==='I');
@@ -1521,6 +1948,18 @@ h('rsnskipbtn').addEventListener('click',function(){
   cov('rsnovl');
   if(rsnCurrent.cb){var cb=rsnCurrent.cb;rsnCurrent.cb=null;cb();}
 });
+/* Clear the existing-reason text directly from the "เหตุผลเดิม" indicator,
+ * without needing to manually select+delete inside the textarea. */
+if(h('rsnClearBtn')){
+  h('rsnClearBtn').addEventListener('click',function(e){
+    e.stopPropagation();
+    var ta=h('rsnText');
+    if(ta){ta.value='';if(h('rsnCharCount'))h('rsnCharCount').textContent='0 / 300';}
+    h('rsnExistingNote').style.display='none';
+    _rsnUpdateReqState(); /* re-check: if rating is L/I, save stays blocked until new text is entered */
+    if(ta)ta.focus();
+  });
+}
 h('rsnsavebtn').addEventListener('click',function(){
   var k=rsnCurrent.pid+'|'+rsnCurrent.cid;
   var txt=h('rsnText').value.trim();
@@ -1666,6 +2105,56 @@ function autoLoad(){
     if(d&&d.selfSc){selfSc=d.selfSc;othSc=d.othSc||{};rsnNotes=d.rsnNotes||{};return true;}}catch(e){}
   return false;
 }
+/* Round/history persistence -- separate key so it isn't wiped by per-person
+ * autosave/load cycles above. Saved on every round open/close action. */
+function saveRoundsData(){
+  try{localStorage.setItem('sf_rounds',JSON.stringify({currentRound:currentRound,ROUNDS:ROUNDS}));}catch(e){}
+}
+function loadRoundsData(){
+  try{var d=JSON.parse(localStorage.getItem('sf_rounds')||'null');
+    if(d){currentRound=d.currentRound||currentRound;ROUNDS=d.ROUNDS||[];}}catch(e){}
+}
+
+/* ── Admin: close the current round & start a new one ──
+ * MOCK DATA LAYER: archives selfSc/othSc/rsnNotes as a frozen snapshot in
+ * ROUNDS, then clears them so the new round starts blank. Everything here
+ * is localStorage-only -- when a real backend is connected, this is the
+ * function that should be swapped to call the "close round" API instead. */
+function openCloseRoundDialog(){
+  if(!isAdmin())return;
+  h('crCurLabel').textContent=currentRound.label;
+  h('crNextLabel').value=nextRoundLabelGuess();
+  h('closeRoundOvl').classList.add('on');
+}
+function nextRoundLabelGuess(){
+  var m=currentRound.label.match(/(\d+)\s*$/);
+  if(m){var n=parseInt(m[1],10)+1;return currentRound.label.replace(/\d+\s*$/,n);}
+  return currentRound.label+' (\u0e15\u0e48\u0e2d)';
+}
+if(h('crCancelBtn'))h('crCancelBtn').addEventListener('click',function(){h('closeRoundOvl').classList.remove('on');});
+if(h('crConfirmBtn'))h('crConfirmBtn').addEventListener('click',function(){
+  var nextLabel=h('crNextLabel').value.trim();
+  if(!nextLabel){h('crNextLabel').focus();return;}
+  /* archive the current round as a frozen snapshot */
+  ROUNDS.push({
+    id:'r_'+Date.now(),
+    label:currentRound.label,
+    closedAt:Date.now(),
+    selfSc:JSON.parse(JSON.stringify(selfSc)),
+    othSc:JSON.parse(JSON.stringify(othSc)),
+    rsnNotes:JSON.parse(JSON.stringify(rsnNotes))
+  });
+  /* start the new round: fresh label, blank working scores */
+  currentRound={id:'r_'+Date.now()+'_cur',label:nextLabel};
+  selfSc={};othSc={};rsnNotes={};
+  sSaved=false;sSub=false;oSaved=false;oSub=false;
+  dbRoundView='current';
+  saveRoundsData();
+  autoSave();
+  h('closeRoundOvl').classList.remove('on');
+  toast('&#128197;','ปิดรอบเรียบร้อย','เริ่มรอบใหม่: '+nextLabel,'var(--E)');
+  renderTab();
+});
 
 /* -- SCORE SUMMARY CARD (ranked, shown after Save) -- */
 function scoreSummaryCard(){
@@ -1855,9 +2344,12 @@ function renderPerson(){
   /* score summary card shown after Save */
   var sumHtml=oSaved?scoreSummaryCard():'';
   var html=sumHtml+'<div style="display:flex;flex-direction:column;gap:10px">';
+  var locked2=oSub||oSaved;
+  var defs2={};getDefaults(CU).forEach(function(e){defs2[e.empId]=true;});
   persons.forEach(function(p){
     var open=expd[p.empId];var pct2=pPct(p.empId,false);
     var pc2=pct2>=100?'var(--E)':pct2>=60?'var(--G)':'var(--L)';
+    var canRemove=!locked2&&!defs2[p.empId];
     html+='<div class="pc">';
     html+='<div class="pch2" onclick="expd[\''+p.empId+'\']=!expd[\''+p.empId+'\'];renderPerson()">';
     html+=avHTML(p,40);
@@ -1866,6 +2358,7 @@ function renderPerson(){
     html+='<span class="ppo">'+(p.dept||p.div)+' \u00B7 '+p.pos+'</span>';
     html+='<span class="ppg" style="color:'+pc2+'">'+pct2+'% \u00B7 '+pStr(p.empId,false)+'</span>';
     html+='</div></div>';
+    if(canRemove)html+='<button onclick="event.stopPropagation();removePerson(\''+p.empId+'\')" title="\u0e25\u0e1a\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19" style="flex-shrink:0;width:26px;height:26px;border-radius:50%;border:none;background:rgba(163,45,45,.1);color:var(--I);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-right:4px">&#10005;</button>';
     html+='<div class="pchv'+(open?' op':'')+'">&#9662;</div>';
     html+='</div>';
     html+=rtStrip(p);
@@ -1981,12 +2474,12 @@ function filterAdd(q){
   c.innerHTML=html;
 }
 function addPerson(eid){
-  /* ???????????????????????? Default ??????? - ????????????? ?????????????????????????????? Save ??? */
-  if(persons.filter(function(p){return p.empId===eid;}).length)return; /* ?????? */
+  /* เพิ่มบุคคลเข้ารายการ Default - การ์ดเริ่มต้นแบบย่อ ผู้ใช้กดเปิดเองได้ */
+  if(persons.filter(function(p){return p.empId===eid;}).length)return; /* กันซ้ำ */
   var emp=null;for(var i=0;i<ALL_EMP.length;i++){if(ALL_EMP[i].empId===eid){emp=ALL_EMP[i];break;}}
   if(!emp)return;
   persons.push(Object.assign({},emp));
-  expd[emp.empId]=true;
+  expd[emp.empId]=false; /* start collapsed, same as everyone else -- user can tap to expand */
   CATS.forEach(function(c){catOp[emp.empId+c]=true;});
   filterAdd(h('addq').value);
   renderTab();
@@ -2347,14 +2840,19 @@ function yPct(v){
     {lo:0.5,hi:1.8, topPct:64, hPct:26},
     {lo:0,hi:0.5,   topPct:90, hPct:10}
   ];
+  var raw=50;
   for(var i=0;i<bounds.length;i++){
     var b=bounds[i];
     if(v>=b.lo&&v<=b.hi){
       var frac=(b.hi>b.lo)?(b.hi-v)/(b.hi-b.lo):0; /* higher score -> nearer top of its band */
-      return b.topPct+frac*b.hPct;
+      raw=b.topPct+frac*b.hPct;
+      break;
     }
   }
-  return 50;
+  /* Keep the avg-dot's center at least ~14% away from either edge so the dot
+     (which is centered on this point via translate(-50%,-50%)) never visually
+     overlaps the topmost/bottommost zone-band letter, even at score 5 or 0. */
+  return Math.max(14,Math.min(86,raw));
 }
 
 function renderDash(){
@@ -2385,8 +2883,33 @@ function renderDash(){
   html+='<span style="font-size:10px;color:var(--t2)">ข้อมูลที่มี:</span>';
   html+='<span style="font-size:10px;font-weight:600;color:'+(selfDone>0?'var(--E)':'var(--t2)')+'">'+(selfDone>0?'&#10003;':'\u2013')+' ตนเอง ('+selfDone+'/'+CRITERIA.length+')</span>';
   html+='<span style="font-size:10px;font-weight:600;color:'+(otherDone>0?'var(--G)':'var(--t2)')+'">'+(otherDone>0?'&#10003;':'\u2013')+' ผู้อื่น ('+otherDone+'/'+(persons.length*CRITERIA.length)+')</span>';
+  html+='<button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">&#128190; Export PDF</button>';
   html+='</div>';
   html+='</div></div>';
+
+  /* --- 1b. ROUND SELECTOR ---
+     MOCK DATA LAYER: rounds are stored in localStorage only for now (see
+     ROUNDS/currentRound declaration). Employees can browse past rounds
+     here (read-only); only the Admin account can close/open rounds --
+     see the dedicated Admin shell's "จัดการรอบประเมิน" tab. */
+  html+='<div class="card" style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+  html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">&#128197; รอบประเมิน:</span>';
+  html+='<select id="dbRoundSel" style="padding:5px 10px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer" onchange="dbRoundView=this.value;renderDash()">';
+  html+='<option value="current"'+(dbRoundView==='current'?' selected':'')+'>'+currentRound.label+' (กำลังดำเนินการ)</option>';
+  ROUNDS.slice().reverse().forEach(function(r){
+    html+='<option value="'+r.id+'"'+(dbRoundView===r.id?' selected':'')+'>'+r.label+' (ปิดรอบแล้ว)</option>';
+  });
+  html+='</select>';
+  if(dbRoundView!=='current')html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:5px">&#128065; กำลังดูข้อมูลย้อนหลัง \u2014 อ่านอย่างเดียว</span>';
+  html+='</div>';
+
+  /* if viewing a past round, swap in its frozen data for every widget below;
+     remember the live (current-round) data so we can restore it after render */
+  var _liveSelfSc=selfSc,_liveOthSc=othSc,_liveRsnNotes=rsnNotes,_viewingPast=false;
+  if(dbRoundView!=='current'){
+    var pastRound=ROUNDS.filter(function(r){return r.id===dbRoundView;})[0];
+    if(pastRound){selfSc=pastRound.selfSc;othSc=pastRound.othSc;rsnNotes=pastRound.rsnNotes;_viewingPast=true;}
+  }
 
   /* empty state check */
   var noData=!hasData(dbFilter);
@@ -2400,7 +2923,8 @@ function renderDash(){
   if(noData){
     html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน<br><span style="font-size:11px">กรอกคะแนนในหน้าประเมินก่อน แล้วกลับมาดูที่นี่</span></div>';
   } else {
-    html+='<div style="overflow-x:auto;padding:4px"><table class="sw-table">';
+    /* ── Desktop: full table (hidden on mobile via CSS) ── */
+    html+='<div class="sw-table-wrap"><div style="overflow-x:auto;padding:4px"><table class="sw-table">';
     html+='<thead><tr>';
     html+='<th class="lft" style="min-width:200px">หัวข้อ / เกณฑ์</th>';
     html+='<th>FOCUS</th>';
@@ -2442,7 +2966,52 @@ function renderDash(){
     html+='<td>'+( totAvg?'<span class="rb-inl" style="background:'+RCOL[totL.l]+'">'+totL.l+'</span>':'\u2013')+'</td>';
     html+='<td style="font-size:10px;color:#aaa">'+totCnt+' ข้อมูล</td>';
     html+='</tr>';
-    html+='</tbody></table></div>';
+    html+='</tbody></table></div></div>'; /* close table, overflow-x div, sw-table-wrap */
+
+    /* ── Mobile: card-list view (hidden on desktop via CSS) ──
+       Each criterion becomes a self-contained card so nothing needs
+       horizontal scrolling -- every field (FOCUS, score, level, count)
+       is fully visible and readable at once. */
+    html+='<div class="sw-card-list">';
+    var idsM=dbFilter==='self'?selfId:allIds;
+    CATS.forEach(function(cat){
+      var m=CAT_META[cat];
+      var cc=CRITERIA.filter(function(c){return c.cat===cat;});
+      var catAvg=avgScore2(idsM,cc,dbFilter);
+      var catL=s2l(catAvg);
+      var cnt=dataCount(idsM,cc,dbFilter);
+      html+='<div class="sw-card-cathdr" style="background:'+m.bg+';color:'+m.cl+'">';
+      html+='<span>&#9654; '+m.lb+'</span>';
+      html+='<span class="sw-card-cat-score">'
+        +(catAvg?'<b style="color:'+catL.c+'">'+scaleScore(catAvg).toFixed(2)+'</b> <span class="rb-inl" style="background:'+RCOL[catL.l]+'">'+catL.l+'</span>':'\u2013')
+        +'</span>';
+      html+='</div>';
+      cc.forEach(function(c){
+        var fd=FDEF[c.foc];
+        var avg=avgScore2(idsM,[c],dbFilter);
+        var lbl=s2l(avg);
+        var cnt2=dataCount(idsM,[c],dbFilter);
+        html+='<div class="sw-card">';
+        html+='<div class="sw-card-top">';
+        html+='<span class="sw-card-foc" style="background:'+(fd?fd.bg:'transparent')+';color:'+(fd?fd.cl:'var(--t2)')+'">'+c.foc+'</span>';
+        html+='<span class="sw-card-lbl">'+c.lb+'</span>';
+        html+='</div>';
+        html+='<div class="sw-card-bottom">';
+        html+='<span class="sw-card-score">'+( avg?'<b style="color:'+lbl.c+'">'+scaleScore(avg).toFixed(2)+'</b>':'\u2013')+'</span>';
+        html+='<span class="rb-inl" style="background:'+(avg?RCOL[lbl.l]:'var(--t2)')+'">'+(avg?lbl.l:'\u2013')+'</span>';
+        html+='<span class="sw-card-cnt">'+cnt2+'/'+idsM.length+' คน</span>';
+        html+='</div>';
+        html+='</div>';
+      });
+    });
+    /* Summary card */
+    html+='<div class="sw-card sw-card-sum">';
+    html+='<div class="sw-card-bottom">';
+    html+='<span class="sw-card-lbl" style="color:#fff;font-weight:700">Summary</span>';
+    html+='<span class="sw-card-score">'+( totAvg?'<b style="color:#FFD080">'+scaleScore(totAvg).toFixed(2)+'</b>':'\u2013')+'</span>';
+    html+='<span class="rb-inl" style="background:'+(totAvg?RCOL[totL.l]:'var(--t2)')+'">'+(totAvg?totL.l:'\u2013')+'</span>';
+    html+='</div></div>';
+    html+='</div>'; /* close sw-card-list */
   }
   html+='</div>';
 
@@ -2450,56 +3019,81 @@ function renderDash(){
   html+='<div class="card">';
   html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128202;</div>';
   html+='<div class="db-sh-ttl">ผลการประเมินคะแนน FOCUS</div>';
-  html+='<div class="chart-legend"><span class="chart-legend-item"><span class="chart-ld" style="background:var(--pb)"></span>คะแนน</span></div>';
   html+='</div>';
   if(noData){
     html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน</div>';
   } else {
     var ids3=dbFilter==='self'?selfId:allIds;
     var maxH=160;
+    /* overall average across all 5 FOCUS letters -- used as the dashed
+       reference line and the basis for each bar's vs-average % badge,
+       since there is no prior-period data to compare against. */
+    var focScores={};
+    fkeys.forEach(function(f){focScores[f]=avgScore2(ids3,CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);});
+    var focValsHas=fkeys.map(function(f){return focScores[f];}).filter(function(a){return a>0;});
+    var focAvgAll=focValsHas.length?focValsHas.reduce(function(a,b){return a+b;},0)/focValsHas.length:0;
+    var avgLinePct=focAvgAll?(1-focAvgAll/5)*100:null; /* position of the dashed average line, top-down */
     html+='<div style="padding:0 16px 16px"><div class="focus-chart-wrap" style="align-items:end">';
     html+='<div>';
-    /* y-axis labels */
-    html+='<div style="display:flex;margin-bottom:4px;padding-left:32px">';
-    html+='<div style="flex:1"></div>';
+    /* legend: bar color + average reference line */
+    html+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;padding-left:32px;font-size:10px;color:var(--t2)">';
+    html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--pb)"></span>คะแนนแต่ละ FOCUS</span>';
+    if(focAvgAll)html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:0;border-top:2px dashed var(--I)"></span>เฉลี่ยรวม ('+focAvgAll.toFixed(2)+')</span>';
     html+='</div>';
-    html+='<div style="display:flex;gap:6px;align-items:flex-end;height:200px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 8px 0 28px;position:relative">';
-    /* Y-axis */
-    [5,4,3,2,1].forEach(function(v,i){
+    html+='<div style="display:flex;gap:6px;align-items:flex-end;height:220px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 8px 0 28px;position:relative">';
+    /* Y-axis -- explicit range from 0 (bottom) to 5 (top) */
+    [5,4,3,2,1,0].forEach(function(v,i){
       var top=(1-v/5)*100;
-      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:clamp(10px,2.6vw,13px);font-weight:700;color:var(--t2);width:26px;text-align:right">'+v+'</div>';
+      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:clamp(9px,2.2vw,11px);font-weight:700;color:var(--t2);width:26px;text-align:right">'+v+'</div>';
       html+='<div style="position:absolute;left:30px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
     });
-    /* bars per FOCUS letter -- score number centered INSIDE the bar, level badge above */
+    /* dashed overall-average reference line spanning the bar area */
+    if(avgLinePct!==null)html+='<div style="position:absolute;left:30px;right:8px;top:'+avgLinePct+'%;border-top:2px dashed var(--I);z-index:2"></div>';
+    /* bars per FOCUS letter -- score number centered INSIDE the bar when there's
+       room, or just above it when the bar is too short (low scores stay
+       visually accurate to the 0-5 axis -- no artificial minimum height).
+       A small badge above each bar shows how it compares to the overall
+       average (▲/▼ %), echoing the year-over-year badge style but using
+       "vs. average" since there is no prior-period data to compare against. */
     fkeys.forEach(function(f){
       var fd=FDEF[f];
-      var cur=avgScore2(ids3,CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);
-      var barH=cur?Math.max(38,Math.round(cur/5*maxH)):0; /* min height raised so the centered number always fits */
+      var cur=focScores[f];
+      var barH=cur?Math.max(1,Math.round(cur/5*maxH)):0; /* strictly proportional to the 0-5 scale */
+      var numFits=barH>=26; /* enough room to center the score number inside the bar */
       var lbl=s2l(cur);
+      var diffPct=(cur&&focAvgAll)?Math.round((cur-focAvgAll)/focAvgAll*100):null;
       html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px">';
-      /* level badge (E/G/S/L/I) above the bar */
-      html+='<div style="min-height:26px;display:flex;align-items:center">';
-      if(cur)html+='<span style="padding:3px 10px;border-radius:7px;background:'+RCOL[lbl.l]+';color:#fff;font-size:clamp(10px,2.8vw,14px);font-weight:800;font-family:var(--fh)">'+lbl.l+'</span>';
+      /* vs-average badge (▲/▼ %) */
+      html+='<div style="min-height:18px;display:flex;align-items:center;font-size:clamp(9px,2.2vw,11px);font-weight:700">';
+      if(diffPct!==null){
+        if(diffPct>0)html+='<span style="color:var(--E)">&#9650; '+diffPct+'%</span>';
+        else if(diffPct<0)html+='<span style="color:var(--I)">&#9660; '+Math.abs(diffPct)+'%</span>';
+        else html+='<span style="color:var(--t2)">&#9654; 0%</span>';
+      }
       html+='</div>';
-      /* bar with score number centered inside */
-      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;min-height:'+( cur?'38':'0')+'px;position:relative;display:flex;align-items:center;justify-content:center">';
-      if(cur)html+='<span style="font-size:clamp(11px,3.4vw,18px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
-      else html+='<span style="font-size:clamp(10px,2.8vw,15px);color:var(--t2)">\u2013</span>';
+      /* level badge (E/G/S/L/I) above the bar */
+      html+='<div style="min-height:24px;display:flex;align-items:center">';
+      if(cur)html+='<span style="padding:2px 8px;border-radius:6px;background:'+RCOL[lbl.l]+';color:#fff;font-size:clamp(9px,2.4vw,11px);font-weight:800;font-family:var(--fh)">'+lbl.l+'</span>';
+      html+='</div>';
+      /* score number sits above the bar when the bar is too short to contain it */
+      if(cur&&!numFits)html+='<span style="font-size:clamp(9px,2.2vw,11px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
+      /* bar with score number centered inside (only when it fits) */
+      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
+      if(cur&&numFits)html+='<span style="font-size:clamp(9px,2.2vw,11px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
+      if(!cur)html+='<span style="position:absolute;bottom:2px;font-size:clamp(9px,2vw,11px);color:var(--t2)">\u2013</span>';
       html+='</div>';
       /* FOCUS letter (F/O/C/U/S) */
-      html+='<div style="font-size:clamp(12px,3.2vw,17px);font-weight:800;color:'+fd.cl+'">'+f+'</div>';
-      html+='<div style="font-size:clamp(8px,2vw,11px);font-weight:600;color:var(--t2);text-align:center;max-width:70px;word-break:break-word">'+fd.nm+'</div>';
+      html+='<div style="font-size:clamp(10px,2.6vw,13px);font-weight:800;color:'+fd.cl+'">'+f+'</div>';
+      html+='<div style="font-size:clamp(8px,1.8vw,10px);font-weight:600;color:var(--t2);text-align:center;max-width:70px;word-break:break-word">'+fd.nm+'</div>';
       html+='</div>';
     });
     html+='</div></div>';
     /* Zone chart - average */
-    var focAll=fkeys.map(function(f){return avgScore2(ids3,CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);});
-    var focHas=focAll.filter(function(a){return a>0;});
-    var fm=focHas.length?focHas.reduce(function(a,b){return a+b;},0)/focHas.length:0;
+    var fm=focAvgAll;
     var fmL=s2l(fm);
     html+='<div>';
-    html+='<div style="font-size:clamp(11px,2.6vw,13px);font-weight:700;color:var(--t2);margin-bottom:6px;text-align:center">ภาพรวม FOCUS</div>';
-    html+='<div style="position:relative;height:200px;border-radius:var(--r);overflow:hidden">';
+    html+='<div style="font-size:clamp(10px,2.2vw,11px);font-weight:700;color:var(--t2);margin-bottom:6px;text-align:center">ภาพรวม FOCUS</div>';
+    html+='<div style="position:relative;height:220px;border-radius:var(--r);overflow:hidden">';
     /* Zone chart -- background bands sized to match actual score ranges (not equal 20% each):
        E 4.5-5.0 (10%), G 3.25-4.5 (25%), S 1.8-3.25 (29%), L 0.5-1.8 (26%), I 0-0.5 (10%)
        Stacked top-to-bottom since the chart's y-axis has 5 at top, 0 at bottom. */
@@ -2514,16 +3108,16 @@ function renderDash(){
     zones.forEach(function(z,zi){
       var zh=z[2];
       html+='<div style="position:absolute;top:'+zTop+'%;left:0;right:0;height:'+zh+'%;background:'+z[1]+';display:flex;align-items:center;justify-content:flex-end;padding-right:12px">';
-      html+='<span style="font-size:clamp(12px,3.2vw,18px);font-weight:800;color:rgba(0,0,0,.34)">'+z[0]+'</span></div>';
+      html+='<span style="font-size:clamp(10px,2.6vw,13px);font-weight:800;color:rgba(0,0,0,.34)">'+z[0]+'</span></div>';
       zTop+=zh;
     });
     if(fm){
       html+='<div style="position:absolute;left:50%;top:'+yPct(fm)+'%;transform:translate(-50%,-50%);width:clamp(40px,11vw,56px);height:clamp(40px,11vw,56px);border-radius:50%;background:'+RCOL[fmL.l]+';border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--fh)">';
-      html+='<div style="font-size:clamp(13px,3.4vw,19px);font-weight:800;color:#fff;line-height:1.1">'+fmL.l+'</div>';
-      html+='<div style="font-size:clamp(8px,2vw,11px);font-weight:700;color:rgba(255,255,255,.9)">'+fm.toFixed(2)+'</div>';
+      html+='<div style="font-size:clamp(11px,2.8vw,15px);font-weight:800;color:#fff;line-height:1.1">'+fmL.l+'</div>';
+      html+='<div style="font-size:clamp(8px,1.8vw,10px);font-weight:700;color:rgba(255,255,255,.9)">'+fm.toFixed(2)+'</div>';
       html+='</div>';
     } else {
-      html+='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:clamp(10px,2.6vw,13px)">\u2013</div>';
+      html+='<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:clamp(9px,2.2vw,11px)">\u2013</div>';
     }
     html+='</div>';
     html+='</div>';
@@ -2580,6 +3174,52 @@ function renderDash(){
     }
     html+='</div></div>';
   }
+
+  /* --- 6. ROUND TREND (org-wide FOCUS average across rounds) ---
+     Only meaningful once at least one round has been closed -- otherwise
+     there is nothing to compare yet. Always uses the live current-round
+     scores for the "current" point regardless of which round is being
+     browsed above, so the trend line itself never gets stuck mid-swap. */
+  if(ROUNDS.length>0){
+    html+='<div class="card">';
+    html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128201;</div>';
+    html+='<div class="db-sh-ttl">แนวโน้มคะแนนรวมตามรอบประเมิน</div>';
+    html+='<span style="font-size:10px;color:var(--t2)">เฉลี่ยรวมทุก FOCUS \u2014 ทั้งองค์กร</span></div>';
+    html+='<div style="padding:14px 16px">';
+    var trendPoints=ROUNDS.map(function(r){
+      var savedSelf=selfSc,savedOth=othSc;
+      selfSc=r.selfSc;othSc=r.othSc;
+      var avg=avgScore2(allIds,CRITERIA,'overall');
+      selfSc=savedSelf;othSc=savedOth;
+      return{label:r.label,avg:avg,closed:true};
+    });
+    var savedSelf2=selfSc,savedOth2=othSc;
+    selfSc=_liveSelfSc;othSc=_liveOthSc;
+    var liveAvg=avgScore2(allIds,CRITERIA,'overall');
+    selfSc=savedSelf2;othSc=savedOth2;
+    trendPoints.push({label:currentRound.label+' (ปัจจุบัน)',avg:liveAvg,closed:false});
+    var trendMax=5;
+    html+='<div style="display:flex;align-items:flex-end;gap:18px;height:140px;border-bottom:1.5px solid var(--b0);padding:0 6px 0 30px;position:relative">';
+    [5,4,3,2,1,0].forEach(function(v){
+      var top=(1-v/5)*100;
+      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--t2);width:24px;text-align:right">'+v+'</div>';
+    });
+    trendPoints.forEach(function(tp,ti){
+      var h2=tp.avg?Math.max(1,Math.round(tp.avg/trendMax*120)):0;
+      var lbl=s2l(tp.avg);
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;max-width:90px">';
+      html+='<div style="font-size:11px;font-weight:800;color:'+lbl.c+'">'+(tp.avg?tp.avg.toFixed(2):'\u2013')+'</div>';
+      html+='<div style="width:100%;height:'+h2+'px;background:'+(tp.closed?'var(--S)':'var(--pb)')+';border-radius:5px 5px 0 0"></div>';
+      html+='<div style="font-size:10px;color:var(--t2);text-align:center">'+tp.label+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+    html+='</div></div>';
+  }
+
+  /* restore the live current-round data if we temporarily swapped in a
+     past round's frozen snapshot for browsing above */
+  if(_viewingPast){selfSc=_liveSelfSc;othSc=_liveOthSc;rsnNotes=_liveRsnNotes;}
 
   html+='</div>';
   h('dbody').innerHTML=html;
@@ -2733,10 +3373,44 @@ function openDrill(eid,name,hlCat){
   h('drillovl').classList.add('on');
 }
 
-/* mobile sidebar */
+/* mobile sidebar (drawer open/close on small screens) */
 function toggleSb(){h('sb').classList.toggle('open');h('mobOvl').classList.toggle('open');}
 if(h('hbgBtn'))h('hbgBtn').addEventListener('click',toggleSb);
 if(h('mobOvl'))h('mobOvl').addEventListener('click',function(){h('sb').classList.remove('open');h('mobOvl').classList.remove('open');});
+
+/* desktop sidebar collapse/expand (icon-only rail vs full width) */
+var _sbAutoThreshold=1100; /* below this width, auto-collapse to save space */
+var _sbUserOverride=null;  /* null = follow auto-resize; true/false = user explicitly chose this state */
+function toggleSbCollapse(){
+  var sb=h('sb');if(!sb)return;
+  sb.classList.toggle('collapsed');
+  _sbUserOverride=sb.classList.contains('collapsed');
+  try{localStorage.setItem('sf_sb_collapsed',_sbUserOverride?'1':'0');}catch(e){}
+}
+if(h('sbCollapseBtn'))h('sbCollapseBtn').addEventListener('click',function(e){e.stopPropagation();toggleSbCollapse();});
+/* Auto-collapse the sidebar as the window narrows (e.g. resizing into tablet
+   width, or a smaller laptop screen) so content gets more room automatically.
+   A manual click on the collapse button always takes priority -- once the
+   person has explicitly chosen a state, auto-resize stops overriding it. */
+function _sbAutoResize(){
+  var sb=h('sb');if(!sb)return;
+  if(window.innerWidth<=680)return; /* mobile breakpoint handles its own layout */
+  if(_sbUserOverride!==null)return; /* respect explicit user choice */
+  sb.classList.toggle('collapsed',window.innerWidth<_sbAutoThreshold);
+}
+window.addEventListener('resize',_sbAutoResize);
+/* restore saved collapse state on load, else fall back to auto-sizing */
+(function(){
+  try{
+    var saved=localStorage.getItem('sf_sb_collapsed');
+    if(saved==='1'||saved==='0'){
+      _sbUserOverride=(saved==='1');
+      if(h('sb'))h('sb').classList.toggle('collapsed',_sbUserOverride);
+      return;
+    }
+  }catch(e){}
+  _sbAutoResize(); /* no saved preference yet -- size based on current window width */
+})();
 
 </script>
 </body>
