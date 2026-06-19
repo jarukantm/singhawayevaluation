@@ -254,12 +254,6 @@ button,input,select{font-family:var(--fb)}
 .ppg{font-size:10px;font-weight:600}
 .pchv{font-size:12px;color:var(--t2);transition:transform .2s;flex-shrink:0}
 .pchv.op{transform:rotate(180deg)}
-/* realtime */
-.rts{display:flex;align-items:center;gap:5px;padding:6px 16px;background:var(--s1);
-  border-bottom:1px solid var(--b0);flex-wrap:wrap;border-top:1px solid var(--b0)}
-.rtl{font-size:10px;color:var(--t2);font-weight:600}
-.rtb{padding:2px 8px;border-radius:6px;font-size:10px;font-weight:700}
-.rto{padding:3px 10px;border-radius:6px;font-size:11px;font-weight:700;color:#fff;margin-left:auto}
 .pb{display:none;border-top:1px solid var(--b0)}
 .pb.op{display:block}
 .cath{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;
@@ -381,7 +375,8 @@ button,input,select{font-family:var(--fb)}
 
 /* ── GRID ── */
 .gm{display:flex;flex-direction:column;gap:10px}
-.gmb{padding:10px 14px;background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0)}
+.gmb{padding:10px 14px;background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);
+  position:sticky;top:0;z-index:30}
 .gmt{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin-bottom:8px}
 .gml{font-size:11px;font-weight:700;color:var(--t1)}
 .gstep{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
@@ -753,15 +748,17 @@ button,input,select{font-family:var(--fb)}
  * "Export PDF" calls window.print(); the browser's print/Save-as-PDF dialog
  * handles the actual file creation -- no external library needed. This
  * stylesheet strips away anything that isn't part of the printable report
- * (sidebar, bottom nav, buttons, dropdowns) and lets only the Dashboard
- * content flow as a normal printable document.
+ * (sidebar, bottom nav, buttons, dropdowns, filter/round-selector controls)
+ * and lets only the chosen Dashboard section cards flow as a normal
+ * printable document.
  * The .printing-dash class is toggled on <body> by exportDashPDF() right
- * before calling print(), and removed again on the 'afterprint' event. */
+ * before calling print(), and removed again on the 'afterprint' event.
+ * body.pdf-hide-<sectionId> additionally hides any one card the person
+ * unchecked in the export-options dialog. */
 @media print{
   body.printing-dash .sb,body.printing-dash .mob-nav,body.printing-dash .hbg-btn,
   body.printing-dash .mob-overlay,body.printing-dash .topbar,
-  body.printing-dash .db-filter button,body.printing-dash #dbScaleSel,
-  body.printing-dash #dbRoundSel,body.printing-dash .db-pdf-btn,
+  body.printing-dash [data-pdf-sec="controls"],
   body.printing-dash .sb-collapse-btn{display:none!important}
   body.printing-dash .main{width:100%!important}
   body.printing-dash .view{overflow:visible!important;padding:0!important;display:block!important}
@@ -771,6 +768,11 @@ button,input,select{font-family:var(--fb)}
     page-break-inside:avoid;margin-bottom:14px}
   body.printing-dash .vi{width:100%!important}
   body.printing-dash{background:#fff!important}
+  body.pdf-hide-singhaway [data-pdf-sec="singhaway"],
+  body.pdf-hide-focus [data-pdf-sec="focus"],
+  body.pdf-hide-feedback [data-pdf-sec="feedback"],
+  body.pdf-hide-overview [data-pdf-sec="overview"],
+  body.pdf-hide-trend [data-pdf-sec="trend"]{display:none!important}
 }
 </style>
 </head>
@@ -838,9 +840,9 @@ button,input,select{font-family:var(--fb)}
         <div style="font-size:11px;color:var(--t1);margin-bottom:12px">กรุณาอ่านและรับทราบก่อนเริ่มประเมิน</div>
       </div>
       <div class="wrules">
-        <div class="wrow"><div class="wnum">1</div><div class="wtxt">ผู้ประเมินต้องทำการประเมินรายชื่อ Default <b>ครบทุกคน ในทุกหัวข้อ</b></div></div>
-        <div class="wrow"><div class="wnum">2</div><div class="wtxt">สามารถระบุสาเหตุการให้คะแนน หรือไม่ก็ได้</div></div>
-        <div class="wrow"><div class="wnum">3</div><div class="wtxt">หากต้องการ<b>เพิ่มผู้ถูกประเมิน</b> จำเป็นต้องประเมิน Default ครบทุกหัวข้อก่อน</div></div>
+        <div class="wrow"><div class="wnum">1</div><div class="wtxt">ผู้ประเมินต้องทำการประเมินรายชื่อ <b>ครบทุกคน ในทุกหัวข้อ</b> และสามารถเลือกรายชื่อผู้ที่ต้องการประเมินเพิ่มได้</div></div>
+        <div class="wrow"><div class="wnum">2</div><div class="wtxt">ระดับการประเมินมี 5 ระดับ <b>E</b>-ดีมาก <b>G</b>-ดี <b>S</b>-มาตรฐาน <b>L</b>-ด้อยกว่ามาตรฐาน <b>I</b>-ต้องปรับปรุง</div></div>
+        <div class="wrow"><div class="wnum">3</div><div class="wtxt">การประเมินผู้อื่นสามารถทำได้สองแบบ คือ ประเมินแบบรายบุคคล หรือประเมินรายหัวข้อ ข้อมูลเชื่อมโยงกัน</div></div>
         <div class="wrow"><div class="wnum">4</div><div class="wtxt">กด <b>Save</b> เพื่อบันทึกชั่วคราว — กด <b>Edit</b> เพื่อแก้ไขได้ภายหลัง</div></div>
         <div class="wrow"><div class="wnum">5</div><div class="wtxt">กด <b>Submit</b> เพื่อส่งข้อมูล — หลัง Submit <b>ไม่สามารถแก้ไขได้</b></div></div>
         <div class="wrow"><div class="wnum">6</div><div class="wtxt">ระบบจัดเก็บข้อมูลเมื่อกด Submit เท่านั้น</div></div>
@@ -911,6 +913,7 @@ button,input,select{font-family:var(--fb)}
           <div style="font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t0)">บันทึกเหตุผลการให้คะแนน</div>
           <div style="font-size:11px;color:var(--t2);margin-top:2px">ข้อมูลนี้ช่วยให้การประเมินมีความโปร่งใส — ไม่บังคับกรอก</div>
         </div>
+        <button id="rsnCloseXBtn" type="button" title="\u0e1b\u0e34\u0e14 \u0e41\u0e25\u0e30\u0e22\u0e01\u0e40\u0e25\u0e34\u0e01\u0e01\u0e32\u0e23\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e19\u0e35\u0e49" style="flex-shrink:0;width:28px;height:28px;border-radius:50%;border:none;background:var(--s2);color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">&#10005;</button>
       </div>
 
       <!-- ② Person info card -->
@@ -1001,6 +1004,22 @@ button,input,select{font-family:var(--fb)}
       <div id="fwAllBody" style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:4px"></div>
       <div style="display:flex;justify-content:flex-end;margin-top:14px">
         <button class="btn bo" onclick="cov('fwAllovl')">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPORT PDF -- choose which Dashboard sections to include -->
+  <div class="ovl" id="exportPdfOvl">
+    <div class="mbox" style="max-width:420px">
+      <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px">&#128190; Export PDF</div>
+      <div style="font-size:11px;color:var(--t2);margin-bottom:14px">เลือกเฉพาะส่วนที่ต้องการให้อยู่ในไฟล์ PDF</div>
+      <div id="exportPdfOpts" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <button class="btn bo" style="font-size:11px;padding:6px 10px" onclick="setAllExportPdfOpts(true)">เลือกทั้งหมด</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn bo" onclick="cov('exportPdfOvl')">ยกเลิก</button>
+          <button class="btn bt" id="exportPdfConfirmBtn">&#10003; Export PDF</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1242,31 +1261,31 @@ var RVAL={E:5,G:4,S:3,L:2,I:1};
 var RATINGS=['E','G','S','L','I'];
 var RNAME={E:'Excellence',G:'Good',S:'Standard',L:'Low',I:'Improve'};
 var FDEF={
-  F:{nm:'Fast',cl:'#0D6EE7',bg:'rgba(13,110,231,.1)',df:{
+  F:{nm:'Fast',cl:'#2563EB',bg:'rgba(37,99,235,.1)',df:{
     E:'\u0e40\u0e02\u0e49\u0e32\u0e43\u0e08\u0e41\u0e25\u0e30\u0e15\u0e2d\u0e1a\u0e2a\u0e19\u0e2d\u0e07\u0e04\u0e27\u0e32\u0e21\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e25\u0e39\u0e01\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e17\u0e31\u0e19\u0e17\u0e35 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27\u0e01\u0e27\u0e48\u0e32\u0e41\u0e1c\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e21\u0e35\u0e1b\u0e23\u0e30\u0e2a\u0e34\u0e17\u0e18\u0e34\u0e20\u0e32\u0e1e\u0e41\u0e25\u0e30\u0e15\u0e23\u0e07\u0e08\u0e38\u0e14 \u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e23\u0e31\u0e1a\u0e21\u0e37\u0e2d\u0e07\u0e32\u0e19\u0e40\u0e23\u0e48\u0e07\u0e14\u0e48\u0e27\u0e19 \u0e41\u0e25\u0e30\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e27\u0e34\u0e18\u0e35\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e43\u0e2b\u0e49\u0e40\u0e23\u0e47\u0e27\u0e02\u0e36\u0e49\u0e19',
     G:'\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e04\u0e27\u0e32\u0e21\u0e04\u0e37\u0e1a\u0e2b\u0e19\u0e49\u0e32 \u0e41\u0e01\u0e49\u0e1b\u0e31\u0e0d\u0e2b\u0e32 \u0e15\u0e2d\u0e1a\u0e2a\u0e19\u0e2d\u0e07\u0e41\u0e25\u0e30\u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27\u0e01\u0e27\u0e48\u0e32\u0e41\u0e1c\u0e19\u0e40\u0e25\u0e47\u0e01\u0e19\u0e49\u0e2d\u0e22 \u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e1a\u0e19\u0e1e\u0e37\u0e49\u0e19\u0e10\u0e32\u0e19\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25',
     S:'\u0e41\u0e08\u0e49\u0e07\u0e1c\u0e39\u0e49\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e17\u0e31\u0e19\u0e17\u0e35\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e04\u0e32\u0e14\u0e27\u0e48\u0e32\u0e07\u0e32\u0e19\u0e08\u0e30\u0e25\u0e48\u0e32\u0e0a\u0e49\u0e32 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27 \u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e43\u0e19\u0e02\u0e2d\u0e1a\u0e40\u0e02\u0e15\u0e07\u0e32\u0e19 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e2b\u0e25\u0e32\u0e01\u0e2b\u0e25\u0e32\u0e22\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27\u0e15\u0e23\u0e07\u0e15\u0e32\u0e21\u0e41\u0e1c\u0e19 \u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49\u0e07\u0e32\u0e19\u0e43\u0e2b\u0e21\u0e48\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27',
     L:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e15\u0e32\u0e21\u0e41\u0e1c\u0e19 \u0e41\u0e15\u0e48\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e21\u0e35\u0e07\u0e32\u0e19\u0e41\u0e17\u0e23\u0e01\u0e08\u0e30\u0e40\u0e2a\u0e35\u0e22\u0e08\u0e31\u0e07\u0e2b\u0e27\u0e30 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e0a\u0e49\u0e32\u0e41\u0e21\u0e49\u0e08\u0e30\u0e40\u0e04\u0e22\u0e40\u0e1b\u0e47\u0e19\u0e07\u0e32\u0e19\u0e17\u0e35\u0e48\u0e17\u0e33\u0e21\u0e32\u0e41\u0e25\u0e49\u0e27 \u0e41\u0e25\u0e30\u0e15\u0e49\u0e2d\u0e07\u0e04\u0e2d\u0e22\u0e15\u0e34\u0e14\u0e15\u0e32\u0e21\u0e07\u0e32\u0e19\u0e40\u0e2a\u0e21\u0e2d',
     I:'\u0e44\u0e21\u0e48\u0e08\u0e31\u0e14\u0e25\u0e33\u0e14\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e33\u0e04\u0e31\u0e0d\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e25\u0e48\u0e32\u0e0a\u0e49\u0e32 \u0e23\u0e39\u0e49\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e41\u0e15\u0e48\u0e44\u0e21\u0e48\u0e25\u0e07\u0e21\u0e37\u0e2d\u0e41\u0e01\u0e49 \u0e23\u0e2d\u0e04\u0e33\u0e2a\u0e31\u0e48\u0e07 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e0a\u0e49\u0e32 \u0e41\u0e08\u0e49\u0e07\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e01\u0e23\u0e30\u0e0a\u0e31\u0e49\u0e19\u0e0a\u0e34\u0e14\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48\u0e41\u0e08\u0e49\u0e07'}},
-  O:{nm:'Ownership',cl:'#1D9E75',bg:'rgba(29,158,117,.1)',df:{
+  O:{nm:'Ownership',cl:'#0EA5A8',bg:'rgba(14,165,168,.1)',df:{
     E:'\u0e21\u0e35\u0e04\u0e27\u0e32\u0e21\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e08\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e15\u0e48\u0e2d\u0e1c\u0e25\u0e25\u0e31\u0e1e\u0e18\u0e4c \u0e44\u0e21\u0e48\u0e1b\u0e25\u0e48\u0e2d\u0e22\u0e1c\u0e48\u0e32\u0e19\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e41\u0e08\u0e49\u0e07\u0e41\u0e25\u0e30\u0e41\u0e01\u0e49\u0e44\u0e02\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e19\u0e33\u0e44\u0e1b\u0e1b\u0e23\u0e31\u0e1a\u0e1b\u0e23\u0e38\u0e07\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1b\u0e49\u0e2d\u0e07\u0e01\u0e31\u0e19\u0e01\u0e32\u0e23\u0e40\u0e01\u0e34\u0e14\u0e0b\u0e49\u0e33',
     G:'\u0e21\u0e35\u0e04\u0e27\u0e32\u0e21\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e08\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e15\u0e48\u0e2d\u0e1c\u0e25\u0e25\u0e31\u0e1e\u0e18\u0e4c \u0e41\u0e08\u0e49\u0e07\u0e41\u0e25\u0e30\u0e41\u0e01\u0e49\u0e44\u0e02\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34',
     S:'\u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e2b\u0e19\u0e49\u0e32\u0e17\u0e35\u0e48 \u0e41\u0e01\u0e49\u0e44\u0e02\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e0a\u0e35\u0e49\u0e41\u0e19\u0e30 \u0e41\u0e08\u0e49\u0e07\u0e1c\u0e39\u0e49\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34',
     L:'\u0e1b\u0e0f\u0e34\u0e1a\u0e31\u0e15\u0e34\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e17\u0e35\u0e48\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e21\u0e2d\u0e1a\u0e2b\u0e21\u0e32\u0e22 \u0e15\u0e49\u0e2d\u0e07\u0e15\u0e34\u0e14\u0e15\u0e32\u0e21 \u0e40\u0e1e\u0e34\u0e01\u0e40\u0e09\u0e22\u0e15\u0e48\u0e2d\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e41\u0e25\u0e30\u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e04\u0e27\u0e32\u0e21\u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e40\u0e01\u0e34\u0e14\u0e1b\u0e31\u0e0d\u0e2b\u0e32',
     I:'\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e44\u0e21\u0e48\u0e41\u0e08\u0e49\u0e07\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e2b\u0e23\u0e37\u0e2d\u0e41\u0e01\u0e49\u0e44\u0e02 \u0e2a\u0e48\u0e07\u0e1c\u0e25\u0e01\u0e23\u0e30\u0e17\u0e1a\u0e15\u0e48\u0e2d\u0e07\u0e32\u0e19\u0e41\u0e25\u0e30\u0e17\u0e35\u0e21 \u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e01\u0e32\u0e23\u0e22\u0e2d\u0e21\u0e23\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e41\u0e25\u0e30\u0e1c\u0e25\u0e31\u0e01\u0e20\u0e32\u0e23\u0e30\u0e43\u0e2b\u0e49\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19'}},
-  C:{nm:'Commitment',cl:'#534AB7',bg:'rgba(83,74,183,.1)',df:{
+  C:{nm:'Commitment',cl:'#7C3AED',bg:'rgba(124,58,237,.1)',df:{
     E:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32 \u0e04\u0e32\u0e14\u0e01\u0e32\u0e23\u0e13\u0e4c \u0e41\u0e25\u0e30\u0e27\u0e32\u0e07\u0e41\u0e1c\u0e19\u0e1b\u0e49\u0e2d\u0e07\u0e01\u0e31\u0e19\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e44\u0e14\u0e49\u0e17\u0e38\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e41\u0e25\u0e30\u0e1e\u0e31\u0e12\u0e19\u0e32\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e15\u0e48\u0e2d\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07',
     G:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14\u0e43\u0e19\u0e2a\u0e34\u0e48\u0e07\u0e17\u0e35\u0e48\u0e17\u0e33\u0e44\u0e14\u0e49 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d \u0e1e\u0e31\u0e12\u0e19\u0e32\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e43\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19',
     S:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14\u0e43\u0e19\u0e2a\u0e34\u0e48\u0e07\u0e17\u0e35\u0e48\u0e17\u0e33\u0e44\u0e14\u0e49 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49 \u0e2a\u0e48\u0e07\u0e21\u0e2d\u0e1a\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19',
     L:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49\u0e1a\u0e32\u0e07\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e21\u0e48\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d',
     I:'\u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e1b\u0e32\u0e01/\u0e44\u0e21\u0e48\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e44\u0e21\u0e48\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32 \u0e44\u0e21\u0e48\u0e21\u0e35\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e43\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19'}},
-  U:{nm:'United',cl:'#0F6E52',bg:'rgba(15,110,82,.1)',df:{
+  U:{nm:'United',cl:'#16A34A',bg:'rgba(22,163,74,.1)',df:{
     E:'\u0e40\u0e1b\u0e47\u0e19\u0e41\u0e1a\u0e1a\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e02\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e40\u0e1b\u0e47\u0e19\u0e17\u0e35\u0e21 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e43\u0e2b\u0e49\u0e04\u0e19\u0e23\u0e2d\u0e1a\u0e15\u0e31\u0e27\u0e2d\u0e22\u0e32\u0e01\u0e23\u0e48\u0e27\u0e21\u0e21\u0e37\u0e2d\u0e14\u0e49\u0e27\u0e22',
     G:'\u0e0a\u0e48\u0e27\u0e22\u0e40\u0e2b\u0e25\u0e37\u0e2d\u0e17\u0e35\u0e21\u0e40\u0e0a\u0e34\u0e07\u0e23\u0e38\u0e01 \u0e41\u0e25\u0e30\u0e2a\u0e48\u0e07\u0e40\u0e2a\u0e23\u0e34\u0e21\u0e1a\u0e23\u0e23\u0e22\u0e32\u0e01\u0e32\u0e28\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d',
     S:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e1a\u0e17\u0e35\u0e21\u0e15\u0e32\u0e21\u0e1a\u0e17\u0e1a\u0e32\u0e17\u0e2b\u0e19\u0e49\u0e32\u0e17\u0e35\u0e48 \u0e41\u0e25\u0e30\u0e40\u0e04\u0e32\u0e23\u0e1e\u0e02\u0e49\u0e2d\u0e15\u0e01\u0e25\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21',
     L:'\u0e43\u0e2b\u0e49\u0e04\u0e27\u0e32\u0e21\u0e23\u0e48\u0e27\u0e21\u0e21\u0e37\u0e2d\u0e40\u0e09\u0e1e\u0e32\u0e30\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e16\u0e39\u0e01\u0e02\u0e2d \u0e41\u0e15\u0e48\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e43\u0e2a\u0e48\u0e43\u0e08\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e43\u0e19\u0e20\u0e32\u0e1e\u0e23\u0e27\u0e21',
     I:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e41\u0e1a\u0e1a\u0e15\u0e48\u0e32\u0e07\u0e04\u0e19\u0e15\u0e48\u0e32\u0e07\u0e17\u0e33 \u0e44\u0e21\u0e48\u0e40\u0e1b\u0e34\u0e14\u0e23\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e04\u0e34\u0e14\u0e40\u0e2b\u0e47\u0e19 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e43\u0e2b\u0e49\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e19\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e15\u0e34\u0e14\u0e02\u0e31\u0e14'}},
-  S:{nm:'Strong',cl:'#993C1D',bg:'rgba(153,60,29,.1)',df:{
+  S:{nm:'Strong',cl:'#DC2626',bg:'rgba(220,38,38,.1)',df:{
     E:'\u0e40\u0e1b\u0e47\u0e19\u0e1e\u0e25\u0e31\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e43\u0e19\u0e17\u0e38\u0e01\u0e2a\u0e16\u0e32\u0e19\u0e01\u0e32\u0e23\u0e13\u0e4c \u0e2a\u0e23\u0e49\u0e32\u0e07\u0e41\u0e23\u0e07\u0e1a\u0e31\u0e19\u0e14\u0e32\u0e25\u0e43\u0e08\u0e43\u0e2b\u0e49\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19\u0e01\u0e25\u0e49\u0e32\u0e01\u0e49\u0e32\u0e27\u0e02\u0e49\u0e32\u0e21\u0e02\u0e35\u0e14\u0e08\u0e33\u0e01\u0e31\u0e14 \u0e41\u0e25\u0e30\u0e1c\u0e25\u0e31\u0e01\u0e14\u0e31\u0e19\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07\u0e44\u0e1b\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e01\u0e31\u0e19',
     G:'\u0e22\u0e37\u0e19\u0e2b\u0e22\u0e31\u0e14\u0e17\u0e48\u0e32\u0e21\u0e01\u0e25\u0e32\u0e07\u0e04\u0e27\u0e32\u0e21\u0e01\u0e14\u0e14\u0e31\u0e19 \u0e01\u0e25\u0e49\u0e32\u0e40\u0e2a\u0e19\u0e2d\u0e41\u0e19\u0e27\u0e04\u0e34\u0e14\u0e43\u0e2b\u0e21\u0e48 \u0e41\u0e25\u0e30\u0e23\u0e48\u0e27\u0e21\u0e02\u0e31\u0e1a\u0e40\u0e04\u0e25\u0e37\u0e48\u0e2d\u0e19\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21',
     S:'\u0e01\u0e25\u0e49\u0e32\u0e40\u0e1c\u0e0a\u0e34\u0e0d\u0e1b\u0e31\u0e0d\u0e2b\u0e32 \u0e41\u0e2a\u0e14\u0e07\u0e04\u0e27\u0e32\u0e21\u0e04\u0e34\u0e14\u0e40\u0e2b\u0e47\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e40\u0e2b\u0e21\u0e32\u0e30\u0e2a\u0e21 \u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49\u0e41\u0e25\u0e30\u0e40\u0e1b\u0e34\u0e14\u0e23\u0e31\u0e1a\u0e41\u0e19\u0e27\u0e04\u0e34\u0e14\u0e43\u0e2b\u0e21\u0e48\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1e\u0e31\u0e12\u0e19\u0e32\u0e15\u0e19\u0e40\u0e2d\u0e07',
@@ -1382,17 +1401,59 @@ function toast(ico,msg,sub,col){
   el.classList.add('on');if(ttimer)clearTimeout(ttimer);ttimer=setTimeout(function(){el.classList.remove('on');},3600);
 }
 
-/* ── Export Dashboard as PDF ──
+/* ── Export Dashboard as PDF (with section picker) ──
  * Uses the browser's native print dialog (Save as PDF) rather than a JS
- * PDF library -- no external dependency, works offline, and respects the
- * @media print stylesheet that hides the sidebar/nav/buttons so only the
- * report content prints. body.printing-dash is removed again on
+ * PDF library -- no external dependency, works offline. Each exportable
+ * Dashboard card is tagged with data-pdf-sec="..." in renderDash(); the
+ * options dialog below lets the person choose which of those sections to
+ * include, then body.printing-dash + body.pdf-hide-<sec> classes control
+ * what's visible during print via the @media print stylesheet.
+ * body.printing-dash (and any pdf-hide-* class) is removed again on
  * 'afterprint' so the live app UI is unaffected once the dialog closes. */
+var PDF_SECTIONS=[
+  {id:'singhaway',label:'ผลการประเมิน Singhaway Values'},
+  {id:'focus',label:'ผลการประเมินคะแนน FOCUS'},
+  {id:'feedback',label:'ข้อเสนอแนะจากการประเมิน'},
+  {id:'overview',label:'ภาพรวมคะแนนรายบุคคล'},
+  {id:'trend',label:'แนวโน้มคะแนนตามรอบประเมิน'}
+];
 function exportDashPDF(){
-  document.body.classList.add('printing-dash');
-  setTimeout(function(){window.print();},50);
+  var wrap=h('exportPdfOpts');if(!wrap)return;
+  wrap.innerHTML='';
+  PDF_SECTIONS.forEach(function(sec){
+    /* skip offering a section that has no card on the page right now
+       (e.g. "แนวโน้ม" only exists once a round has been closed) */
+    if(!document.querySelector('[data-pdf-sec="'+sec.id+'"]'))return;
+    var row=document.createElement('label');
+    row.style.cssText='display:flex;align-items:center;gap:9px;padding:9px 11px;border:1.5px solid var(--b0);border-radius:var(--r);cursor:pointer';
+    row.innerHTML='<input type="checkbox" class="pdf-sec-chk" data-sec="'+sec.id+'" checked style="width:16px;height:16px;accent-color:var(--pb);cursor:pointer"><span style="font-size:12px;color:var(--t0)">'+sec.label+'</span>';
+    wrap.appendChild(row);
+  });
+  if(!wrap.children.length){
+    wrap.innerHTML='<div style="font-size:12px;color:var(--t2);text-align:center;padding:1rem">ยังไม่มีข้อมูลให้ Export</div>';
+  }
+  h('exportPdfOvl').classList.add('on');
 }
-window.addEventListener('afterprint',function(){document.body.classList.remove('printing-dash');});
+function setAllExportPdfOpts(checked){
+  document.querySelectorAll('.pdf-sec-chk').forEach(function(c){c.checked=checked;});
+}
+if(h('exportPdfConfirmBtn')){
+  h('exportPdfConfirmBtn').addEventListener('click',function(){
+    var chosen=[];
+    document.querySelectorAll('.pdf-sec-chk').forEach(function(c){if(c.checked)chosen.push(c.dataset.sec);});
+    cov('exportPdfOvl');
+    /* hide every exportable card whose section wasn't chosen */
+    PDF_SECTIONS.forEach(function(sec){
+      document.body.classList.toggle('pdf-hide-'+sec.id,chosen.indexOf(sec.id)<0);
+    });
+    document.body.classList.add('printing-dash');
+    setTimeout(function(){window.print();},50);
+  });
+}
+window.addEventListener('afterprint',function(){
+  document.body.classList.remove('printing-dash');
+  PDF_SECTIONS.forEach(function(sec){document.body.classList.remove('pdf-hide-'+sec.id);});
+});
 
 /* ══════════════════════════ ADMIN MODULE ══════════════════════════
  * MOCK DATA LAYER -- IMPORTANT LIMITATION:
@@ -1948,6 +2009,25 @@ h('rsnskipbtn').addEventListener('click',function(){
   cov('rsnovl');
   if(rsnCurrent.cb){var cb=rsnCurrent.cb;rsnCurrent.cb=null;cb();}
 });
+/* Close (x) button -- always available, even for mandatory L/I ratings.
+ * If the rating is L/I and no reason has actually been saved for it yet,
+ * closing this way means the person changed their mind about that rating:
+ * clear the score entirely (delete it from othSc) so it's exactly as if
+ * the E/G/S/L/I button was never clicked, rather than leaving an L/I
+ * rating with no required reason sitting in an invalid state. */
+if(h('rsnCloseXBtn')){
+  h('rsnCloseXBtn').addEventListener('click',function(){
+    if(!rsnCurrent){cov('rsnovl');return;}
+    var required=(rsnCurrent.r==='L'||rsnCurrent.r==='I');
+    var alreadySaved=!!rsnNotes[rsnCurrent.pid+'|'+rsnCurrent.cid];
+    if(required&&!alreadySaved){
+      delete othSc[sk(rsnCurrent.pid,rsnCurrent.cid)];
+      autoSave();
+    }
+    cov('rsnovl');
+    if(rsnCurrent.cb){var cb=rsnCurrent.cb;rsnCurrent.cb=null;cb();}
+  });
+}
 /* Clear the existing-reason text directly from the "เหตุผลเดิม" indicator,
  * without needing to manually select+delete inside the textarea. */
 if(h('rsnClearBtn')){
@@ -2321,17 +2401,6 @@ function renderSelf(){
 }
 
 /* REALTIME */
-function rtStrip(p){
-  var cats=CATS.map(function(cat){return avgFor([p.empId],CRITERIA.filter(function(c){return c.cat===cat;}),false);});
-  var ov=avgFor([p.empId],CRITERIA,false);var ovL=s2l(ov);
-  var html='<div class="rts"><span class="rtl">Real-time :</span>';
-  CATS.forEach(function(cat,i){var l=s2l(cats[i]);
-    if(l.l!=='\u2014')html+='<span class="rtb" style="background:'+RCOL[l.l]+'18;color:'+RCOL[l.l]+'">'+cat.split(' ').slice(-1)[0]+': '+l.l+'</span>';
-  });
-  if(ovL.l!=='\u2014')html+='<span class="rto" style="background:'+RCOL[ovL.l]+';margin-left:auto">รวม: '+ovL.l+'</span>';
-  return html+'</div>';
-}
-
 /* PERSON CARDS */
 function renderPerson(){
   var total=CRITERIA.length*persons.length;var done=0;
@@ -2361,7 +2430,6 @@ function renderPerson(){
     if(canRemove)html+='<button onclick="event.stopPropagation();removePerson(\''+p.empId+'\')" title="\u0e25\u0e1a\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19" style="flex-shrink:0;width:26px;height:26px;border-radius:50%;border:none;background:rgba(163,45,45,.1);color:var(--I);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-right:4px">&#10005;</button>';
     html+='<div class="pchv'+(open?' op':'')+'">&#9662;</div>';
     html+='</div>';
-    html+=rtStrip(p);
     html+='<div class="pb'+(open?' op':'')+'">';
     CATS.forEach(function(cat){
       var m=CAT_META[cat];var cc=CRITERIA.filter(function(c){return c.cat===cat;});
@@ -2499,14 +2567,26 @@ function renderGrid(){
   var cc=CRITERIA.filter(function(c){return c.cat===gmCat;});
   var m=CAT_META[gmCat];
   function placed(cid,r){return persons.filter(function(p){return gS(p.empId,cid)===r;});}
+  /* completion state per category -- used for both the dropdown checkmarks
+     and the at-a-glance status row below, so a person switching back and
+     forth between tabs doesn't have to open the dropdown to check which
+     main categories still need attention. */
+  function catIsDone(cat){
+    var critsInCat=CRITERIA.filter(function(c){return c.cat===cat;});
+    return persons.every(function(p){return critsInCat.every(function(c){return !!gS(p.empId,c.id);});});
+  }
   var sumHtml2=oSaved?scoreSummaryCard():'';
   var html=sumHtml2+'<div class="gm">';
   /* bank */
   html+='<div class="gmb"><div class="gmt">';
-  html+='<div class="gml"><span class="gstep">1</span>ลากชื่อลงตาราง <span class="gstep">2</span>กดค้าง 0.5 วิ เลือกหลายคน</div>';
+  html+='<div class="gml"><span class="gstep">1</span>สามารถจัดเรียงรายชื่อได้ <span class="gstep">2</span>กดค้าง 0.5 วินาทีเพื่อเข้าสู่โหมดเลือกหลายคน <span class="gstep">3</span>ประเมินโดยการนำรายชื่อใส่ในตาราง</div>';
   html+='<select class="gcatsel" id="gcatsel">';
-  CATS.forEach(function(c){html+='<option value="'+c+'"'+(c===gmCat?' selected':'')+'>'+CAT_META[c].lb+'</option>';});
-  html+='</select></div><div class="gmc" id="gmchips2">';
+  CATS.forEach(function(c){
+    var mark=catIsDone(c)?'\u2713 ':'';
+    html+='<option value="'+c+'"'+(c===gmCat?' selected':'')+'>'+mark+CAT_META[c].lb+'</option>';
+  });
+  html+='</select></div>';
+  html+='<div class="gmc" id="gmchips2">';
   persons.forEach(function(p,i){
     var allDone=cc.every(function(c){return gS(p.empId,c.id);});
     var isSel=!!gmSel[p.empId];
@@ -2539,17 +2619,24 @@ function renderGrid(){
   cc.forEach(function(c){
     var fd=FDEF[c.foc];
     var ftStyle=fd?'background:'+fd.bg+';color:'+fd.cl:'background:transparent;color:var(--t2)';
-    /* who has been evaluated already on this criterion (any rating) */
-    var doneList=persons.filter(function(p){return !!gS(p.empId,c.id);});
+    /* who still needs to be evaluated on this criterion (any rating) --
+       showing the REMAINING people is more useful than a completed-count,
+       since the user can see at a glance exactly who they still owe a
+       score to without counting backwards from a number. */
+    var pendingList=persons.filter(function(p){return !gS(p.empId,c.id);});
     html+='<div class="ggcc"><span style="'+ftStyle+';width:18px;height:18px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0">'+c.foc+'</span>'+c.lb;
-    /* evaluated-so-far indicator */
+    /* pending (not-yet-evaluated) indicator */
     html+='<div class="ggcc-done">';
-    doneList.slice(0,5).forEach(function(p){
-      var ph3=getPhoto(p.empId);
-      var av3=ph3?'<img src="'+ph3+'" alt="'+p.name+'">':'<span style="background:'+p.color+';width:100%;height:100%;display:flex;align-items:center;justify-content:center">'+ini(p.name)+'</span>';
-      html+='<div class="ggcc-done-av" title="'+p.name+' \u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e41\u0e25\u0e49\u0e27">'+av3+'</div>';
-    });
-    html+='<span class="ggcc-done-cnt">'+doneList.length+'/'+persons.length+' \u0e04\u0e19</span>';
+    if(pendingList.length===0){
+      html+='<span class="ggcc-done-cnt" style="color:var(--E)">&#10003; ครบทุกคน</span>';
+    } else {
+      pendingList.slice(0,5).forEach(function(p){
+        var ph3=getPhoto(p.empId);
+        var av3=ph3?'<img src="'+ph3+'" alt="'+p.name+'">':'<span style="background:'+p.color+';width:100%;height:100%;display:flex;align-items:center;justify-content:center">'+ini(p.name)+'</span>';
+        html+='<div class="ggcc-done-av" title="'+p.name+' \u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19">'+av3+'</div>';
+      });
+      html+='<span class="ggcc-done-cnt">เหลือ '+pendingList.length+' คน</span>';
+    }
     html+='</div>';
     html+='</div>';
     RATINGS.forEach(function(r){
@@ -2862,7 +2949,7 @@ function renderDash(){
   var html='<div style="display:flex;flex-direction:column;gap:14px">';
 
   /* --- 1. FILTER --- */
-  html+='<div class="card"><div class="db-filter">';
+  html+='<div class="card" data-pdf-sec="controls"><div class="db-filter">';
   html+='<span class="db-filter-lbl">&#128269; แสดงผล:</span>';
   [['overall','\uD83C\uDF10 Overall'],['self','\uD83E\uDDD1 ตนเอง'],['other','\uD83D\uDC65 ผู้อื่น'],['p','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e1b'],['k','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e01'],['s','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e2a']].forEach(function(f){
     html+='<button class="db-ftab'+(dbFilter===f[0]?' on':'')+'" onclick="dbFilter=\''+f[0]+'\';renderDash()">'+f[1]+'</button>';
@@ -2892,7 +2979,7 @@ function renderDash(){
      ROUNDS/currentRound declaration). Employees can browse past rounds
      here (read-only); only the Admin account can close/open rounds --
      see the dedicated Admin shell's "จัดการรอบประเมิน" tab. */
-  html+='<div class="card" style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+  html+='<div class="card" data-pdf-sec="controls" style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
   html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">&#128197; รอบประเมิน:</span>';
   html+='<select id="dbRoundSel" style="padding:5px 10px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer" onchange="dbRoundView=this.value;renderDash()">';
   html+='<option value="current"'+(dbRoundView==='current'?' selected':'')+'>'+currentRound.label+' (กำลังดำเนินการ)</option>';
@@ -2915,7 +3002,7 @@ function renderDash(){
   var noData=!hasData(dbFilter);
 
   /* --- 2. SINGHAWAY TABLE --- */
-  html+='<div class="card">';
+  html+='<div class="card" data-pdf-sec="singhaway">';
   html+='<div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#11088;</div>';
   html+='<div class="db-sh-ttl">\u0e1c\u0e25\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19 Singhaway Values</div>';
   if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
@@ -3016,7 +3103,7 @@ function renderDash(){
   html+='</div>';
 
   /* --- 3. FOCUS CHART --- */
-  html+='<div class="card">';
+  html+='<div class="card" data-pdf-sec="focus">';
   html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128202;</div>';
   html+='<div class="db-sh-ttl">ผลการประเมินคะแนน FOCUS</div>';
   html+='</div>';
@@ -3024,7 +3111,8 @@ function renderDash(){
     html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน</div>';
   } else {
     var ids3=dbFilter==='self'?selfId:allIds;
-    var maxH=160;
+    var maxH=180; /* px height representing a score of 5 -- bars scale strictly against this */
+    var chartAreaH=220; /* total px height of the scaled 0-5 axis area */
     /* overall average across all 5 FOCUS letters -- used as the dashed
        reference line and the basis for each bar's vs-average % badge,
        since there is no prior-period data to compare against. */
@@ -3032,62 +3120,75 @@ function renderDash(){
     fkeys.forEach(function(f){focScores[f]=avgScore2(ids3,CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);});
     var focValsHas=fkeys.map(function(f){return focScores[f];}).filter(function(a){return a>0;});
     var focAvgAll=focValsHas.length?focValsHas.reduce(function(a,b){return a+b;},0)/focValsHas.length:0;
-    var avgLinePct=focAvgAll?(1-focAvgAll/5)*100:null; /* position of the dashed average line, top-down */
+    var avgLinePct=focAvgAll?(1-focAvgAll/5)*100:null; /* position of the dashed average line, top-down, within the 0-5 scaled area only */
     html+='<div style="padding:0 16px 16px"><div class="focus-chart-wrap" style="align-items:end">';
     html+='<div>';
     /* legend: bar color + average reference line */
-    html+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;padding-left:32px;font-size:10px;color:var(--t2)">';
+    html+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;padding-left:32px;font-size:10px;color:var(--t2);flex-wrap:wrap">';
     html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--pb)"></span>คะแนนแต่ละ FOCUS</span>';
     if(focAvgAll)html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:0;border-top:2px dashed var(--I)"></span>เฉลี่ยรวม ('+focAvgAll.toFixed(2)+')</span>';
     html+='</div>';
-    html+='<div style="display:flex;gap:6px;align-items:flex-end;height:220px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 8px 0 28px;position:relative">';
-    /* Y-axis -- explicit range from 0 (bottom) to 5 (top) */
-    [5,4,3,2,1,0].forEach(function(v,i){
-      var top=(1-v/5)*100;
-      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:clamp(9px,2.2vw,11px);font-weight:700;color:var(--t2);width:26px;text-align:right">'+v+'</div>';
-      html+='<div style="position:absolute;left:30px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
-    });
-    /* dashed overall-average reference line spanning the bar area */
-    if(avgLinePct!==null)html+='<div style="position:absolute;left:30px;right:8px;top:'+avgLinePct+'%;border-top:2px dashed var(--I);z-index:2"></div>';
-    /* bars per FOCUS letter -- score number centered INSIDE the bar when there's
-       room, or just above it when the bar is too short (low scores stay
-       visually accurate to the 0-5 axis -- no artificial minimum height).
-       A small badge above each bar shows how it compares to the overall
-       average (▲/▼ %), echoing the year-over-year badge style but using
-       "vs. average" since there is no prior-period data to compare against. */
+    /* ── Badge lane: vs-average % + E/G/S/L/I level badge ──
+       Rendered as its own fixed-height row OUTSIDE the scaled 0-5 chart
+       area below, so it never competes for space with the bars or the
+       dashed average line -- this is what caused the overlap before. */
+    html+='<div style="display:flex;gap:6px;padding:0 8px 0 28px">';
     fkeys.forEach(function(f){
-      var fd=FDEF[f];
       var cur=focScores[f];
-      var barH=cur?Math.max(1,Math.round(cur/5*maxH)):0; /* strictly proportional to the 0-5 scale */
-      var numFits=barH>=26; /* enough room to center the score number inside the bar */
       var lbl=s2l(cur);
       var diffPct=(cur&&focAvgAll)?Math.round((cur-focAvgAll)/focAvgAll*100):null;
-      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px">';
-      /* vs-average badge (▲/▼ %) */
-      html+='<div style="min-height:18px;display:flex;align-items:center;font-size:clamp(9px,2.2vw,11px);font-weight:700">';
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0">';
+      html+='<div style="min-height:16px;display:flex;align-items:center;font-size:clamp(9px,2.2vw,11px);font-weight:700">';
       if(diffPct!==null){
         if(diffPct>0)html+='<span style="color:var(--E)">&#9650; '+diffPct+'%</span>';
         else if(diffPct<0)html+='<span style="color:var(--I)">&#9660; '+Math.abs(diffPct)+'%</span>';
         else html+='<span style="color:var(--t2)">&#9654; 0%</span>';
       }
       html+='</div>';
-      /* level badge (E/G/S/L/I) above the bar */
-      html+='<div style="min-height:24px;display:flex;align-items:center">';
+      html+='<div style="min-height:22px;display:flex;align-items:center">';
       if(cur)html+='<span style="padding:2px 8px;border-radius:6px;background:'+RCOL[lbl.l]+';color:#fff;font-size:clamp(9px,2.4vw,11px);font-weight:800;font-family:var(--fh)">'+lbl.l+'</span>';
       html+='</div>';
-      /* score number sits above the bar when the bar is too short to contain it */
-      if(cur&&!numFits)html+='<span style="font-size:clamp(9px,2.2vw,11px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
-      /* bar with score number centered inside (only when it fits) */
+      html+='</div>';
+    });
+    html+='</div>';
+    /* ── Scaled chart area: y-axis, gridlines, average line, and bars --
+       ALL positioned strictly against the same 0-5 scale within this one
+       fixed-height (chartAreaH) box, so nothing drifts out of alignment. */
+    html+='<div style="display:flex;gap:6px;align-items:flex-end;height:'+chartAreaH+'px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 8px 0 28px;position:relative">';
+    [5,4,3,2,1,0].forEach(function(v){
+      var top=(1-v/5)*100;
+      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:clamp(9px,2.2vw,11px);font-weight:700;color:var(--t2);width:26px;text-align:right">'+v+'</div>';
+      html+='<div style="position:absolute;left:30px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
+    });
+    if(avgLinePct!==null){
+      html+='<div style="position:absolute;left:30px;right:8px;top:'+avgLinePct+'%;border-top:2px dashed var(--I);z-index:2"></div>';
+      /* small label tag on the average line so its value reads clearly even where it crosses a tall bar */
+      html+='<div style="position:absolute;right:8px;top:'+avgLinePct+'%;transform:translateY(-100%);background:var(--I);color:#fff;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px 4px 0 0;z-index:3">'+focAvgAll.toFixed(2)+'</div>';
+    }
+    fkeys.forEach(function(f){
+      var fd=FDEF[f];
+      var cur=focScores[f];
+      var barH=cur?Math.max(1,Math.round(cur/5*maxH)):0; /* strictly proportional to the 0-5 scale -- matches the gridlines above exactly */
+      var numFits=barH>=26; /* enough room to center the score number inside the bar */
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;min-width:0">';
+      if(cur&&!numFits)html+='<span style="position:relative;bottom:'+(barH+2)+'px;font-size:clamp(9px,2.2vw,11px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
       html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
       if(cur&&numFits)html+='<span style="font-size:clamp(9px,2.2vw,11px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
       if(!cur)html+='<span style="position:absolute;bottom:2px;font-size:clamp(9px,2vw,11px);color:var(--t2)">\u2013</span>';
-      html+='</div>';
-      /* FOCUS letter (F/O/C/U/S) */
+      html+='</div></div>';
+    });
+    html+='</div>';
+    /* ── FOCUS letter + name labels: own fixed-height row below the scaled area ── */
+    html+='<div style="display:flex;gap:6px;padding:8px 8px 0 28px">';
+    fkeys.forEach(function(f){
+      var fd=FDEF[f];
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0">';
       html+='<div style="font-size:clamp(10px,2.6vw,13px);font-weight:800;color:'+fd.cl+'">'+f+'</div>';
       html+='<div style="font-size:clamp(8px,1.8vw,10px);font-weight:600;color:var(--t2);text-align:center;max-width:70px;word-break:break-word">'+fd.nm+'</div>';
       html+='</div>';
     });
-    html+='</div></div>';
+    html+='</div>';
+    html+='</div>';
     /* Zone chart - average */
     var fm=focAvgAll;
     var fmL=s2l(fm);
@@ -3126,33 +3227,33 @@ function renderDash(){
   html+='</div>';
 
   /* --- 4. FEEDBACK WALL --- */
-  html+='<div class="card">';
+  html+='<div class="card" data-pdf-sec="feedback">';
   html+='<div class="chd"><div class="db-sh-ico" style="background:rgba(83,74,183,.1)">&#128172;</div>';
   html+='<div class="db-sh-ttl">ข้อเสนอแนะจากการประเมิน</div>';
   html+='<span style="font-size:10px;color:var(--t2)">\u0e44\u0e21\u0e48\u0e40\u0e1b\u0e34\u0e14\u0e40\u0e1c\u0e22\u0e15\u0e31\u0e27\u0e15\u0e19</span></div>';
   html+='<div style="padding:10px 14px">';
   var feedbacks=collectFeedbacks();
-  var show4=feedbacks.slice(0,4);
-  if(show4.length){
-    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">';
-    show4.forEach(function(fb,i){
-      var isLeft=i%2===0;
-      var bgStyle=isLeft
-        ?'background:var(--s1);border:1px solid var(--b0);color:var(--t0)'
-        :'background:linear-gradient(135deg,var(--pb2),var(--pb));color:#fff';
-      var borderStyle=isLeft?'border-radius:16px 16px 16px 4px':'border-radius:16px 16px 4px 16px;margin-left:auto';
-      html+='<div style="padding:12px 14px;'+borderStyle+';'+bgStyle+';max-width:100%">';
-      var ratCol=RCOL[fb.r]||'var(--t2)';
-      /* ลบนิยาม/หัวข้อออก เหลือแค่ระดับ + เหตุผล */
-      html+='<div style="display:inline-block;padding:2px 10px;border-radius:6px;background:'+ratCol+';font-size:11px;font-weight:700;color:#fff;margin-bottom:7px">'+fb.r+' \u2013 '+RNAME[fb.r]+'</div>';
-      html+='<div style="font-size:12px;line-height:1.6">'+fb.note+'</div>';
+  if(feedbacks.length){
+    /* group by rating level -- show exactly ONE sample message per level
+       (E/G/S/L/I) instead of 4 random ones, so every level is represented
+       at a glance rather than possibly showing 4 messages from the same
+       level by chance. "ดูทั้งหมด" opens the full grouped-by-level view. */
+    var byLevel={};RATINGS.forEach(function(r){byLevel[r]=feedbacks.filter(function(f){return f.r===r;});});
+    var levelsWithData=RATINGS.filter(function(r){return byLevel[r].length>0;});
+    html+='<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px">';
+    levelsWithData.forEach(function(r){
+      var sample=byLevel[r][0];
+      var ratCol=RCOL[r];
+      html+='<div style="padding:12px 14px;border-radius:var(--rl);background:var(--s1);border:1px solid var(--b0);border-left:4px solid '+ratCol+'">';
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">';
+      html+='<span style="display:inline-block;padding:2px 10px;border-radius:6px;background:'+ratCol+';font-size:11px;font-weight:700;color:#fff">'+r+' \u2013 '+RNAME[r]+'</span>';
+      if(byLevel[r].length>1)html+='<span style="font-size:10px;color:var(--t2)">และอีก '+(byLevel[r].length-1)+' ข้อความในระดับนี้</span>';
       html+='</div>';
+      html+='<div style="font-size:12px;line-height:1.6;color:var(--t0)">'+sample.note+'</div>';
       html+='</div>';
     });
     html+='</div>';
-    if(feedbacks.length>4){
-      html+='<div style="text-align:center"><button class="btn boteal" onclick="openFeedbackAll()">&#128172; ดูทั้งหมด ('+feedbacks.length+' ข้อความ)</button></div>';
-    }
+    html+='<div style="text-align:center"><button class="btn boteal" onclick="openFeedbackAll()">&#128172; ดูทั้งหมด ('+feedbacks.length+' ข้อความ)</button></div>';
   } else {
     html+='<div style="padding:1.5rem;text-align:center;color:var(--t2);font-size:13px">&#128172; ยังไม่มีข้อเสนอแนะ<br><span style="font-size:11px">เมื่อมีการให้เหตุผลในการประเมิน จะแสดงที่นี่</span></div>';
   }
@@ -3161,7 +3262,7 @@ function renderDash(){
   /* --- 5. SCORE OVERVIEW (role-based) --- */
   var showOverview=['ผู้บริหารระดับกลาง','ผู้บริหารระดับสูง','ผู้ช่วยผู้อำนวยการกลุ่ม','ผู้อำนวยการกลุ่ม'].indexOf(CU.role)>=0;
   if(showOverview){
-    html+='<div class="card">';
+    html+='<div class="card" data-pdf-sec="overview">';
     html+='<div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128200;</div>';
     html+='<div class="db-sh-ttl">ภาพรวมคะแนนรายบุคคล</div>';
     if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px;margin-right:6px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
@@ -3181,7 +3282,7 @@ function renderDash(){
      scores for the "current" point regardless of which round is being
      browsed above, so the trend line itself never gets stuck mid-swap. */
   if(ROUNDS.length>0){
-    html+='<div class="card">';
+    html+='<div class="card" data-pdf-sec="trend">';
     html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128201;</div>';
     html+='<div class="db-sh-ttl">แนวโน้มคะแนนรวมตามรอบประเมิน</div>';
     html+='<span style="font-size:10px;color:var(--t2)">เฉลี่ยรวมทุก FOCUS \u2014 ทั้งองค์กร</span></div>';
@@ -3252,13 +3353,30 @@ function openFeedbackAll(){
   var body=h('fwAllBody');
   if(!body)return;
   body.innerHTML='';
-  all.forEach(function(fb,i){
-    var ratCol=RCOL[fb.r]||'var(--t2)';
-    var div=document.createElement('div');
-    div.style.cssText='padding:12px 14px;background:var(--s1);border:1px solid var(--b0);border-radius:var(--rl)';
-    div.innerHTML='<div style="display:inline-block;padding:2px 10px;border-radius:6px;background:'+ratCol+';font-size:11px;font-weight:700;color:#fff;margin-bottom:6px">'+fb.r+' \u2013 '+RNAME[fb.r]+'</div>'
-      +'<div style="font-size:12px;color:var(--t0);line-height:1.6">'+fb.note+'</div>';
-    body.appendChild(div);
+  /* group by rating level so it's clear which level each piece of
+     feedback belongs to, rather than one flat shuffled list */
+  var byLevel={};RATINGS.forEach(function(r){byLevel[r]=all.filter(function(f){return f.r===r;});});
+  RATINGS.forEach(function(r){
+    var items=byLevel[r];
+    if(!items.length)return;
+    var ratCol=RCOL[r];
+    var sec=document.createElement('div');
+    sec.style.cssText='margin-bottom:18px';
+    var hdr=document.createElement('div');
+    hdr.style.cssText='display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid '+ratCol+'33';
+    hdr.innerHTML='<span style="display:inline-block;padding:3px 12px;border-radius:7px;background:'+ratCol+';font-size:12px;font-weight:700;color:#fff">'+r+' \u2013 '+RNAME[r]+'</span>'
+      +'<span style="font-size:11px;color:var(--t2)">'+items.length+' ข้อความ</span>';
+    sec.appendChild(hdr);
+    var list=document.createElement('div');
+    list.style.cssText='display:flex;flex-direction:column;gap:7px';
+    items.forEach(function(fb){
+      var div=document.createElement('div');
+      div.style.cssText='padding:11px 13px;background:var(--s1);border:1px solid var(--b0);border-radius:var(--r)';
+      div.innerHTML='<div style="font-size:12px;color:var(--t0);line-height:1.6">'+fb.note+'</div>';
+      list.appendChild(div);
+    });
+    sec.appendChild(list);
+    body.appendChild(sec);
   });
   h('fwAllovl').classList.add('on');
 }
