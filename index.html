@@ -58,13 +58,13 @@ button,input,select{font-family:var(--fb)}
 
 /* ── SCREEN ── */
 .scr{display:none;position:fixed;inset:0;z-index:10}
-.scr.on{display:block}
+.scr.on{display:flex}
 /* App screen (#sa) needs display:flex for sidebar+main layout */
 #sa{z-index:10}
 #sa.on{display:flex!important;flex-direction:row;height:100vh;overflow:hidden}
 /* Login screen sits on TOP */
 #sl{z-index:200;background:linear-gradient(145deg,#071628 0%,#0B2040 55%,#071830 100%)}
-.sl-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+.sl-wrap{min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;padding:1rem}
 
 /* ── OVERLAY ── */
 .ovl{display:none;position:fixed;inset:0;background:rgba(8,20,50,.55);z-index:500;
@@ -331,14 +331,15 @@ button,input,select{font-family:var(--fb)}
 .rb.sel.rI{background:var(--I);border-color:var(--I);color:#fff;box-shadow:0 3px 10px rgba(163,45,45,.4),inset 0 1px 0 rgba(255,255,255,.25)}
 .rb:disabled{cursor:default;opacity:.45;box-shadow:none}
 .rb:disabled:hover{transform:none}
-/* popup -- desktop only, triggered by real :hover */
-.rpop{display:none;position:absolute;bottom:calc(100% + 9px);left:50%;transform:translateX(-50%);
+/* popup -- desktop only, triggered by real :hover. position:fixed (not
+   absolute) so it is positioned purely via JS against the viewport,
+   completely independent of the row/card's own stacking context -- this
+   guarantees it always floats above every row, never visually clipped or
+   undercut by a sibling row's own background/border. */
+.rpop{display:none;position:fixed;left:0;top:0;
   background:var(--s0);border:2px solid var(--navy);border-color:rgba(8,20,50,.35);border-radius:var(--rl);
-  box-shadow:0 14px 36px rgba(8,20,50,.28),0 3px 10px rgba(8,20,50,.16);padding:12px 14px;width:240px;z-index:9999;
+  box-shadow:0 14px 36px rgba(8,20,50,.28),0 3px 10px rgba(8,20,50,.16);padding:12px 14px;width:240px;z-index:99999;
   pointer-events:none;text-align:left;white-space:normal}
-@media(hover:hover) and (pointer:fine){
-  .rbw:hover .rpop{display:block}
-}
 .rpop::after{content:'';position:absolute;top:100%;left:calc(50% + var(--arrow-shift,0px));transform:translateX(-50%);
   border:8px solid transparent;border-top-color:rgba(8,20,50,.35)}
 .rpop::before{content:'';position:absolute;top:100%;left:calc(50% + var(--arrow-shift,0px));transform:translateX(-50%) translateY(-2px);
@@ -431,6 +432,11 @@ button,input,select{font-family:var(--fb)}
 /* chip done state -- person fully scored in current category */
 .gchip.gdone{opacity:.45;background:var(--s2)}
 .gchip.gdone .gcav{filter:grayscale(1)}
+/* touch-mode: tap a chip to "arm" it, then tap a rating cell to place it
+   (desktop keeps drag & drop; touch devices get this instead since native
+   HTML5 drag events don't fire reliably from touch gestures) */
+.gchip.garmed{outline:2.5px solid var(--pb);outline-offset:1px;box-shadow:0 0 0 4px rgba(13,110,231,.15)}
+.gdrop.gtap-target{background:rgba(13,110,231,.1)!important;outline:2px dashed var(--pb);outline-offset:-2px}
 /* per-row evaluated-so-far indicator */
 .ggcc{flex-wrap:wrap;row-gap:4px}
 .ggcc-done{display:flex;align-items:center;gap:3px;margin-left:auto;flex-shrink:0}
@@ -761,8 +767,9 @@ button,input,select{font-family:var(--fb)}
   body.printing-dash [data-pdf-sec="controls"],
   body.printing-dash .sb-collapse-btn{display:none!important}
   body.printing-dash .main{width:100%!important}
-  body.printing-dash .view{overflow:visible!important;padding:0!important;display:block!important}
-  body.printing-dash .views{overflow:visible!important}
+  body.printing-dash .view{display:none!important}
+  body.printing-dash .view.on{overflow:visible!important;padding:0!important;display:block!important}
+  body.printing-dash .views{overflow:visible!important;display:block!important}
   body.printing-dash #sa{padding-bottom:0!important}
   body.printing-dash .card{box-shadow:none!important;border:1px solid #ccc!important;
     page-break-inside:avoid;margin-bottom:14px}
@@ -778,7 +785,7 @@ button,input,select{font-family:var(--fb)}
 </head>
 <body>
 
-<!-- MOBILE BOTTOM NAV -->
+<!-- MOBILE BOTTOM NAV (employee shell) -->
 <nav class="mob-nav" id="mobNav">
   <div class="mob-nav-inner">
     <button class="mob-nav-btn on" id="mn-self" onclick="showTab('self')">
@@ -796,6 +803,26 @@ button,input,select{font-family:var(--fb)}
     <button class="mob-nav-btn" id="mn-dash" onclick="showTab('dash')">
       <span class="mn-ico">&#128202;</span>
       <span>ภาพรวม</span>
+    </button>
+  </div>
+</nav>
+
+<!-- MOBILE BOTTOM NAV (Admin shell) -- mirrors the Admin sidebar's 3 tabs,
+     completely separate from the employee nav above since Admin has no
+     self/person/grid evaluation tabs at all. -->
+<nav class="mob-nav" id="mobNavAdmin" style="display:none">
+  <div class="mob-nav-inner">
+    <button class="mob-nav-btn" id="mna-scores" onclick="showAdminTab('scores')">
+      <span class="mn-ico">&#128202;</span>
+      <span>คะแนน</span>
+    </button>
+    <button class="mob-nav-btn" id="mna-rounds" onclick="showAdminTab('rounds')">
+      <span class="mn-ico">&#128197;</span>
+      <span>รอบประเมิน</span>
+    </button>
+    <button class="mob-nav-btn" id="mna-status" onclick="showAdminTab('status')">
+      <span class="mn-ico">&#9989;</span>
+      <span>สถานะ</span>
     </button>
   </div>
 </nav>
@@ -1155,8 +1182,18 @@ button,input,select{font-family:var(--fb)}
     <div class="mbox subm">
       <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128197; ปิดรอบประเมินปัจจุบัน?</div>
       <div class="wb"><span>&#9888;&#65039;</span><span>คะแนนของรอบ "<b id="crCurLabelA"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
-      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px">ชื่อรอบถัดไป</div>
-      <input type="text" class="lin" id="crNextLabelA" style="color:var(--t0);background:var(--s1);border-color:var(--b1);margin-bottom:14px" placeholder="เช่น รอบที่ 2">
+      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px">กำหนดช่วงเวลารอบถัดไป</div>
+      <div style="display:flex;gap:8px;margin-bottom:6px">
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--t2);margin-bottom:3px">วันเริ่มต้น</div>
+          <input type="date" class="lin" id="crNextStartA" style="color:var(--t0);background:var(--s1);border-color:var(--b1);margin-bottom:0">
+        </div>
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--t2);margin-bottom:3px">วันสิ้นสุด</div>
+          <input type="date" class="lin" id="crNextEndA" style="color:var(--t0);background:var(--s1);border-color:var(--b1);margin-bottom:0">
+        </div>
+      </div>
+      <div id="crNextPreviewA" style="font-size:11px;color:var(--pb);font-weight:700;margin-bottom:14px;min-height:16px"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" id="crCancelBtnA">ยกเลิก</button>
         <button class="btn bt" id="crConfirmBtnA">&#10003; ยืนยันปิดรอบ</button>
@@ -1172,6 +1209,38 @@ button,input,select{font-family:var(--fb)}
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
         <button class="btn bo" onclick="cov('notifyOvl')">ปิด</button>
         <button class="btn bt" id="notifyConfirmBtn">&#10003; ส่งแจ้งเตือน (Demo)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN: PER-PERSON SCORE HISTORY -->
+  <div class="ovl" id="adminHistOvl">
+    <div class="mbox" style="max-width:480px">
+      <div id="adminHistBody"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:14px">
+        <button class="btn bo" onclick="cov('adminHistOvl')">ปิด</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN: EDIT CURRENT ROUND DATES -->
+  <div class="ovl" id="editRoundOvlA">
+    <div class="mbox subm">
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#9999;&#65039; แก้ไขวันที่รอบปัจจุบัน</div>
+      <div style="display:flex;gap:8px;margin-bottom:14px">
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--t2);margin-bottom:3px">วันเริ่มต้น</div>
+          <input type="date" class="lin" id="editRoundStartA" style="color:var(--t0);background:var(--s1);border-color:var(--b1);margin-bottom:0">
+        </div>
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--t2);margin-bottom:3px">วันสิ้นสุด</div>
+          <input type="date" class="lin" id="editRoundEndA" style="color:var(--t0);background:var(--s1);border-color:var(--b1);margin-bottom:0">
+        </div>
+      </div>
+      <div class="wb" style="margin-bottom:14px"><span>\u2139\uFE0F</span><span>ถ้าเปลี่ยนวันเริ่มต้นข้ามปี พ.ศ. ระบบจะปรับเลขรอบกลับไปเป็น 1 ให้อัตโนมัติ</span></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn bo" id="editRoundCancelBtnA">ยกเลิก</button>
+        <button class="btn bt" id="editRoundConfirmBtnA">&#10003; บันทึก</button>
       </div>
     </div>
   </div>
@@ -1198,14 +1267,12 @@ button,input,select{font-family:var(--fb)}
       </div>
     </div>
     <nav class="sb-nav">
-      <div class="sb-sec-lbl">ติดตามการประเมิน</div>
-      <button class="nb on" id="at-status" onclick="showAdminTab('status')" title="สถานะการประเมิน"><div class="ni">&#9989;</div><span class="nb-txt">สถานะการประเมิน</span></button>
-      <div class="sb-sep"></div>
       <div class="sb-sec-lbl">ภาพรวมคะแนน</div>
-      <button class="nb" id="at-scores" onclick="showAdminTab('scores')" title="คะแนนรายบุคคล"><div class="ni">&#128202;</div><span class="nb-txt">คะแนนรายบุคคล</span></button>
+      <button class="nb on" id="at-scores" onclick="showAdminTab('scores')" title="คะแนนรายบุคคล"><div class="ni">&#128202;</div><span class="nb-txt">คะแนนรายบุคคล</span></button>
       <div class="sb-sep"></div>
-      <div class="sb-sec-lbl">ระบบ</div>
-      <button class="nb" id="at-rounds" onclick="showAdminTab('rounds')" title="จัดการรอบประเมิน"><div class="ni">&#128197;</div><span class="nb-txt">จัดการรอบประเมิน</span></button>
+      <div class="sb-sec-lbl">การจัดการระบบ</div>
+      <button class="nb" id="at-rounds" onclick="showAdminTab('rounds')" title="รอบการประเมิน"><div class="ni">&#128197;</div><span class="nb-txt">รอบการประเมิน</span></button>
+      <button class="nb" id="at-status" onclick="showAdminTab('status')" title="สถานะการประเมิน"><div class="ni">&#9989;</div><span class="nb-txt">สถานะการประเมิน</span></button>
     </nav>
     <div class="sb-foot">
       <button class="sb-logout" id="loutbtnA" onclick="doLogout()" title="ออกจากระบบ">&#128682;<span class="nb-txt">ออกจากระบบ</span></button>
@@ -1216,14 +1283,14 @@ button,input,select{font-family:var(--fb)}
   <div class="main">
     <div class="topbar">
       <div class="tb-left">
-        <div class="tb-title" id="atbtitle">สถานะการประเมิน</div>
+        <div class="tb-title" id="atbtitle">คะแนนรายบุคคล</div>
         <div class="tb-sub" id="atbsub"></div>
       </div>
       <div class="tb-right"></div>
     </div>
     <div class="views">
-      <div class="view on" id="va-status"><div class="vi" id="adminStatusBody"></div></div>
-      <div class="view" id="va-scores"><div class="vi" id="adminScoresBody"></div></div>
+      <div class="view" id="va-status"><div class="vi" id="adminStatusBody"></div></div>
+      <div class="view on" id="va-scores"><div class="vi" id="adminScoresBody"></div></div>
       <div class="view" id="va-rounds"><div class="vi" id="adminRoundsBody"></div></div>
     </div>
   </div>
@@ -1354,6 +1421,7 @@ var CU=null,persons=[],selfSc={},othSc={};
 var sSaved=false,sSub=false,oSaved=false,oSub=false;
 var curTab='self',expd={},catOp={},orgExp={};
 var gmCat=CATS[0],gmSM=false,gmSel={},gmDP=null,gmRI=null,gmLPT=null;
+var gmArmed=null; /* touch-mode: pid of the single chip currently "armed" for tap-to-place, or '__multi__' */
 var subTgt=null,cdIdx=null,orgMode='dept',orgQ='';
 
 /* ── EVALUATION ROUNDS (history) ──
@@ -1363,13 +1431,52 @@ var subTgt=null,cdIdx=null,orgMode='dept',orgQ='';
  * designed to map directly onto a future API response with minimal change.
  *
  * Rounds are NOT calendar-locked -- the org's evaluation cycle runs roughly
- * yearly but timing varies, so an Admin manually opens/closes each round.
- * currentRound: the round currently being filled in (selfSc/othSc/rsnNotes
- *   above always refer to THIS round while it's open).
+ * yearly but timing varies, so an Admin manually opens/closes each round
+ * and picks the start/end date each time.
+ *
+ * currentRound fields:
+ *   id        -- internal id
+ *   year      -- Buddhist-calendar year (พ.ศ.), derived from startDate
+ *   roundNo   -- round number WITHIN that year (resets to 1 when the
+ *                year changes, increments otherwise)
+ *   startDate, endDate -- 'YYYY-MM-DD' (Gregorian, for <input type=date>)
+ *   label     -- derived display label, e.g. "รอบที่ 1/2569" (kept as a
+ *                plain field too so older code/storage that expects a
+ *                label string keeps working without extra lookups)
  * ROUNDS: closed/archived rounds, each a frozen snapshot:
- *   {id, label, closedAt, selfSc, othSc, rsnNotes}
+ *   {id, year, roundNo, startDate, endDate, label, closedAt, selfSc, othSc, rsnNotes}
  */
-var currentRound={id:'r1',label:'รอบที่ 1'};
+function buddhistYear(dateStr){
+  if(!dateStr)return null;
+  var y=new Date(dateStr+'T00:00:00').getFullYear();
+  return y+543;
+}
+function roundLabel(year,roundNo){return 'รอบที่ '+roundNo+'/'+year;}
+/* figure out the next round's year+number given the previous round and a
+   newly-picked start date: same Buddhist year -> increment; new year -> 1 */
+function nextRoundMeta(prevYear,prevRoundNo,newStartDate){
+  var y=buddhistYear(newStartDate);
+  if(y===prevYear)return{year:y,roundNo:prevRoundNo+1};
+  return{year:y,roundNo:1};
+}
+function daysRemaining(endDate){
+  if(!endDate)return null;
+  var end=new Date(endDate+'T23:59:59');
+  var now=new Date();
+  var diff=Math.ceil((end-now)/86400000);
+  return diff;
+}
+var THAI_MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+function fmtThaiDate(dateStr){
+  if(!dateStr)return '';
+  var d=new Date(dateStr+'T00:00:00');
+  return d.getDate()+' '+THAI_MONTHS[d.getMonth()]+' '+(d.getFullYear()+543);
+}
+var currentRound={id:'r1',year:buddhistYear(new Date().toISOString().slice(0,10)),roundNo:1,
+  startDate:new Date().toISOString().slice(0,10),
+  endDate:new Date(Date.now()+30*86400000).toISOString().slice(0,10),
+  label:''};
+currentRound.label=roundLabel(currentRound.year,currentRound.roundNo);
 var ROUNDS=[]; /* closed rounds, most recent last */
 var dbRoundView='current'; /* 'current' or a closed round's id -- which round the Dashboard is viewing */
 function isAdmin(){return !!(CU&&CU.isAdmin);}
@@ -1468,14 +1575,15 @@ window.addEventListener('afterprint',function(){
  * When a backend is connected, mockCompletionFor() and mockScoreFor()
  * are the two functions to replace with real API calls -- the rendering
  * code around them does not need to change. */
-var curAdminTab='status';
+var curAdminTab='scores';
 function showAdminTab(t){
   curAdminTab=t;
   ['status','scores','rounds'].forEach(function(x){
     h('at-'+x).classList.toggle('on',x===t);
     h('va-'+x).classList.toggle('on',x===t);
+    var mb=h('mna-'+x);if(mb)mb.classList.toggle('on',x===t);
   });
-  var titles={status:'สถานะการประเมิน',scores:'คะแนนรายบุคคล',rounds:'จัดการรอบประเมิน'};
+  var titles={status:'สถานะการประเมิน',scores:'คะแนนรายบุคคล',rounds:'รอบการประเมิน'};
   h('atbtitle').textContent=titles[t];
   renderAdminTab();
 }
@@ -1491,39 +1599,113 @@ function mockCompletionFor(empId){
   var seed=_seedFor(empId+currentRound.id);
   var selfDone=(seed%100)<78; /* ~78% completed self-assessment */
   var receivedPct=(seed>>3)%101; /* 0-100% of expected evaluators have rated them */
-  return{selfDone:selfDone,receivedPct:receivedPct};
+  var submitted=(seed%100)<55; /* ~55% have actually hit Submit (vs just Save, or nothing) */
+  var saved=submitted||(seed%100)<78;
+  /* deterministic mock save/submit timestamps within the current round's
+     date range, so "Save \u0e40\u0e21\u0e37\u0e48\u0e2d\u0e44\u0e2b\u0e23\u0e48 / Submit \u0e40\u0e21\u0e37\u0e48\u0e2d\u0e44\u0e2b\u0e23\u0e48" has something
+     concrete to display per item 7.3 */
+  var roundStart=currentRound.startDate?new Date(currentRound.startDate+'T00:00:00').getTime():Date.now()-7*86400000;
+  var spanMs=Math.max(1,(currentRound.endDate?new Date(currentRound.endDate+'T00:00:00').getTime():Date.now())-roundStart);
+  var savedAt=saved?(roundStart+((seed>>5)%1000)/1000*spanMs*0.6):null;
+  var submittedAt=submitted?(roundStart+((seed>>9)%1000)/1000*spanMs*0.9+ (savedAt||0)*0):null;
+  if(submitted&&savedAt&&submittedAt&&submittedAt<savedAt)submittedAt=savedAt+3600000; /* keep chronological order */
+  return{selfDone:selfDone,receivedPct:receivedPct,saved:saved,submitted:submitted,savedAt:savedAt,submittedAt:submittedAt};
 }
 function mockScoreFor(empId){
   var seed=_seedFor(empId+currentRound.id+'_score');
   var avg=1.5+((seed%351)/100); /* spread roughly 1.50 - 5.00 */
   var min=Math.max(1,avg-((seed>>4)%150)/100);
   var max=Math.min(5,avg+((seed>>7)%120)/100);
-  return{avg:avg,min:min,max:max};
+  /* per-FOCUS-letter (F/O/C/U/S) and per-Singhaway-category breakdown --
+     each letter/category gets its own deterministic seed so the numbers
+     are stable across renders but vary meaningfully person to person,
+     enabling drill-down views like "who scored E on F". */
+  var byFocus={};
+  Object.keys(FDEF).forEach(function(f,i){
+    var s2=_seedFor(empId+currentRound.id+'_foc_'+f);
+    byFocus[f]=Math.max(1,Math.min(5,1.5+((s2%351)/100)));
+  });
+  var byCat={};
+  CATS.forEach(function(cat){
+    var s3=_seedFor(empId+currentRound.id+'_cat_'+cat);
+    byCat[cat]=Math.max(1,Math.min(5,1.5+((s3%351)/100)));
+  });
+  return{avg:avg,min:min,max:max,byFocus:byFocus,byCat:byCat};
 }
 
 /* --- TAB 1: สถานะการประเมิน (completion tracker + demo notify) --- */
 function renderAdminStatus(){
   var html='<div class="phd"><div><div class="ptitle">&#9989; สถานะการประเมิน</div></div></div>';
-  html+='<div class="wb" style="margin-bottom:14px"><span>&#8505;&#65039;</span><span>ข้อมูลตัวอย่าง (Demo) \u2014 ระบบยังไม่เชื่อมต่อกับฐานข้อมูลกลาง สถานะด้านล่างเป็นข้อมูลจำลองเพื่อสาธิตการใช้งาน</span></div>';
-  var rows=ALL_EMP.map(function(e){
+  html+='<div class="wb" style="margin-bottom:14px"><span>&#8505;&#65039;</span><span>ข้อมูลตัวอย่าง (Demo) \u2014 ระบบยังไม่เชื่อมต่อกับฐานข้อมูลกลาง สถานะ/เวลา Save-Submit ด้านล่างเป็นข้อมูลจำลองเพื่อสาธิตการใช้งาน</span></div>';
+  var allRows=ALL_EMP.map(function(e){
     var c=mockCompletionFor(e.empId);
     return{e:e,c:c};
   });
-  var selfDoneCnt=rows.filter(function(r){return r.c.selfDone;}).length;
+  var selfDoneCnt=allRows.filter(function(r){return r.c.selfDone;}).length;
+  var submittedCnt=allRows.filter(function(r){return r.c.submitted;}).length;
+  var pendingSubmit=allRows.filter(function(r){return !r.c.submitted;});
   html+='<div class="card" style="padding:14px 16px;margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">';
-  html+='<div><div style="font-size:11px;color:var(--t2)">ประเมินตนเองแล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+selfDoneCnt+' / '+rows.length+'</div></div>';
-  html+='<div><div style="font-size:11px;color:var(--t2)">ยังไม่ประเมินตนเอง</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--I)">'+(rows.length-selfDoneCnt)+' คน</div></div>';
-  html+='<button class="btn bt" style="margin-left:auto;font-size:12px" onclick="notifyAllPending()">&#128276; ส่งแจ้งเตือนทุกคนที่ยังไม่ประเมิน</button>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">ประเมินตนเองแล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+selfDoneCnt+' / '+allRows.length+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">Submit แล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--G)">'+submittedCnt+' / '+allRows.length+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">ยังไม่ Submit</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--I)">'+pendingSubmit.length+' คน</div></div>';
+  html+='<button class="btn bt" style="margin-left:auto;font-size:12px" onclick="notifyAllPending()">&#128276; ส่งแจ้งเตือนทุกคนที่ยังไม่ Submit</button>';
   html+='</div>';
+
+  /* ── daily 9am auto-reminder schedule info ──
+     MOCK: real delivery needs a server-side cron/scheduler -- a page that
+     isn't open in a browser can't fire a notification on its own. This
+     panel shows the schedule a backend would need to run, plus a manual
+     "send now" trigger for testing, and tracks (in localStorage) whether
+     today's auto-reminder has already gone out so re-rendering this page
+     doesn't make it look like it re-sends every time. */
+  var todayKey='sf_auto_remind_'+new Date().toISOString().slice(0,10);
+  var sentToday=false;
+  try{sentToday=localStorage.getItem(todayKey)==='1';}catch(e){}
+  var rdStatus=daysRemaining(currentRound.endDate);
+  var scheduleActive=rdStatus===null||rdStatus>=0;
+  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#8987;</div><div class="db-sh-ttl">แจ้งเตือนอัตโนมัติรายวัน</div></div>';
+  html+='<div style="padding:14px 16px">';
+  html+='<div style="font-size:12px;color:var(--t1);line-height:1.7;margin-bottom:10px">ระบบจะส่งแจ้งเตือนให้คนที่ยังไม่กด <b>Submit</b> ทุกวัน เวลา <b>9:00 น.</b> โดยอัตโนมัติ จนกว่าจะกด Submit หรือหมดระยะเวลาประเมินของรอบนี้'
+    +(currentRound.endDate?' (สิ้นสุด '+fmtThaiDate(currentRound.endDate)+')':'')+'</div>';
+  html+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+  html+='<span class="rb-inl" style="background:'+(scheduleActive?'var(--E)':'var(--t2)')+'">'+(scheduleActive?'\u25CF กำลังทำงาน':'\u25CF หยุดทำงาน (รอบหมดเวลาแล้ว)')+'</span>';
+  html+='<span style="font-size:11px;color:var(--t2)">'+(sentToday?'\u2713 ส่งแจ้งเตือนของวันนี้ไปแล้ว':'ยังไม่ส่งแจ้งเตือนของวันนี้')+'</span>';
+  html+='</div>';
+  html+='<div class="wb" style="margin-top:10px;background:rgba(186,117,23,.08);border-color:rgba(186,117,23,.25);color:var(--L)"><span>&#9888;&#65039;</span><span>การส่งจริงทุกวัน 9:00 น. ต้องมี backend/cron ฝั่งเซิร์ฟเวอร์ทำงานอยู่เสมอ (เบราว์เซอร์ที่ไม่ได้เปิดหน้านี้ไว้จะส่งเองไม่ได้) \u2014 ปุ่มด้านล่างคือการสาธิต/ทดสอบส่งด้วยมือ</span></div>';
+  html+='<button class="btn bo" style="margin-top:10px;font-size:12px" onclick="sendDailyReminderNow()">&#128276; ทดสอบส่งแจ้งเตือนตอนนี้ ('+pendingSubmit.length+' คน)</button>';
+  html+='</div></div>';
+
+  /* ── filter bar: search + department dropdown ── */
+  var depts=Array.from(new Set(ALL_EMP.map(function(e){return e.dept;}).filter(function(d){return d;}))).sort();
+  html+='<div class="card" style="padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">';
+  html+='<input type="text" id="adminStatusSearch" value="'+adminStatusQ+'" placeholder="\uD83D\uDD0D ค้นหาชื่อ ชื่อเล่น หรือรหัสพนักงาน..." style="flex:1;min-width:200px;padding:8px 12px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;outline:none" oninput="adminStatusQ=this.value;renderAdminStatus()">';
+  html+='<select id="adminStatusDept" style="padding:8px 12px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer" onchange="adminStatusDept=this.value;renderAdminStatus()">';
+  html+='<option value=""'+(adminStatusDept===''?' selected':'')+'>ทุกหน่วยงาน</option>';
+  depts.forEach(function(d){html+='<option value="'+d+'"'+(adminStatusDept===d?' selected':'')+'>'+d+'</option>';});
+  html+='</select>';
+  html+='</div>';
+
+  var q=adminStatusQ.trim().toLowerCase();
+  var rows=allRows.filter(function(r){
+    if(adminStatusDept&&r.e.dept!==adminStatusDept)return false;
+    if(!q)return true;
+    return r.e.name.toLowerCase().indexOf(q)>=0||(r.e.nick||'').toLowerCase().indexOf(q)>=0||r.e.empId.toLowerCase().indexOf(q)>=0;
+  });
+
   html+='<div class="card"><div style="overflow-x:auto"><table class="sw-table"><thead><tr>';
-  html+='<th class="lft">ชื่อ</th><th>ระดับ</th><th>ประเมินตนเอง</th><th style="min-width:140px">ได้รับการประเมินจากผู้อื่น</th><th>แจ้งเตือน</th>';
+  html+='<th class="lft">ชื่อ</th><th>หน่วยงาน</th><th>ระดับ</th><th>กด Save</th><th>กด Submit</th><th style="min-width:140px">ได้รับการประเมินจากผู้อื่น</th><th>แจ้งเตือน</th>';
   html+='</tr></thead><tbody>';
+  if(!rows.length){
+    html+='<tr><td colspan="7" style="text-align:center;padding:1.5rem;color:var(--t2)">ไม่พบข้อมูลที่ค้นหา</td></tr>';
+  }
   rows.forEach(function(r){
     var e=r.e,c=r.c;
     html+='<tr>';
     html+='<td class="lft">'+e.name+' <span style="color:var(--t2);font-size:10px">('+e.nick+')</span></td>';
+    html+='<td style="font-size:11px;color:var(--t2)">'+(e.dept||e.div)+'</td>';
     html+='<td style="font-size:11px;color:var(--t2)">'+e.role+'</td>';
-    html+='<td>'+(c.selfDone?'<span class="rb-inl" style="background:var(--E)">&#10003; แล้ว</span>':'<span class="rb-inl" style="background:var(--I)">ยังไม่ทำ</span>')+'</td>';
+    html+='<td style="font-size:11px;color:var(--t2)">'+(c.savedAt?fmtThaiDateTime(c.savedAt):'<span style="color:var(--I)">\u2013</span>')+'</td>';
+    html+='<td style="font-size:11px;color:var(--t2)">'+(c.submittedAt?fmtThaiDateTime(c.submittedAt):'<span style="color:var(--I)">ยังไม่ Submit</span>')+'</td>';
     html+='<td><div style="display:flex;align-items:center;gap:6px;justify-content:center"><div style="flex:1;max-width:90px;height:6px;background:var(--s2);border-radius:3px;overflow:hidden"><div style="width:'+c.receivedPct+'%;height:100%;background:'+(c.receivedPct>=70?'var(--E)':c.receivedPct>=30?'var(--L)':'var(--I)')+'"></div></div><span style="font-size:10px;color:var(--t2);white-space:nowrap">'+c.receivedPct+'%</span></div></td>';
     html+='<td><button class="btn bo" style="font-size:10px;padding:4px 10px" onclick="openNotifyDialog(\''+e.empId+'\')">&#128276; แจ้งเตือน</button></td>';
     html+='</tr>';
@@ -1531,10 +1713,23 @@ function renderAdminStatus(){
   html+='</tbody></table></div></div>';
   h('adminStatusBody').innerHTML=html;
 }
+function fmtThaiDateTime(ts){
+  var d=new Date(ts);
+  return d.getDate()+' '+THAI_MONTHS[d.getMonth()]+' '+(d.getFullYear()+543)+' '+
+    (''+d.getHours()).padStart(2,'0')+':'+(''+d.getMinutes()).padStart(2,'0');
+}
+function sendDailyReminderNow(){
+  var pending=ALL_EMP.filter(function(e){return !mockCompletionFor(e.empId).submitted;});
+  var todayKey='sf_auto_remind_'+new Date().toISOString().slice(0,10);
+  try{localStorage.setItem(todayKey,'1');}catch(e){}
+  if(!pending.length){toast('&#9989;','ทุกคน Submit ครบแล้ว','ไม่มีใครต้องแจ้งเตือนวันนี้','var(--E)');renderAdminTab();return;}
+  toast('&#128276;','ส่งแจ้งเตือนรายวันแล้ว (Demo)','ถึง '+pending.length+' คนที่ยังไม่ Submit','var(--E)');
+  renderAdminTab();
+}
 function openNotifyDialog(empId){
   var e=ALL_EMP.filter(function(x){return x.empId===empId;})[0];
   if(!e)return;
-  h('notifyBody').innerHTML='ส่งการแจ้งเตือนไปยัง <b>'+e.name+'</b> ('+e.nick+') ให้ดำเนินการประเมินให้ครบถ้วนในรอบ <b>'+currentRound.label+'</b>?';
+  h('notifyBody').innerHTML='ส่งการแจ้งเตือนไปยัง <b>'+e.name+'</b> ('+e.nick+') ให้กด Submit การประเมินให้ครบถ้วนในรอบ <b>'+currentRound.label+'</b>?';
   h('notifyConfirmBtn').onclick=function(){
     cov('notifyOvl');
     toast('&#128276;','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+e.name,'var(--E)');
@@ -1542,21 +1737,300 @@ function openNotifyDialog(empId){
   h('notifyOvl').classList.add('on');
 }
 function notifyAllPending(){
-  var pending=ALL_EMP.filter(function(e){return !mockCompletionFor(e.empId).selfDone;});
-  if(!pending.length){toast('&#9989;','ทุกคนประเมินตนเองครบแล้ว','','var(--E)');return;}
-  h('notifyBody').innerHTML='ส่งการแจ้งเตือนไปยังพนักงานที่ยังไม่ประเมินตนเอง <b>'+pending.length+' คน</b> ให้ดำเนินการในรอบ <b>'+currentRound.label+'</b>?';
+  var pending=ALL_EMP.filter(function(e){return !mockCompletionFor(e.empId).submitted;});
+  if(!pending.length){toast('&#9989;','ทุกคน Submit ครบแล้ว','','var(--E)');return;}
+  h('notifyBody').innerHTML='ส่งการแจ้งเตือนไปยังพนักงานที่ยังไม่ Submit <b>'+pending.length+' คน</b> ให้ดำเนินการในรอบ <b>'+currentRound.label+'</b>?';
   h('notifyConfirmBtn').onclick=function(){
     cov('notifyOvl');
-    toast('&#128276;','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+pending.length+' คนที่ยังไม่ประเมินตนเอง','var(--E)');
+    toast('&#128276;','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+pending.length+' คนที่ยังไม่ Submit','var(--E)');
   };
   h('notifyOvl').classList.add('on');
 }
 
 /* --- TAB 2: คะแนนรายบุคคล (sortable: score / Min / Max / letter grade / role level) --- */
 var adminScoreSort='score_desc';
+var adminStatusQ='';
+var adminStatusDept='';
+var adminScoreQ='';
+var adminScoreFocusDrill=null; /* {focus:'F', level:'E'} when drilling into "who got E on F" */
+var focusChartAxis='focus'; /* 'focus' (F/O/C/U/S) or 'level' (E/G/S/L/I) -- which axis the FOCUS chart breaks down by */
+/* ── Org-structure cascading filter state (กลุ่ม > ฝ่าย > แผนก) ──
+ * Real org codes: กลุ่ม = CTEG/CTG/CED/BTDE/CMT, ฝ่าย (under CTG) =
+ * WRM/QMA/IPRD/SS, แผนก (under WRM) = WC/WT/WWT/EV. The 13 mock employees
+ * currently all live under WRM, mapped from their existing div/dept
+ * strings -- the other codes are real, selectable options but show "no
+ * data yet" since this mock roster doesn't have anyone there. */
+var focusFilterGroup='ALL'; /* 'ALL' = เลือกทั้งหมด (whole org), else a กลุ่ม code */
+var focusFilterDiv='';      /* '' = ทุกฝ่าย within the selected กลุ่ม */
+var focusFilterDept='';     /* '' = ทุกแผนก within the selected ฝ่าย */
 function renderAdminScores(){
   var html='<div class="phd"><div><div class="ptitle">&#128202; คะแนนรายบุคคล</div></div><div><button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">&#128190; Export PDF</button></div></div>';
   html+='<div class="wb" style="margin-bottom:14px"><span>&#8505;&#65039;</span><span>ข้อมูลตัวอย่าง (Demo) \u2014 คะแนนด้านล่างเป็นข้อมูลจำลองเพื่อสาธิตการใช้งาน ไม่ใช่คะแนนจริงจากการประเมิน</span></div>';
+
+  /* ── search box ── */
+  html+='<div style="margin-bottom:14px"><input type="text" id="adminScoreSearch" value="'+adminScoreQ+'" placeholder="\uD83D\uDD0D ค้นหาชื่อ ชื่อเล่น รหัสพนักงาน หรือแผนก..." style="width:100%;max-width:420px;padding:9px 13px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:13px;outline:none" oninput="adminScoreQ=this.value;renderAdminScores()"></div>';
+
+  var allRows=ALL_EMP.map(function(e){var sc=mockScoreFor(e.empId);return{e:e,sc:sc,lbl:s2l(sc.avg)};});
+  var q=adminScoreQ.trim().toLowerCase();
+  var rows=q?allRows.filter(function(r){
+    return r.e.name.toLowerCase().indexOf(q)>=0||(r.e.nick||'').toLowerCase().indexOf(q)>=0
+      ||r.e.empId.toLowerCase().indexOf(q)>=0||(r.e.dept||'').toLowerCase().indexOf(q)>=0||(r.e.div||'').toLowerCase().indexOf(q)>=0;
+  }):allRows;
+
+  if(!rows.length){
+    html+='<div class="card" style="padding:2rem;text-align:center;color:var(--t2)">ไม่พบข้อมูลที่ค้นหา</div>';
+    h('adminScoresBody').innerHTML=html;return;
+  }
+
+  /* ── org-wide averages, used as the comparison baseline ── */
+  var avgAll=allRows.reduce(function(s,r){return s+r.sc.avg;},0)/allRows.length;
+  var minAll=Math.min.apply(null,allRows.map(function(r){return r.sc.min;}));
+  var maxAll=Math.max.apply(null,allRows.map(function(r){return r.sc.max;}));
+  var fkeysA=Object.keys(FDEF);
+
+  html+='<div class="card" style="padding:14px 16px;margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap">';
+  html+='<div><div style="font-size:11px;color:var(--t2)">ค่าเฉลี่ยรวมทั้งองค์กร</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:'+s2l(avgAll).c+'">'+avgAll.toFixed(2)+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">Min</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--I)">'+minAll.toFixed(2)+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">Max</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+maxAll.toFixed(2)+'</div></div>';
+  html+='</div>';
+
+  /* ── FOCUS summary: interactive chart with cascading org filters ──
+     (1) scope: 3 cascading dropdowns (กลุ่ม > ฝ่าย > แผนก) built from the
+         REAL div/dept fields on the 13 mock employees, mapped onto the
+         org's actual code structure:
+           กลุ่ม:  CTEG / CTG / CED / BTDE / CMT  (+ "เลือกทั้งหมด" = whole org)
+           ฝ่าย:   WRM / QMA / IPRD / SS          (children of CTG)
+           แผนก:   WC / WT / WWT / EV             (children of WRM)
+         Only WRM currently has real mock employees behind it (mapped from
+         the existing บริหารทรัพยากร division and its 4 departments) --
+         the other codes exist as real selectable options but show "ไม่มี
+         ข้อมูลพนักงานในระดับนี้" since this mock roster doesn't have anyone
+         there yet. Leaving แผนก unselected shows all of the selected ฝ่าย.
+     (2) breakdown axis: แยกตามหัวข้อ FOCUS (F/O/C/U/S) vs แยกตามระดับคะแนน (E/G/S/L/I) */
+  var ORG_STRUCTURE={
+    'CTEG':{},
+    'CTG':{'WRM':['WC','WT','WWT','EV'],'QMA':[],'IPRD':[],'SS':[]},
+    'CED':{},
+    'BTDE':{},
+    'CMT':{}
+  };
+  /* maps a ฝ่าย/แผนก code to the real div/dept string already on ALL_EMP --
+     only WRM/WC/WT/WWT/EV have actual people behind them in this mock roster */
+  var DIV_CODE_TO_NAME={'WRM':'บริหารทรัพยากร'};
+  var DEPT_CODE_TO_NAME={'WC':'อนุรักษ์ทรัพยากรน้ำ','WT':'บำบัดน้ำดี','WWT':'บำบัดน้ำทิ้ง','EV':'สิ่งแวดล้อม'};
+
+  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128202;</div><div class="db-sh-ttl">สรุปคะแนน FOCUS</div></div>';
+  html+='<div style="padding:14px 16px">';
+  html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">';
+  html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">กลุ่ม:</span>';
+  html+='<select id="focusFilterGroup" style="padding:6px 10px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer" onchange="focusFilterGroup=this.value;focusFilterDiv=\'\';focusFilterDept=\'\';renderAdminScores()">';
+  html+='<option value="ALL"'+(focusFilterGroup==='ALL'?' selected':'')+'>&#127757; เลือกทั้งหมด (ภาพรวมองค์กร)</option>';
+  Object.keys(ORG_STRUCTURE).forEach(function(g){html+='<option value="'+g+'"'+(focusFilterGroup===g?' selected':'')+'>'+g+'</option>';});
+  html+='</select>';
+
+  var divsInGroup=focusFilterGroup!=='ALL'?Object.keys(ORG_STRUCTURE[focusFilterGroup]||{}):[];
+  if(divsInGroup.length){
+    html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">ฝ่าย:</span>';
+    html+='<select id="focusFilterDiv" style="padding:6px 10px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer" onchange="focusFilterDiv=this.value;focusFilterDept=\'\';renderAdminScores()">';
+    html+='<option value=""'+(focusFilterDiv===''?' selected':'')+'>ทุกฝ่าย</option>';
+    divsInGroup.forEach(function(dv){html+='<option value="'+dv+'"'+(focusFilterDiv===dv?' selected':'')+'>'+dv+'</option>';});
+    html+='</select>';
+  }
+
+  var deptsInDiv=(focusFilterDiv&&ORG_STRUCTURE[focusFilterGroup])?(ORG_STRUCTURE[focusFilterGroup][focusFilterDiv]||[]):[];
+  if(deptsInDiv.length){
+    html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">แผนก:</span>';
+    html+='<select id="focusFilterDept" style="padding:6px 10px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer" onchange="focusFilterDept=this.value;renderAdminScores()">';
+    html+='<option value=""'+(focusFilterDept===''?' selected':'')+'>ทุกแผนก (ทั้งหมดของ '+focusFilterDiv+')</option>';
+    deptsInDiv.forEach(function(dp){html+='<option value="'+dp+'"'+(focusFilterDept===dp?' selected':'')+'>'+dp+'</option>';});
+    html+='</select>';
+  }
+
+  html+='<span style="font-size:11px;font-weight:700;color:var(--t1);margin-left:8px">แกนข้อมูล:</span>';
+  html+='<button class="db-ftab'+(focusChartAxis==='focus'?' on':'')+'" onclick="focusChartAxis=\'focus\';renderAdminScores()">แยกตามหัวข้อ F O C U S</button>';
+  html+='<button class="db-ftab'+(focusChartAxis==='level'?' on':'')+'" onclick="focusChartAxis=\'level\';renderAdminScores()">แยกตามระดับคะแนน E G S L I</button>';
+  html+='</div>';
+
+  /* resolve the selected code path down to real people in ALL_EMP --
+     ALL = everyone; a group/div/dept with no real mapping yet (anything
+     other than WRM/WC/WT/WWT/EV) correctly resolves to an empty list,
+     since this mock roster has no one there. */
+  var scopeLabel='ภาพรวมองค์กร';
+  var peopleInScope=ALL_EMP;
+  if(focusFilterGroup!=='ALL'){
+    var divName=focusFilterDiv?DIV_CODE_TO_NAME[focusFilterDiv]:null;
+    var deptName=focusFilterDept?DEPT_CODE_TO_NAME[focusFilterDept]:null;
+    if(!focusFilterDiv){
+      /* a กลุ่ม chosen but no ฝ่าย yet -- only CTG maps to any real data at all */
+      peopleInScope=focusFilterGroup==='CTG'?ALL_EMP.filter(function(e){return e.div==='บริหารทรัพยากร';}):[];
+      scopeLabel=focusFilterGroup;
+    } else if(!divName){
+      peopleInScope=[]; /* QMA/IPRD/SS chosen -- no mock people behind these yet */
+      scopeLabel=focusFilterDiv;
+    } else if(!deptName){
+      peopleInScope=ALL_EMP.filter(function(e){return e.div===divName;});
+      scopeLabel=focusFilterDiv;
+    } else {
+      peopleInScope=ALL_EMP.filter(function(e){return e.div===divName&&e.dept===deptName;});
+      scopeLabel=focusFilterDept;
+    }
+  }
+
+  var scopeIsOrg=true; /* the dedicated "ดูข้อมูลของ" per-person dropdown was removed --
+                          the 3 cascading dropdowns above are now the only scope control */
+  var scopePerson=null;
+  /* org-wide stats below ("ค่าเฉลี่ยรวมทั้งองค์กร" etc.) should also respect
+     this filter once one is applied, otherwise the headline numbers above
+     would silently ignore the very filter the person just set */
+  var scopeRowsForAgg=peopleInScope;
+  var focusAvgScoped={};fkeysA.forEach(function(f){
+    var vals=scopeRowsForAgg.map(function(e){return mockScoreFor(e.empId).byFocus[f];});
+    focusAvgScoped[f]=vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0;
+  });
+
+  if(!peopleInScope.length){
+    html+='<div class="wb" style="margin-bottom:0"><span>\u2139\uFE0F</span><span>ยังไม่มีข้อมูลพนักงานในระดับ "'+scopeLabel+'" \u2014 ข้อมูลตัวอย่าง (Demo) ขณะนี้มีอยู่เฉพาะใต้ WRM (บริหารทรัพยากร) เท่านั้น</span></div>';
+    html+='</div></div>';
+  } else
+  if(focusChartAxis==='focus'){
+    /* ── bars by F/O/C/U/S, height = average score (org) or that person's score ──
+       Level badge sits in its own fixed-height lane ABOVE the scaled 0-5
+       chart area (not stacked inside the same flex column as the bar),
+       so a perfect score of 5.00 never makes the badge collide with the
+       bar top or the y-axis "5" label -- same fix pattern used on the
+       employee Dashboard's FOCUS chart. */
+    var focusChartH=200; /* bars scale against this EXACT height -- must match what the y-axis labels below are positioned against, or the bar will visually land on the wrong gridline */
+    html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">แกนตั้ง = <b>คะแนนเฉลี่ย</b> (0-5)</div>';
+    html+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
+    fkeysA.forEach(function(f){
+      var val=scopeIsOrg?focusAvgScoped[f]:scopePerson?mockScoreFor(scopePerson.empId).byFocus[f]:0;
+      var lbl=s2l(val);
+      html+='<div style="flex:1;display:flex;justify-content:center;min-height:24px;align-items:center;min-width:0">';
+      html+='<span class="rb-inl" style="background:'+RCOL[lbl.l]+';cursor:pointer;border:none" onclick="adminScoreFocusDrill={focus:\''+f+'\',level:\''+lbl.l+'\'};renderAdminScores()" title="\u0e14\u0e39\u0e27\u0e48\u0e32\u0e43\u0e04\u0e23\u0e44\u0e14\u0e49 '+lbl.l+' \u0e43\u0e19 '+f+'">'+lbl.l+'</span>';
+      html+='</div>';
+    });
+    html+='</div>';
+    html+='<div style="display:flex;align-items:flex-end;gap:14px;height:'+focusChartH+'px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 10px 0 30px;position:relative">';
+    [5,4,3,2,1,0].forEach(function(v){
+      var top=(1-v/5)*100;
+      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--t2);width:24px;text-align:right">'+v+'</div>';
+      html+='<div style="position:absolute;left:30px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
+    });
+    fkeysA.forEach(function(f){
+      var fd=FDEF[f];
+      var val=scopeIsOrg?focusAvgScoped[f]:scopePerson?mockScoreFor(scopePerson.empId).byFocus[f]:0;
+      var barH=Math.max(1,Math.round(val/5*focusChartH)); /* scaled against focusChartH itself, matching the axis exactly -- this was the bug: it used to scale against a separate, smaller "focusBarMaxH" that didn't match the axis */
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;min-width:0">';
+      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
+      html+='<span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+val.toFixed(2)+'</span>';
+      html+='</div></div>';
+    });
+    html+='</div>';
+    html+='<div style="display:flex;gap:14px;padding:8px 10px 0 30px">';
+    fkeysA.forEach(function(f){
+      var fd=FDEF[f];
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0">';
+      html+='<div style="font-size:13px;font-weight:800;color:'+fd.cl+'">'+f+'</div>';
+      html+='<div style="font-size:9px;color:var(--t2);text-align:center">'+fd.nm+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+    html+='<div style="font-size:10px;color:var(--t2);margin-top:8px;text-align:center">คะแนนเฉลี่ยของหัวข้อนั้น \u2014 '+scopeLabel+' ('+scopeRowsForAgg.length+' คน) \u2014 ระดับ E/G/S/L/I คำนวณจากคะแนนเฉลี่ยของหัวข้อนั้นโดยเฉพาะ (อาจต่างจากระดับรวมของแต่ละคนในแท็บ "แยกตามระดับคะแนน")</div>';
+  } else {
+    /* ── bars by E/G/S/L/I -- org-wide: how many PEOPLE land in each level
+       (using each person's overall avg); per-person: how many of their 5
+       FOCUS letters land in each level. Both answer "แยกตามระดับคะแนน". */
+    var levelCounts={};RATINGS.forEach(function(r){levelCounts[r]=0;});
+    var totalForPct=0;
+    if(scopeIsOrg){
+      scopeRowsForAgg.forEach(function(e){levelCounts[s2l(mockScoreFor(e.empId).avg).l]++;});
+      totalForPct=scopeRowsForAgg.length;
+    } else if(scopePerson){
+      var sc=mockScoreFor(scopePerson.empId);
+      fkeysA.forEach(function(f){levelCounts[s2l(sc.byFocus[f]).l]++;});
+      totalForPct=fkeysA.length;
+    }
+    var maxCount=Math.max.apply(null,RATINGS.map(function(r){return levelCounts[r];}))||1;
+    var levelChartH=240; /* total px height of the scaled chart area */
+    /* Use a "nice" round axis max (not just the raw maxCount) so the
+       gridlines are round numbers (0,2,4,6... or 0,5,10,15...) instead of
+       arbitrary fractions -- this is also what makes it visually obvious
+       this chart's axis is a HEADCOUNT scale, not the 0-5 score scale
+       used in the "แยกตามหัวข้อ FOCUS" view, even though both charts sit
+       in the same position when switching between them. */
+    function niceAxisMax(v){
+      /* must be divisible by 5 so the 5 gridline intervals are always
+         whole numbers -- the previous version rounded each gridline
+         independently, which produced uneven steps like 8,6,5,3,2,0 */
+      if(v<=5)return 5;
+      var step=v<=10?5:v<=20?5:v<=50?10:Math.ceil(v/50)*10;
+      var m=Math.ceil(v/step)*step;
+      return m%5===0?m:Math.ceil(m/5)*5;
+    }
+    var axisMax=niceAxisMax(maxCount);
+    var axisStep=axisMax/5;
+    var levelLabelH=20; /* fixed space reserved for the %/count label above each bar, subtracted from levelChartH so the bar itself scales exactly against the gridlines below it */
+    html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">แกนตั้ง = <b>จำนวนคน</b> (ไม่ใช่คะแนน 0-5 เหมือนมุมมอง "แยกตามหัวข้อ FOCUS")</div>';
+    html+='<div style="display:flex;align-items:flex-end;gap:14px;height:'+levelChartH+'px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 10px 0 30px;position:relative">';
+    for(var gi=5;gi>=0;gi--){
+      var gv=Math.round(axisStep*gi);
+      var gtop=(1-gi/5)*100;
+      html+='<div style="position:absolute;left:0;top:'+gtop+'%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--t2);width:24px;text-align:right">'+gv+'</div>';
+      html+='<div style="position:absolute;left:30px;right:8px;top:'+gtop+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
+    }
+    RATINGS.forEach(function(r){
+      var cnt=levelCounts[r];
+      /* bar scales against (levelChartH - labelH), matching exactly what
+         the gridlines above represent over that same span -- this was
+         the bug: it used to scale against an unrelated, smaller
+         "levelBarMaxH" constant that didn't match the axis at all. */
+      var barH=axisMax?Math.max(cnt?4:0,Math.round(cnt/axisMax*(levelChartH-levelLabelH))):0;
+      html+='<div style="flex:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-width:0">';
+      html+='<div style="height:'+levelLabelH+'px;display:flex;align-items:center;font-size:11px;font-weight:800;color:'+RCOL[r]+';white-space:nowrap">'+(totalForPct?Math.round(cnt/totalForPct*100):0)+'%</div>';
+      html+='<div style="width:100%;height:'+barH+'px;background:'+RCOL[r]+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center;cursor:pointer" onclick="'+(scopeIsOrg?'adminScoreSort=\'letter\';renderAdminScores()':'')+'">';
+      if(cnt>0)html+='<span style="font-size:12px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+cnt+'</span>';
+      html+='</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+    /* FOCUS-letter-style labels (E/G/S/L/I + name) sit in their own row
+       below the scaled chart area, never competing for height with the
+       bars/labels above -- same fix pattern as the employee dashboard's
+       FOCUS chart from an earlier session. */
+    html+='<div style="display:flex;gap:14px;padding:8px 10px 0 30px">';
+    RATINGS.forEach(function(r){
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0">';
+      html+='<div style="font-size:14px;font-weight:800;color:'+RCOL[r]+'">'+r+'</div>';
+      html+='<div style="font-size:9px;color:var(--t2);text-align:center">'+RNAME[r]+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+    html+='<div style="font-size:10px;color:var(--t2);margin-top:8px;text-align:center">จำนวนคน (จากค่าเฉลี่ยรวมของแต่ละคน) \u2014 '+scopeLabel+' ('+scopeRowsForAgg.length+' คน)</div>';
+  }
+  html+='</div></div>';
+
+  /* ── drill-down result: who got a specific level on a specific FOCUS letter ── */
+  if(adminScoreFocusDrill){
+    var df=adminScoreFocusDrill.focus,dl=adminScoreFocusDrill.level;
+    var fd2=FDEF[df];
+    var matches=allRows.filter(function(r){return s2l(r.sc.byFocus[df]).l===dl;});
+    html+='<div class="card" style="margin-bottom:14px;border-left:4px solid '+RCOL[dl]+'">';
+    html+='<div class="chd"><div class="db-sh-ico" style="background:'+RCOL[dl]+'18">&#128269;</div>';
+    html+='<div class="db-sh-ttl">คนที่ได้ระดับ '+dl+' ในหัวข้อ '+df+' ('+fd2.nm+') \u2014 '+matches.length+' คน</div>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 10px" onclick="adminScoreFocusDrill=null;renderAdminScores()">&#10005; ปิด</button></div>';
+    if(!matches.length){
+      html+='<div style="padding:1.25rem;text-align:center;color:var(--t2);font-size:12px">ไม่มีใครได้ระดับนี้</div>';
+    } else {
+      html+='<div style="padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px">';
+      matches.forEach(function(r){
+        html+='<span style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--s1);border:1px solid var(--b0);border-radius:14px;font-size:12px">'+r.e.name+' <span style="color:var(--t2);font-size:10px">('+r.e.nick+')</span></span>';
+      });
+      html+='</div>';
+    }
+    html+='</div>';
+  }
+
+  /* ── sort controls ── */
   html+='<div class="card" style="padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
   html+='<span style="font-size:11px;font-weight:700;color:var(--t1)">เรียงตาม:</span>';
   var sortOpts=[['score_desc','คะแนนมาก\u2192น้อย'],['score_asc','คะแนนน้อย\u2192มาก'],['letter','ระดับตัวอักษร E\u2192I'],['role','ระดับตำแหน่ง ส\u2192ก\u2192ป']];
@@ -1564,48 +2038,95 @@ function renderAdminScores(){
     html+='<button class="db-ftab'+(adminScoreSort===o[0]?' on':'')+'" onclick="adminScoreSort=\''+o[0]+'\';renderAdminScores()">'+o[1]+'</button>';
   });
   html+='</div>';
-  var rows=ALL_EMP.map(function(e){var sc=mockScoreFor(e.empId);return{e:e,sc:sc,lbl:s2l(sc.avg)};});
   var roleOrder={'ผู้บริหารระดับสูง':0,'เชี่ยวชาญ':0,'ผู้บริหารระดับกลาง':1,'ปฏิบัติการ':2};
   if(adminScoreSort==='score_desc')rows.sort(function(a,b){return b.sc.avg-a.sc.avg;});
   else if(adminScoreSort==='score_asc')rows.sort(function(a,b){return a.sc.avg-b.sc.avg;});
   else if(adminScoreSort==='letter')rows.sort(function(a,b){return b.sc.avg-a.sc.avg;});
   else if(adminScoreSort==='role')rows.sort(function(a,b){return(roleOrder[a.e.role]||9)-(roleOrder[b.e.role]||9)||b.sc.avg-a.sc.avg;});
-  /* org-wide stats */
-  var avgAll=rows.reduce(function(s,r){return s+r.sc.avg;},0)/rows.length;
-  var minAll=Math.min.apply(null,rows.map(function(r){return r.sc.min;}));
-  var maxAll=Math.max.apply(null,rows.map(function(r){return r.sc.max;}));
-  html+='<div class="card" style="padding:14px 16px;margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap">';
-  html+='<div><div style="font-size:11px;color:var(--t2)">ค่าเฉลี่ยรวม</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:'+s2l(avgAll).c+'">'+avgAll.toFixed(2)+'</div></div>';
-  html+='<div><div style="font-size:11px;color:var(--t2)">Min</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--I)">'+minAll.toFixed(2)+'</div></div>';
-  html+='<div><div style="font-size:11px;color:var(--t2)">Max</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+maxAll.toFixed(2)+'</div></div>';
-  html+='</div>';
+
+  /* ── per-person table, with a vs-average column ── */
   html+='<div class="card"><div style="overflow-x:auto"><table class="sw-table"><thead><tr>';
-  html+='<th class="lft">ชื่อ</th><th>ระดับตำแหน่ง</th><th>คะแนนเฉลี่ย</th><th>Min</th><th>Max</th><th>ระดับ</th>';
+  html+='<th class="lft">ชื่อ</th><th>ระดับตำแหน่ง</th><th>คะแนนเฉลี่ย</th><th>เทียบเฉลี่ยองค์กร</th><th>Min</th><th>Max</th><th>ระดับ</th><th>History</th>';
   html+='</tr></thead><tbody>';
   rows.forEach(function(r){
+    var diff=r.sc.avg-avgAll;
+    var diffPct=avgAll?Math.round(diff/avgAll*100):0;
     html+='<tr>';
     html+='<td class="lft">'+r.e.name+' <span style="color:var(--t2);font-size:10px">('+r.e.nick+')</span></td>';
     html+='<td style="font-size:11px;color:var(--t2)">'+r.e.role+'</td>';
     html+='<td><b style="color:'+r.lbl.c+';font-family:var(--fh)">'+r.sc.avg.toFixed(2)+'</b></td>';
+    html+='<td>'+(diffPct>0?'<span style="color:var(--E)">&#9650; '+diffPct+'%</span>':diffPct<0?'<span style="color:var(--I)">&#9660; '+Math.abs(diffPct)+'%</span>':'<span style="color:var(--t2)">0%</span>')+'</td>';
     html+='<td style="color:var(--t2)">'+r.sc.min.toFixed(2)+'</td>';
     html+='<td style="color:var(--t2)">'+r.sc.max.toFixed(2)+'</td>';
     html+='<td><span class="rb-inl" style="background:'+RCOL[r.lbl.l]+'">'+r.lbl.l+'</span></td>';
+    html+='<td><button class="btn bo" style="font-size:10px;padding:3px 9px" onclick="openAdminScoreHistory(\''+r.e.empId+'\')">&#128201; ดู</button></td>';
     html+='</tr>';
   });
   html+='</tbody></table></div></div>';
   h('adminScoresBody').innerHTML=html;
 }
+/* per-person History modal: trend of their overall average across closed rounds + current */
+function openAdminScoreHistory(empId){
+  var e=ALL_EMP.filter(function(x){return x.empId===empId;})[0];
+  if(!e)return;
+  var points=ROUNDS.map(function(r){
+    var savedCur=currentRound;currentRound=r; /* mockScoreFor seeds off currentRound.id, so swap temporarily */
+    var sc=mockScoreFor(empId);
+    currentRound=savedCur;
+    return{label:roundLabel(r.year,r.roundNo),avg:sc.avg};
+  });
+  points.push({label:roundLabel(currentRound.year,currentRound.roundNo)+' (ปัจจุบัน)',avg:mockScoreFor(empId).avg});
+  var body=h('adminHistBody');
+  if(!body)return;
+  body.innerHTML='';
+  var title=document.createElement('div');
+  title.style.cssText='font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t0);margin-bottom:4px';
+  title.textContent=e.name+' ('+e.nick+')';
+  body.appendChild(title);
+  var sub=document.createElement('div');
+  sub.style.cssText='font-size:11px;color:var(--t2);margin-bottom:14px';
+  sub.textContent='แนวโน้มคะแนนเฉลี่ยรวม ข้ามรอบประเมิน (ข้อมูลตัวอย่าง)';
+  body.appendChild(sub);
+  var chart=document.createElement('div');
+  chart.style.cssText='display:flex;align-items:flex-end;gap:10px;height:140px;border-bottom:1.5px solid var(--b0);padding:0 4px';
+  points.forEach(function(p){
+    var col=s2l(p.avg);
+    var barH=Math.max(1,Math.round(p.avg/5*120));
+    var colDiv=document.createElement('div');
+    colDiv.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;max-width:80px';
+    colDiv.innerHTML='<div style="font-size:11px;font-weight:800;color:'+col.c+'">'+p.avg.toFixed(2)+'</div>'
+      +'<div style="width:100%;height:'+barH+'px;background:var(--pb);border-radius:5px 5px 0 0"></div>'
+      +'<div style="font-size:10px;color:var(--t2);text-align:center">'+p.label+'</div>';
+    chart.appendChild(colDiv);
+  });
+  body.appendChild(chart);
+  h('adminHistOvl').classList.add('on');
+}
 
 /* --- TAB 3: จัดการรอบประเมิน (round lifecycle -- moved here from the
    employee Dashboard since it's purely an Admin/system concern) --- */
 function renderAdminRounds(){
-  var html='<div class="phd"><div><div class="ptitle">&#128197; จัดการรอบประเมิน</div></div></div>';
+  var html='<div class="phd"><div><div class="ptitle">&#128197; รอบการประเมิน</div></div></div>';
   html+='<div class="card" style="padding:16px;margin-bottom:14px">';
   html+='<div style="font-size:12px;color:var(--t2);margin-bottom:4px">รอบปัจจุบัน</div>';
-  html+='<div style="font-family:var(--fh);font-size:20px;font-weight:800;color:var(--t0);margin-bottom:14px">'+currentRound.label+' <span style="font-size:12px;font-weight:600;color:var(--E)">(กำลังดำเนินการ)</span></div>';
-  html+='<button class="btn bt" onclick="openCloseRoundDialogAdmin()">&#10003; ปิดรอบ &amp; เริ่มรอบใหม่</button>';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">';
+  html+='<div>';
+  html+='<div style="font-family:var(--fh);font-size:20px;font-weight:800;color:var(--t0)">'+roundLabel(currentRound.year,currentRound.roundNo)+' <span style="font-size:12px;font-weight:600;color:var(--E)">(กำลังดำเนินการ)</span></div>';
+  if(currentRound.startDate&&currentRound.endDate)html+='<div style="font-size:12px;color:var(--t1);margin-top:3px">ระหว่างวันที่ '+fmtThaiDate(currentRound.startDate)+' \u2013 '+fmtThaiDate(currentRound.endDate)+'</div>';
   html+='</div>';
-  html+='<div class="card"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#128193;</div><div class="db-sh-ttl">ประวัติรอบที่ปิดแล้ว</div></div>';
+  var rdA=daysRemaining(currentRound.endDate);
+  if(rdA!==null){
+    var rdColA=rdA<0?'var(--I)':rdA<=3?'var(--L)':'var(--E)';
+    html+='<div style="text-align:center;padding:8px 16px;background:'+rdColA+'14;border-radius:var(--r)">';
+    html+='<div style="font-family:var(--fh);font-size:22px;font-weight:800;color:'+rdColA+'">'+(rdA<0?'หมดเวลา':rdA)+'</div>';
+    html+='<div style="font-size:10px;color:var(--t2)">'+(rdA<0?'เกินกำหนด '+Math.abs(rdA)+' วัน':'วันคงเหลือ')+'</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  html+='<div style="display:flex;gap:8px"><button class="btn bt" onclick="openCloseRoundDialogAdmin()">&#10003; ปิดรอบ &amp; เริ่มรอบใหม่</button>';
+  html+='<button class="btn bo" onclick="openEditRoundDatesDialog()">&#9999;&#65039; แก้ไขวันที่รอบนี้</button></div>';
+  html+='</div>';
+  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#128193;</div><div class="db-sh-ttl">ประวัติรอบที่ปิดแล้ว</div></div>';
   if(!ROUNDS.length){
     html+='<div style="padding:1.5rem;text-align:center;color:var(--t2)">ยังไม่มีรอบที่ปิดแล้ว</div>';
   } else {
@@ -1613,40 +2134,131 @@ function renderAdminRounds(){
     ROUNDS.slice().reverse().forEach(function(r){
       var d=new Date(r.closedAt);
       html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)">';
-      html+='<div><div style="font-weight:700;font-size:13px;color:var(--t0)">'+r.label+'</div><div style="font-size:10px;color:var(--t2)">ปิดรอบเมื่อ '+d.toLocaleDateString('th-TH')+'</div></div>';
+      html+='<div><div style="font-weight:700;font-size:13px;color:var(--t0)">'+r.label+'</div>';
+      if(r.startDate&&r.endDate)html+='<div style="font-size:10px;color:var(--t2)">'+fmtThaiDate(r.startDate)+' \u2013 '+fmtThaiDate(r.endDate)+'</div>';
+      html+='<div style="font-size:10px;color:var(--t2)">ปิดรอบเมื่อ '+d.toLocaleDateString('th-TH')+'</div></div>';
       html+='</div>';
     });
     html+='</div>';
   }
   html+='</div>';
+
+  /* ── สิทธิ์การประเมิน: which role levels must evaluate which other role
+     levels. Falls back to the hardcoded department/division logic
+     (getDefaults) until an Admin actually edits and saves a rule here. */
+  html+='<div class="card"><div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128274;</div><div class="db-sh-ttl">สิทธิ์การประเมิน</div>';
+  html+='<span style="font-size:10px;color:var(--t2)">กำหนดว่าระดับใดต้องประเมินระดับใดบ้าง</span></div>';
+  html+='<div style="padding:14px 16px">';
+  if(!EVAL_RULES){
+    html+='<div class="wb" style="margin-bottom:12px"><span>\u2139\uFE0F</span><span>ยังใช้กฎเริ่มต้นของระบบอยู่ (ตามแผนก/ฝ่าย) \u2014 ยังไม่มีการกำหนดสิทธิ์เอง</span></div>';
+  }
+  ALL_ROLES.forEach(function(role){
+    var checked=EVAL_RULES&&EVAL_RULES[role]?EVAL_RULES[role]:[];
+    html+='<div style="margin-bottom:12px;padding:11px 13px;border:1px solid var(--b0);border-radius:var(--r)">';
+    html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin-bottom:8px">'+role+' ต้องประเมิน:</div>';
+    html+='<div style="display:flex;gap:14px;flex-wrap:wrap">';
+    ALL_ROLES.forEach(function(targetRole){
+      var cid='evalrule_'+role+'_'+targetRole;
+      html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer">'
+        +'<input type="checkbox" class="evalrule-chk" data-role="'+role+'" data-target="'+targetRole+'" '+(checked.indexOf(targetRole)>=0?'checked':'')+' style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer">'+targetRole+'</label>';
+    });
+    html+='</div></div>';
+  });
+  html+='<div style="display:flex;gap:8px;margin-top:6px">';
+  html+='<button class="btn bt" onclick="saveEvalRulesFromForm()">&#10003; บันทึกสิทธิ์การประเมิน</button>';
+  html+='<button class="btn bo" onclick="resetEvalRules()">ใช้กฎเริ่มต้นของระบบ</button>';
+  html+='</div>';
+  html+='</div></div>';
   h('adminRoundsBody').innerHTML=html;
 }
+function saveEvalRulesFromForm(){
+  var rules={};
+  document.querySelectorAll('.evalrule-chk').forEach(function(chk){
+    var role=chk.dataset.role,target=chk.dataset.target;
+    if(!rules[role])rules[role]=[];
+    if(chk.checked)rules[role].push(target);
+  });
+  EVAL_RULES=rules;
+  saveEvalRules();
+  toast('&#128274;','บันทึกสิทธิ์การประเมินแล้ว','การประเมินรอบถัดไปจะใช้กฎนี้','var(--E)');
+  renderAdminRounds();
+}
+function resetEvalRules(){
+  EVAL_RULES=null;
+  saveEvalRules();
+  toast('&#8634;','กลับไปใช้กฎเริ่มต้นของระบบ','','var(--L)');
+  renderAdminRounds();
+}
+function openEditRoundDatesDialog(){
+  h('editRoundStartA').value=currentRound.startDate||'';
+  h('editRoundEndA').value=currentRound.endDate||'';
+  h('editRoundOvlA').classList.add('on');
+}
+if(h('editRoundCancelBtnA'))h('editRoundCancelBtnA').addEventListener('click',function(){h('editRoundOvlA').classList.remove('on');});
+if(h('editRoundConfirmBtnA'))h('editRoundConfirmBtnA').addEventListener('click',function(){
+  var s=h('editRoundStartA').value,e=h('editRoundEndA').value;
+  if(!s||!e){return;}
+  if(e<s){toast('\u26A0\uFE0F','วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
+  /* editing dates can change which Buddhist year the round falls in --
+     recompute year/roundNo consistently with how a brand-new round would */
+  var newYear=buddhistYear(s);
+  if(newYear!==currentRound.year){
+    currentRound.year=newYear;currentRound.roundNo=1;
+  }
+  currentRound.startDate=s;currentRound.endDate=e;
+  currentRound.label=roundLabel(currentRound.year,currentRound.roundNo);
+  saveRoundsData();
+  h('editRoundOvlA').classList.remove('on');
+  toast('&#9999;\uFE0F','แก้ไขวันที่รอบเรียบร้อย',roundLabel(currentRound.year,currentRound.roundNo),'var(--E)');
+  renderAdminTab();
+});
 function openCloseRoundDialogAdmin(){
-  h('crCurLabelA').textContent=currentRound.label;
-  h('crNextLabelA').value=nextRoundLabelGuess();
+  h('crCurLabelA').textContent=roundLabel(currentRound.year,currentRound.roundNo);
+  /* default the next round to start the day after the current one ends */
+  var defStart=currentRound.endDate
+    ?new Date(new Date(currentRound.endDate+'T00:00:00').getTime()+86400000).toISOString().slice(0,10)
+    :new Date().toISOString().slice(0,10);
+  var defEnd=new Date(new Date(defStart+'T00:00:00').getTime()+30*86400000).toISOString().slice(0,10);
+  h('crNextStartA').value=defStart;
+  h('crNextEndA').value=defEnd;
+  _updateCrNextPreviewA();
   h('closeRoundOvlA').classList.add('on');
 }
+function _updateCrNextPreviewA(){
+  var s=h('crNextStartA').value,e=h('crNextEndA').value;
+  var preview=h('crNextPreviewA');if(!preview)return;
+  if(!s||!e){preview.textContent='';return;}
+  var meta=nextRoundMeta(currentRound.year,currentRound.roundNo,s);
+  preview.textContent='\u2192 จะเป็น '+roundLabel(meta.year,meta.roundNo)+' ('+fmtThaiDate(s)+' \u2013 '+fmtThaiDate(e)+')';
+}
+if(h('crNextStartA'))h('crNextStartA').addEventListener('change',_updateCrNextPreviewA);
+if(h('crNextEndA'))h('crNextEndA').addEventListener('change',_updateCrNextPreviewA);
 if(h('crCancelBtnA'))h('crCancelBtnA').addEventListener('click',function(){h('closeRoundOvlA').classList.remove('on');});
 if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
-  var nextLabel=h('crNextLabelA').value.trim();
-  if(!nextLabel){h('crNextLabelA').focus();return;}
+  var nextStart=h('crNextStartA').value,nextEnd=h('crNextEndA').value;
+  if(!nextStart||!nextEnd){if(!nextStart)h('crNextStartA').focus();else h('crNextEndA').focus();return;}
+  if(nextEnd<nextStart){toast('\u26A0\uFE0F','วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
+  var meta=nextRoundMeta(currentRound.year,currentRound.roundNo,nextStart);
   /* IMPORTANT LIMITATION: each employee's scores only ever exist in their
      own browser session (wiped on logout, never aggregated anywhere
      central) -- so there is no real org-wide score data for the Admin to
      archive here. This action currently only advances the round
-     label/metadata, ready for when a real backend supplies aggregated
-     scores to archive. selfSc/othSc are stored empty as a placeholder so
-     the data shape matches what a real archived round will look like. */
+     metadata, ready for when a real backend supplies aggregated scores
+     to archive. selfSc/othSc are stored empty as a placeholder so the
+     data shape matches what a real archived round will look like. */
   ROUNDS.push({
     id:'r_'+Date.now(),
-    label:currentRound.label,
+    year:currentRound.year,roundNo:currentRound.roundNo,
+    startDate:currentRound.startDate,endDate:currentRound.endDate,
+    label:roundLabel(currentRound.year,currentRound.roundNo),
     closedAt:Date.now(),
     selfSc:{},othSc:{},rsnNotes:{}
   });
-  currentRound={id:'r_'+Date.now()+'_cur',label:nextLabel};
+  currentRound={id:'r_'+Date.now()+'_cur',year:meta.year,roundNo:meta.roundNo,
+    startDate:nextStart,endDate:nextEnd,label:roundLabel(meta.year,meta.roundNo)};
   saveRoundsData();
   h('closeRoundOvlA').classList.remove('on');
-  toast('&#128197;','ปิดรอบเรียบร้อย (Demo)','เริ่มรอบใหม่: '+nextLabel+' \u2014 ยังไม่มีข้อมูลคะแนนจริงให้เก็บประวัติ','var(--L)');
+  toast('&#128197;','ปิดรอบเรียบร้อย (Demo)','เริ่ม '+currentRound.label+' \u2014 ยังไม่มีข้อมูลคะแนนจริงให้เก็บประวัติ','var(--L)');
   renderAdminTab();
 });
 
@@ -1659,6 +2271,7 @@ function doLogin(){
   h('lerr').style.display='none';
   CU=Object.assign({},ud,{username:u});
   loadRoundsData(); /* round/history is organizational state, shared across logins on this browser */
+  loadEvalRules(); /* evaluation-rights rules, also organizational state shared across logins */
   dbRoundView='current';
   if(CU.isAdmin){
     /* Admin is a system account, not part of the employee roster --
@@ -1667,6 +2280,10 @@ function doLogin(){
     persons=[];
     h('sl').classList.remove('on');
     h('saAdmin').classList.add('on');
+    /* swap the mobile bottom nav too -- Admin's 3 tabs, not the
+       employee's self/person/grid/dash 4 tabs */
+    if(h('mobNav'))h('mobNav').style.display='none';
+    if(h('mobNavAdmin'))h('mobNavAdmin').style.display='';
     renderAdminTab();
     return;
   }
@@ -1678,6 +2295,10 @@ function doLogin(){
   h('wname').textContent=CU.name;
   h('wrole').textContent=CU.role+' \u00b7 '+CU.dept+' \u00b7 '+CU.pos;
   h('wchk').checked=false;h('wsbtn').disabled=true;
+  /* swap the mobile bottom nav back to the employee's 4 tabs, in case the
+     previous session in this browser was an Admin login */
+  if(h('mobNavAdmin'))h('mobNavAdmin').style.display='none';
+  if(h('mobNav'))h('mobNav').style.display='';
   /* switch screens: hide login, show app */
   h('sl').classList.remove('on');
   h('sa').classList.add('on');
@@ -1692,7 +2313,7 @@ function doLogout(){
   CU=null;persons=[];selfSc={};othSc={};
   sSaved=false;sSub=false;oSaved=false;oSub=false;
   curTab='self';expd={};catOp={};orgExp={};
-  gmCat=CATS[0];gmSM=false;gmSel={};gmDP=null;gmRI=null;subTgt=null;cdIdx=null;orgMode='dept';orgQ='';
+  gmCat=CATS[0];gmSM=false;gmSel={};gmDP=null;gmRI=null;gmArmed=null;subTgt=null;cdIdx=null;orgMode='dept';orgQ='';
   h('lu').value='';h('lp').value='';h('lp').type='password';h('eyb').textContent='\uD83D\uDC41';h('lerr').style.display='none';
   /* close all overlays */
   ['wovl','subovl','addovl','drillovl','rsnovl','batchrsnovl','closeRoundOvl'].forEach(function(id){h(id).classList.remove('on');});
@@ -1700,6 +2321,9 @@ function doLogout(){
   h('sa').classList.remove('on');
   h('saAdmin').classList.remove('on');
   h('sl').classList.add('on');
+  /* reset mobile nav to the employee default for the next login */
+  if(h('mobNavAdmin'))h('mobNavAdmin').style.display='none';
+  if(h('mobNav'))h('mobNav').style.display='';
 }
 /* loutbtn uses onclick="doLogout()" in HTML */
 
@@ -1723,8 +2347,28 @@ function startApp(){
 }
 
 /* DEFAULTS */
+/* ── Evaluation rights (who must evaluate whom, by role level) ──
+ * MOCK DATA LAYER: stored in localStorage, editable by Admin under
+ * "รอบการประเมิน" > "สิทธิ์การประเมิน" (item 7.2). Each entry says which
+ * OTHER role levels a person holding a given role must evaluate.
+ * Falls back to the original hardcoded department/division logic in
+ * getDefaults() below when no custom rule has been saved for a role,
+ * so existing behavior is unchanged until an Admin actually edits this. */
+var EVAL_RULES=null; /* null = use hardcoded defaults; otherwise {role: [role,...]} */
+function loadEvalRules(){
+  try{var d=JSON.parse(localStorage.getItem('sf_eval_rules')||'null');if(d)EVAL_RULES=d;}catch(e){}
+}
+function saveEvalRules(){
+  try{localStorage.setItem('sf_eval_rules',JSON.stringify(EVAL_RULES));}catch(e){}
+}
+var ALL_ROLES=['ปฏิบัติการ','ผู้บริหารระดับกลาง','ผู้บริหารระดับสูง'];
 function getDefaults(user){
   var id=user.empId,dept=user.dept,div=user.div,role=user.role;
+  /* custom Admin-defined rule takes priority if one exists for this role */
+  if(EVAL_RULES&&EVAL_RULES[role]){
+    var allowedRoles=EVAL_RULES[role];
+    return ALL_EMP.filter(function(e){return e.empId!==id&&allowedRoles.indexOf(e.role)>=0;});
+  }
   if(role==='ปฏิบัติการ')return ALL_EMP.filter(function(e){
     return e.empId!==id&&((e.dept===dept&&['ปฏิบัติการ','ผู้บริหารระดับกลาง','เชี่ยวชาญ'].indexOf(e.role)>=0)||(e.div===div&&e.role==='ผู้บริหารระดับสูง'));
   });
@@ -1785,31 +2429,44 @@ function setRating(pid,cid,r,isSelf){
 var _openDefKey=null;
 var _isHoverDevice=window.matchMedia&&window.matchMedia('(hover:hover) and (pointer:fine)').matches;
 
-/* ── Keep rating-definition popups inside the viewport ──
- * .rpop is centered on its .rbw button by default (left:50%;transform:translateX(-50%)).
- * For buttons near the screen edge (e.g. the rightmost "I" column) this centers the
- * popup off-screen. On hover we measure the popup's rect and nudge it back on-screen
- * via an inline transform override, instead of clipping. */
+/* ── Position the rating-definition popup against the viewport ──
+ * .rpop is position:fixed now, so its top/left must be set entirely in
+ * JS based on the hovered button's own position -- this is what makes it
+ * float above every row regardless of the row's local stacking context,
+ * fixing cases where the popup used to visually get clipped or undercut
+ * by a sibling row's background/border. */
 if(_isHoverDevice){
   document.addEventListener('mouseover',function(e){
     var rbw=e.target.closest&&e.target.closest('.rbw');
     if(!rbw)return;
     var pop=rbw.querySelector('.rpop');
     if(!pop)return;
-    /* reset to default centered position first so measurements are accurate */
-    pop.style.left='50%';pop.style.transform='translateX(-50%)';pop.style.setProperty('--arrow-shift','0px');
+    var btnRect=rbw.getBoundingClientRect();
+    /* render once off-screen first so we can measure its natural size */
+    pop.style.display='block';pop.style.left='-9999px';pop.style.top='-9999px';
     requestAnimationFrame(function(){
-      var pr=pop.getBoundingClientRect();
+      var pw=pop.offsetWidth,ph=pop.offsetHeight;
       var margin=10;
+      var centerX=btnRect.left+btnRect.width/2;
+      var left=centerX-pw/2;
       var shift=0;
-      if(pr.left<margin)shift=margin-pr.left;
-      else if(pr.right>window.innerWidth-margin)shift=(window.innerWidth-margin)-pr.right;
-      if(shift!==0){
-        pop.style.transform='translateX(calc(-50% + '+shift+'px))';
-        /* shift the arrow back so it still points at the button, not at the popup's new center */
-        pop.style.setProperty('--arrow-shift',(-shift)+'px');
-      }
+      if(left<margin){shift=margin-left;left=margin;}
+      else if(left+pw>window.innerWidth-margin){shift=(window.innerWidth-margin-pw)-left;left=window.innerWidth-margin-pw;}
+      var top=btnRect.top-ph-9; /* 9px gap above the button, matching the old bottom:calc(100% + 9px) */
+      if(top<margin)top=btnRect.bottom+9; /* not enough room above -- flip below the button instead */
+      pop.style.left=left+'px';pop.style.top=top+'px';
+      /* shift the arrow back so it still points at the button, not at the popup's re-centered box */
+      pop.style.setProperty('--arrow-shift',(-shift)+'px');
     });
+  });
+  document.addEventListener('mouseout',function(e){
+    var rbw=e.target.closest&&e.target.closest('.rbw');
+    if(!rbw)return;
+    /* only hide if the mouse actually left the .rbw element (not just moved
+       to a child within it) */
+    if(rbw.contains(e.relatedTarget))return;
+    var pop=rbw.querySelector('.rpop');
+    if(pop)pop.style.display='none';
   });
 }
 function toggleDef(target,cid,r){
@@ -2265,13 +2922,7 @@ function scoreSummaryCard(){
     html+='<div class="sc-rank-name">'+p.name.split(' ')[0]+'<div style="font-size:9px;color:var(--t2);font-weight:400">('+p.nick+')</div></div>';
     html+='<div class="sc-rank-score" style="color:'+lc+'">'+(avg?avg.toFixed(2):'\u2013')+'</div>';
     if(avg)html+='<div class="sc-rank-lbl" style="background:'+RCOL[lbl.l]+'">'+lbl.l+'</div>';
-    html+='<div class="sc-rank-cat-row">';
-    CATS.forEach(function(cat,ci){
-      var ca=item.cats[ci];var cl=s2l(ca);
-      var m=CAT_META[cat];
-      if(ca)html+='<span class="sc-rank-cat" style="background:'+m.cl+'20;color:'+m.cl+'">'+cat.charAt(0)+': '+cl.l+'</span>';
-    });
-    html+='</div></div>';
+    html+='</div>';
   });
   html+='</div></div>';
   return html;
@@ -2375,8 +3026,10 @@ function renderSelf(){
   if(h('tbsub'))h('tbsub').textContent='กรอกแล้ว '+pStr('self',true)+' ข้อ';
   if(h('tbright'))h('tbright').innerHTML=actBtns(true);
   if(h('selfstatus'))h('selfstatus').innerHTML=sSub?'<div class="tsub">\u2713 Submitted</div>':sSaved?'<div class="tsav">&#128190; Saved</div>':'';
-  if(sSub){if(h('selfbody'))h('selfbody').innerHTML='<div style="padding:1rem 1.25rem;text-align:center;color:var(--teal);font-size:13px;font-weight:600;background:var(--tlt);border-top:1px solid var(--b0)">\u2705 ส่งข้อมูลเรียบร้อยแล้ว ไม่สามารถแก้ไขได้</div>';return;}
   var html='';
+  if(sSub){
+    html+='<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--teal);font-size:13px;font-weight:600;background:var(--tlt);border-bottom:1px solid var(--b0)">\u2705 ส่งข้อมูลเรียบร้อยแล้ว ไม่สามารถแก้ไขได้ \u2014 รายการที่ประเมินไปแล้วแสดงอยู่ด้านล่าง (อ่านอย่างเดียว)</div>';
+  }
   CATS.forEach(function(cat){
     var m=CAT_META[cat];var cc=CRITERIA.filter(function(c){return c.cat===cat;});
     var done=cc.filter(function(c){return gSelf(c.id);}).length;
@@ -2579,7 +3232,8 @@ function renderGrid(){
   var html=sumHtml2+'<div class="gm">';
   /* bank */
   html+='<div class="gmb"><div class="gmt">';
-  html+='<div class="gml"><span class="gstep">1</span>สามารถจัดเรียงรายชื่อได้ <span class="gstep">2</span>กดค้าง 0.5 วินาทีเพื่อเข้าสู่โหมดเลือกหลายคน <span class="gstep">3</span>ประเมินโดยการนำรายชื่อใส่ในตาราง</div>';
+  html+='<div class="gml lgn-hover"><span class="gstep">1</span>สามารถจัดเรียงรายชื่อได้ <span class="gstep">2</span>กดค้าง 0.5 วินาทีเพื่อเข้าสู่โหมดเลือกหลายคน <span class="gstep">3</span>ลากชื่อใส่ในตาราง</div>';
+  html+='<div class="gml lgn-touch"><span class="gstep">1</span>แตะชื่อเพื่อเลือก <span class="gstep">2</span>กดค้าง 0.5 วินาทีเพื่อเลือกหลายคน <span class="gstep">3</span>แตะช่องในตารางเพื่อประเมิน</div>';
   html+='<select class="gcatsel" id="gcatsel">';
   CATS.forEach(function(c){
     var mark=catIsDone(c)?'\u2713 ':'';
@@ -2590,10 +3244,11 @@ function renderGrid(){
   persons.forEach(function(p,i){
     var allDone=cc.every(function(c){return gS(p.empId,c.id);});
     var isSel=!!gmSel[p.empId];
+    var isArmed=gmArmed===p.empId||(gmArmed==='__multi__'&&isSel);
     var ph=getPhoto(p.empId);
     var avH=ph?'<div class="gcav"><img src="'+ph+'" alt="'+p.name+'"></div>':'<div class="gcav" style="background:'+p.color+'">'+ini(p.name)+'</div>';
     var drag=!locked?'draggable="true"':'';
-    html+='<div class="gchip'+(isSel?' gsel':'')+(allDone?' gdone':'')+'" '+drag+' data-idx="'+i+'" data-pid="'+p.empId+'" id="gc_'+p.empId+'">';
+    html+='<div class="gchip'+(isSel?' gsel':'')+(allDone?' gdone':'')+(isArmed?' garmed':'')+'" '+drag+' data-idx="'+i+'" data-pid="'+p.empId+'" id="gc_'+p.empId+'">';
     html+=avH+'<span>'+p.name.split(' ')[0]+'<span style="font-size:9px;color:var(--t2);margin-left:2px">('+p.nick+')</span></span>';
     if(allDone)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2713</span>';
     if(isSel)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2714</span>';
@@ -2689,6 +3344,20 @@ function renderGrid(){
       if(gmSM||gmRI===null||gmRI===i){gmRI=null;return;}
       var a=persons.slice();var mv=a.splice(gmRI,1)[0];a.splice(i,0,mv);persons=a;gmRI=null;gmDP=null;renderTab();
     });
+    /* touch-mode tap-to-arm: tapping a chip on a non-hover (touch) device
+       arms it for placement -- tap a rating cell next to actually place it.
+       Native HTML5 drag events above don't fire reliably from touch
+       gestures, so this is a fully separate interaction path, not a
+       fallback for the same handlers. Tapping an already-armed chip
+       disarms it (cancels the pending placement). */
+    if(!_isHoverDevice){
+      el.addEventListener('click',function(e){
+        if(gmLPT){clearTimeout(gmLPT);gmLPT=null;} /* a tap shouldn't also count as the start of a long-press */
+        if(gmSM){toggleSel(p.empId);return;}
+        if(gmArmed===p.empId){gmArmed=null;}else{gmArmed=p.empId;}
+        renderGrid();
+      });
+    }
   });
   /* drop zones */
   var gplDragSrc=null; /* {pid,cid} of an already-placed chip being dragged to a new rating */
@@ -2736,6 +3405,25 @@ function renderGrid(){
         openReason(pid,cid,r,function(){renderTab();});
       }
     });
+    /* touch-mode tap-to-place: tapping a rating cell while a chip (or a
+       multi-selection) is armed places that person/those people here,
+       mirroring exactly what the drag-and-drop "drop" handler above does. */
+    if(!_isHoverDevice){
+      dz.addEventListener('click',function(){
+        if(!gmArmed)return;
+        if(gmArmed==='__multi__'){
+          var pids2=Object.keys(gmSel);
+          if(!pids2.length){gmArmed=null;return;}
+          pids2.forEach(function(pid){othSc[sk(pid,cid)]=r;});
+          autoSave();gmArmed=null;gmSM=false;gmSel={};
+          openBatchReason(pids2,cid,r,function(){renderTab();});
+        }else{
+          var pid2=gmArmed;gmArmed=null;
+          othSc[sk(pid2,cid)]=r;autoSave();
+          openReason(pid2,cid,r,function(){renderTab();});
+        }
+      });
+    }
   });
   /* placed chips -- click opens editable reason popup (pre-filled with existing comment) */
   document.querySelectorAll('.gpl-body').forEach(function(body){
@@ -2772,8 +3460,8 @@ function renderGrid(){
     });
   });
 }
-function gmEnterSel(pid){gmSM=true;gmSel={};gmSel[pid]=true;renderGrid();}
-function gmExitSel(){gmSM=false;gmSel={};renderGrid();}
+function gmEnterSel(pid){gmSM=true;gmSel={};gmSel[pid]=true;gmArmed=_isHoverDevice?null:'__multi__';renderGrid();}
+function gmExitSel(){gmSM=false;gmSel={};gmArmed=null;renderGrid();}
 function gmSelAll(){persons.forEach(function(p){gmSel[p.empId]=true;});renderGrid();}
 function gmClearSel(){gmSel={};renderGrid();}
 function toggleSel(pid){if(gmSel[pid])delete gmSel[pid];else gmSel[pid]=true;renderGrid();}
@@ -2927,19 +3615,23 @@ function yPct(v){
     {lo:0.5,hi:1.8, topPct:64, hPct:26},
     {lo:0,hi:0.5,   topPct:90, hPct:10}
   ];
-  var raw=50;
+  var raw=50,bandTop=0,bandBottom=100;
   for(var i=0;i<bounds.length;i++){
     var b=bounds[i];
     if(v>=b.lo&&v<=b.hi){
       var frac=(b.hi>b.lo)?(b.hi-v)/(b.hi-b.lo):0; /* higher score -> nearer top of its band */
       raw=b.topPct+frac*b.hPct;
+      bandTop=b.topPct;bandBottom=b.topPct+b.hPct;
       break;
     }
   }
-  /* Keep the avg-dot's center at least ~14% away from either edge so the dot
-     (which is centered on this point via translate(-50%,-50%)) never visually
-     overlaps the topmost/bottommost zone-band letter, even at score 5 or 0. */
-  return Math.max(14,Math.min(86,raw));
+  /* Keep the avg-dot's center a few % away from the chart's outer top/bottom
+     edge (so it doesn't get clipped or sit flush on the border), but never
+     push it outside the boundaries of the band it actually belongs to --
+     a perfect 5.00 must stay visually inside the E band (0-10%), not get
+     shoved down toward the E/G border. */
+  var margin=Math.min(3,(bandBottom-bandTop)/2);
+  return Math.max(bandTop+margin,Math.min(bandBottom-margin,raw));
 }
 
 function renderDash(){
@@ -2974,20 +3666,43 @@ function renderDash(){
   html+='</div>';
   html+='</div></div>';
 
-  /* --- 1b. ROUND SELECTOR ---
+  /* --- 1b. ROUND INFO CARD ---
      MOCK DATA LAYER: rounds are stored in localStorage only for now (see
-     ROUNDS/currentRound declaration). Employees can browse past rounds
-     here (read-only); only the Admin account can close/open rounds --
-     see the dedicated Admin shell's "จัดการรอบประเมิน" tab. */
-  html+='<div class="card" data-pdf-sec="controls" style="padding:12px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
-  html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">&#128197; รอบประเมิน:</span>';
-  html+='<select id="dbRoundSel" style="padding:5px 10px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer" onchange="dbRoundView=this.value;renderDash()">';
-  html+='<option value="current"'+(dbRoundView==='current'?' selected':'')+'>'+currentRound.label+' (กำลังดำเนินการ)</option>';
-  ROUNDS.slice().reverse().forEach(function(r){
-    html+='<option value="'+r.id+'"'+(dbRoundView===r.id?' selected':'')+'>'+r.label+' (ปิดรอบแล้ว)</option>';
-  });
-  html+='</select>';
-  if(dbRoundView!=='current')html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:5px">&#128065; กำลังดูข้อมูลย้อนหลัง \u2014 อ่านอย่างเดียว</span>';
+     ROUNDS/currentRound declaration). Shows the round as structured info
+     (year / round number / date range / days remaining) instead of a
+     dropdown -- opening/closing rounds and setting dates is the Admin's
+     job (see the dedicated Admin shell's "รอบการประเมิน" tab). Past rounds
+     can still be browsed via the small history links below the main info. */
+  var rd=daysRemaining(currentRound.endDate);
+  var viewingRound=dbRoundView==='current'?currentRound:ROUNDS.filter(function(r){return r.id===dbRoundView;})[0]||currentRound;
+  html+='<div class="card" data-pdf-sec="controls" style="padding:14px 16px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">';
+  html+='<div>';
+  html+='<div style="font-size:11px;color:var(--t2);margin-bottom:3px">&#128197; รอบการประเมิน</div>';
+  html+='<div style="font-family:var(--fh);font-size:16px;font-weight:800;color:var(--t0)">ปี '+viewingRound.year+' '+roundLabel(viewingRound.year,viewingRound.roundNo)+'</div>';
+  if(viewingRound.startDate&&viewingRound.endDate){
+    html+='<div style="font-size:12px;color:var(--t1);margin-top:3px">ระหว่างวันที่ '+fmtThaiDate(viewingRound.startDate)+' \u2013 '+fmtThaiDate(viewingRound.endDate)+'</div>';
+  }
+  html+='</div>';
+  if(dbRoundView==='current'&&rd!==null){
+    var rdCol=rd<0?'var(--I)':rd<=3?'var(--L)':'var(--E)';
+    html+='<div style="text-align:center;padding:8px 16px;background:'+rdCol+'14;border-radius:var(--r)">';
+    html+='<div style="font-family:var(--fh);font-size:22px;font-weight:800;color:'+rdCol+'">'+(rd<0?'หมดเวลา':rd)+'</div>';
+    html+='<div style="font-size:10px;color:var(--t2)">'+(rd<0?'เกินกำหนด '+Math.abs(rd)+' วัน':'วันคงเหลือ')+'</div>';
+    html+='</div>';
+  } else if(dbRoundView!=='current'){
+    html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:5px">&#128065; กำลังดูข้อมูลย้อนหลัง \u2014 อ่านอย่างเดียว</span>';
+  }
+  html+='</div>';
+  if(ROUNDS.length){
+    html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b0);display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+    html+='<span style="font-size:10px;color:var(--t2)">ดูรอบอื่น:</span>';
+    html+='<button class="db-ftab'+(dbRoundView==='current'?' on':'')+'" onclick="dbRoundView=\'current\';renderDash()">'+roundLabel(currentRound.year,currentRound.roundNo)+' (ปัจจุบัน)</button>';
+    ROUNDS.slice().reverse().forEach(function(r){
+      html+='<button class="db-ftab'+(dbRoundView===r.id?' on':'')+'" onclick="dbRoundView=\''+r.id+'\';renderDash()">'+roundLabel(r.year,r.roundNo)+'</button>';
+    });
+    html+='</div>';
+  }
   html+='</div>';
 
   /* if viewing a past round, swap in its frozen data for every widget below;
@@ -3111,8 +3826,7 @@ function renderDash(){
     html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน</div>';
   } else {
     var ids3=dbFilter==='self'?selfId:allIds;
-    var maxH=180; /* px height representing a score of 5 -- bars scale strictly against this */
-    var chartAreaH=220; /* total px height of the scaled 0-5 axis area */
+    var chartAreaH=260; /* total px height of the scaled 0-5 axis area -- bars below scale against this EXACT value, not a separate smaller constant, or the bar will visually land on the wrong gridline */
     /* overall average across all 5 FOCUS letters -- used as the dashed
        reference line and the basis for each bar's vs-average % badge,
        since there is no prior-period data to compare against. */
@@ -3123,11 +3837,6 @@ function renderDash(){
     var avgLinePct=focAvgAll?(1-focAvgAll/5)*100:null; /* position of the dashed average line, top-down, within the 0-5 scaled area only */
     html+='<div style="padding:0 16px 16px"><div class="focus-chart-wrap" style="align-items:end">';
     html+='<div>';
-    /* legend: bar color + average reference line */
-    html+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;padding-left:32px;font-size:10px;color:var(--t2);flex-wrap:wrap">';
-    html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--pb)"></span>คะแนนแต่ละ FOCUS</span>';
-    if(focAvgAll)html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:0;border-top:2px dashed var(--I)"></span>เฉลี่ยรวม ('+focAvgAll.toFixed(2)+')</span>';
-    html+='</div>';
     /* ── Badge lane: vs-average % + E/G/S/L/I level badge ──
        Rendered as its own fixed-height row OUTSIDE the scaled 0-5 chart
        area below, so it never competes for space with the bars or the
@@ -3168,7 +3877,7 @@ function renderDash(){
     fkeys.forEach(function(f){
       var fd=FDEF[f];
       var cur=focScores[f];
-      var barH=cur?Math.max(1,Math.round(cur/5*maxH)):0; /* strictly proportional to the 0-5 scale -- matches the gridlines above exactly */
+      var barH=cur?Math.max(1,Math.round(cur/5*chartAreaH)):0; /* strictly proportional to the 0-5 scale -- matches the gridlines above exactly */
       var numFits=barH>=26; /* enough room to center the score number inside the bar */
       html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;min-width:0">';
       if(cur&&!numFits)html+='<span style="position:relative;bottom:'+(barH+2)+'px;font-size:clamp(9px,2.2vw,11px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
@@ -3194,7 +3903,7 @@ function renderDash(){
     var fmL=s2l(fm);
     html+='<div>';
     html+='<div style="font-size:clamp(10px,2.2vw,11px);font-weight:700;color:var(--t2);margin-bottom:6px;text-align:center">ภาพรวม FOCUS</div>';
-    html+='<div style="position:relative;height:220px;border-radius:var(--r);overflow:hidden">';
+    html+='<div style="position:relative;height:260px;border-radius:var(--r);overflow:hidden">';
     /* Zone chart -- background bands sized to match actual score ranges (not equal 20% each):
        E 4.5-5.0 (10%), G 3.25-4.5 (25%), S 1.8-3.25 (29%), L 0.5-1.8 (26%), I 0-0.5 (10%)
        Stacked top-to-bottom since the chart's y-axis has 5 at top, 0 at bottom. */
