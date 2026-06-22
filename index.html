@@ -722,7 +722,21 @@ button,input,select{font-family:var(--fb)}
   #sa.on{padding-bottom:90px}
   .d2{grid-template-columns:1fr}
   .fg{grid-template-columns:repeat(3,1fr)}
-  .ggrid{grid-template-columns:1fr repeat(5,65px)}
+  .ggrid{grid-template-columns:1.3fr repeat(5,1fr);min-width:0}
+  .ggrid-scroll{overflow-x:visible;border-radius:var(--rl);box-shadow:var(--sd0);position:relative}
+  .ggrid-scroll .ggrid{box-shadow:none;border-radius:0}
+  .ggcc{padding:6px 4px;font-size:9px;flex-wrap:wrap;row-gap:3px}
+  .ggcc>span:first-child{width:14px!important;height:14px!important;font-size:6px!important}
+  .gghc{padding:6px 3px;font-size:8px}
+  .gghr{padding:6px 1px}
+  .gghl{font-size:11px}
+  .gghln{font-size:6px;letter-spacing:0}
+  .gdrop{padding:3px 2px;min-height:34px;gap:2px}
+  .gpl{font-size:7px;padding:2px 3px 2px 2px;gap:1px}
+  .gplav{width:9px;height:9px}
+  .gpl-rm{display:none} /* too cramped to show on mobile -- tap the chip itself to open the edit/remove popup instead */
+  .ggcc-done-av{display:none} /* avatar row doesn't fit in the cramped mobile width -- the "เหลือ X คน" count text alone is enough signal and stays visible */
+  .ggcc-done-cnt{font-size:8px;margin-left:0}
   .focus-chart-wrap{grid-template-columns:1fr!important}
 
   /* ── Criterion row: stack label on top, rating + note below (mobile) ──
@@ -3264,7 +3278,7 @@ function renderGrid(){
     html+='</div>';
   }
   /* grid */
-  html+='<div class="ggrid">';
+  html+='<div class="ggrid-scroll"><div class="ggrid">';
   html+='<div class="gghc" style="background:'+m.bg+';color:'+m.cl+'">'+m.lb+'</div>';
   RATINGS.forEach(function(r){
     html+='<div class="gghr" style="border-left:1px solid var(--b0);border-bottom:1px solid var(--b0);background:'+RCOL[r]+'18">';
@@ -3309,7 +3323,7 @@ function renderGrid(){
       html+='</div>';
     });
   });
-  html+='</div></div>';
+  html+='</div></div></div>';
   h('gcontent').innerHTML=html;
   /* bind events after render */
   var catSelEl=document.getElementById('gcatsel');
