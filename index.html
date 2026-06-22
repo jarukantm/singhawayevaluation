@@ -1462,7 +1462,7 @@ var ALL_EMP=[
   {empId:'EMP005',name:'พัดชา ดิลกวัฒนวัฒน์',nick:'หยก',role:'ปฏิบัติการ',dept:'บำบัดน้ำดี',div:'บริหารทรัพยากร',pos:'วิศวกรบำบัดน้ำดี 1',color:'#A32D2D'},
   {empId:'EMP006',name:'อภิชญา โสภาจารีย์',nick:'พลอย',role:'ปฏิบัติการ',dept:'บำบัดน้ำดี',div:'บริหารทรัพยากร',pos:'วิศวกรบำบัดน้ำดี 1',color:'#3B6D11'},
   {empId:'EMP007',name:'ศุภโชค มัญจาวงษ์',nick:'อั้น',role:'ผู้บริหารระดับกลาง',dept:'บำบัดน้ำทิ้ง',div:'บริหารทรัพยากร',pos:'ผจก.แผนกบำบัดน้ำทิ้ง',color:'#0F6E52'},
-  {empId:'EMP008',name:'บรรหาร นันทะโคตร',nick:'บิ๊ก',role:'เชี่ยวชาญ',dept:'บำบัดน้ำทิ้ง',div:'บริหารทรัพยากร',pos:'วิศวกรบำบัดน้ำทิ้ง 2',color:'#0C447C'},
+  {empId:'EMP008',name:'บรรหาร นันทะโคตร',nick:'บิ๊ก',role:'ผู้บริหารระดับกลาง',dept:'บำบัดน้ำทิ้ง',div:'บริหารทรัพยากร',pos:'ผู้เชี่ยวชาญ',color:'#0C447C'},
   {empId:'EMP009',name:'จักรพงศ์ ฟูปลื้ม',nick:'ปอ',role:'ปฏิบัติการ',dept:'บำบัดน้ำทิ้ง',div:'บริหารทรัพยากร',pos:'วิศวกรบำบัดน้ำทิ้ง 1',color:'#854F0B'},
   {empId:'EMP010',name:'ธนภรณ์ พูลสวัสดิ์',nick:'กี้',role:'ปฏิบัติการ',dept:'บำบัดน้ำทิ้ง',div:'บริหารทรัพยากร',pos:'วิศวกรบำบัดน้ำทิ้ง 1',color:'#711B13'},
   {empId:'EMP011',name:'ศรุต ประพัฒน์พงษ์',nick:'นิก',role:'ผู้บริหารระดับกลาง',dept:'สิ่งแวดล้อม',div:'บริหารทรัพยากร',pos:'ผจก.แผนกสิ่งแวดล้อม',color:'#185FA5'},
@@ -1845,10 +1845,34 @@ function notifyAllPending(){
 }
 
 /* --- TAB 2: คะแนนรายบุคคล (sortable: score / Min / Max / letter grade / role level) --- */
-var adminScoreSort='score_desc';
+var adminScoreSortField='score'; /* 'score' | 'letter' | 'role' */
+var adminScoreSortDir='asc';     /* 'asc' | 'desc' -- default: คะแนนน้อยไปมาก */
+function toggleAdminScoreSort(field){
+  if(adminScoreSortField===field){
+    adminScoreSortDir=adminScoreSortDir==='asc'?'desc':'asc';
+  } else {
+    adminScoreSortField=field;
+    adminScoreSortDir='asc';
+  }
+  renderAdminScores();
+}
 var adminStatusQ='';
 var adminStatusDept='';
 var adminScoreQ='';
+function onAdminScoreSearchInput(el){
+  adminScoreQ=el.value;
+  var cursorPos=el.selectionStart;
+  renderAdminScores();
+  /* renderAdminScores() rebuilds this whole view, which recreates the
+     <input> as a brand-new DOM node -- without this, the new node never
+     gets focus and every keystroke would bounce the on-screen keyboard
+     open/closed, making it impossible to type more than one character. */
+  var newEl=h('adminScoreSearch');
+  if(newEl){
+    newEl.focus();
+    newEl.setSelectionRange(cursorPos,cursorPos);
+  }
+}
 var adminScoreFocusDrill=null; /* {focus:'F', level:'E'} when drilling into "who got E on F" */
 var focusChartAxis='focus'; /* 'focus' (F/O/C/U/S) or 'level' (E/G/S/L/I) -- which axis the FOCUS chart breaks down by */
 /* ── Org-structure cascading filter state (กลุ่ม > ฝ่าย > แผนก) ──
@@ -1864,8 +1888,16 @@ function renderAdminScores(){
   var html='<div class="phd"><div><div class="ptitle">&#128202; คะแนนรายบุคคล</div></div><div><button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">&#128190; Export PDF</button></div></div>';
   html+='<div class="wb" style="margin-bottom:14px"><span>&#8505;&#65039;</span><span>ข้อมูลตัวอย่าง (Demo) \u2014 คะแนนด้านล่างเป็นข้อมูลจำลองเพื่อสาธิตการใช้งาน ไม่ใช่คะแนนจริงจากการประเมิน</span></div>';
 
-  /* ── search box ── */
-  html+='<div style="margin-bottom:14px"><input type="text" id="adminScoreSearch" value="'+adminScoreQ+'" placeholder="\uD83D\uDD0D ค้นหาชื่อ ชื่อเล่น รหัสพนักงาน หรือแผนก..." style="width:100%;max-width:420px;padding:9px 13px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:13px;outline:none" oninput="adminScoreQ=this.value;renderAdminScores()"></div>';
+  /* ── search box ──
+     oninput triggers a full re-render of this whole view (rebuilding the
+     table below it), which recreates the <input> element itself -- that
+     used to make it lose focus after every single keystroke, bouncing
+     the on-screen keyboard open/closed and making it impossible to type
+     more than one character at a time. Fixed by explicitly restoring
+     focus + cursor position right after the re-render (see
+     adminScoreSearchInput()). font-size is 16px to also avoid iOS/Android
+     auto-zoom on focus, which was compounding the same bug visually. */
+  html+='<div style="margin-bottom:14px"><input type="text" id="adminScoreSearch" value="'+adminScoreQ+'" placeholder="\uD83D\uDD0D ค้นหาชื่อ ชื่อเล่น รหัสพนักงาน หรือแผนก..." style="width:100%;max-width:420px;padding:9px 13px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:16px;outline:none" oninput="onAdminScoreSearchInput(this)"></div>';
 
   var allRows=ALL_EMP.map(function(e){var sc=mockScoreFor(e.empId);return{e:e,sc:sc,lbl:s2l(sc.avg)};});
   var q=adminScoreQ.trim().toLowerCase();
@@ -2127,19 +2159,37 @@ function renderAdminScores(){
     html+='</div>';
   }
 
-  /* ── sort controls ── */
+  /* ── sort controls ──
+     3 buttons: คะแนน / ระดับตัวอักษร / ระดับตำแหน่ง. Clicking a button that's
+     already active flips its direction (asc<->desc); clicking a different
+     button switches to that field, starting from ascending. Default on
+     first load: คะแนน, ascending (น้อย→มาก). */
   html+='<div class="card" style="padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
   html+='<span style="font-size:11px;font-weight:700;color:var(--t1)">เรียงตาม:</span>';
-  var sortOpts=[['score_desc','คะแนนมาก\u2192น้อย'],['score_asc','คะแนนน้อย\u2192มาก'],['letter','ระดับตัวอักษร E\u2192I'],['role','ระดับตำแหน่ง ส\u2192ก\u2192ป']];
-  sortOpts.forEach(function(o){
-    html+='<button class="db-ftab'+(adminScoreSort===o[0]?' on':'')+'" onclick="adminScoreSort=\''+o[0]+'\';renderAdminScores()">'+o[1]+'</button>';
+  var sortFields=[['score','คะแนน'],['letter','ระดับตัวอักษร'],['role','ระดับตำแหน่ง']];
+  sortFields.forEach(function(f){
+    var isActive=adminScoreSortField===f[0];
+    var arrow=isActive?(adminScoreSortDir==='asc'?' &#9650;':' &#9660;'):'';
+    html+='<button class="db-ftab'+(isActive?' on':'')+'" onclick="toggleAdminScoreSort(\''+f[0]+'\')">'+f[1]+arrow+'</button>';
   });
   html+='</div>';
   var roleOrder={'ผู้บริหารระดับสูง':0,'เชี่ยวชาญ':0,'ผู้บริหารระดับกลาง':1,'ปฏิบัติการ':2};
-  if(adminScoreSort==='score_desc')rows.sort(function(a,b){return b.sc.avg-a.sc.avg;});
-  else if(adminScoreSort==='score_asc')rows.sort(function(a,b){return a.sc.avg-b.sc.avg;});
-  else if(adminScoreSort==='letter')rows.sort(function(a,b){return b.sc.avg-a.sc.avg;});
-  else if(adminScoreSort==='role')rows.sort(function(a,b){return(roleOrder[a.e.role]||9)-(roleOrder[b.e.role]||9)||b.sc.avg-a.sc.avg;});
+  var dirMul=adminScoreSortDir==='asc'?1:-1;
+  if(adminScoreSortField==='score'){
+    rows.sort(function(a,b){return(a.sc.avg-b.sc.avg)*dirMul;});
+  } else if(adminScoreSortField==='letter'){
+    /* RATINGS is ordered best-to-worst (E,G,S,L,I) -- ascending here means
+       I→E (worst to best, matching how "letter ascending" should read
+       alphabetically-by-severity), descending means E→I */
+    var letterRank={};RATINGS.forEach(function(r,i){letterRank[r]=i;});
+    rows.sort(function(a,b){return(letterRank[a.lbl.l]-letterRank[b.lbl.l])*-dirMul;});
+  } else if(adminScoreSortField==='role'){
+    rows.sort(function(a,b){
+      var ra=roleOrder[a.e.role]!==undefined?roleOrder[a.e.role]:9;
+      var rb=roleOrder[b.e.role]!==undefined?roleOrder[b.e.role]:9;
+      return (ra-rb)*dirMul||(b.sc.avg-a.sc.avg);
+    });
+  }
 
   /* ── per-person table, with a vs-average column ── */
   html+='<div class="card"><div style="overflow-x:auto"><table class="sw-table"><thead><tr>';
