@@ -180,6 +180,18 @@ button,input,select{font-family:var(--fb)}
 .tb-title{font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);letter-spacing:-.2px}
 .tb-sub{font-size:11px;color:var(--t1);margin-top:2px}
 .tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+/* ── Mobile-only logout shortcut ──
+   The sidebar (and its logout button) is off-screen on mobile with no
+   hamburger to open it anymore, since that space is now used for tab
+   switching via the bottom nav bar instead. Without this, there was no
+   way to log out at all on mobile -- this button fills that gap. Hidden
+   by default (desktop already has the sidebar's logout button). */
+.tb-mob-logout{display:none;flex-shrink:0;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:var(--r);border:1.5px solid rgba(163,45,45,.3);
+  background:rgba(163,45,45,.06);color:var(--I);font-size:12px;font-weight:700;
+  cursor:pointer;white-space:nowrap}
+.tb-mob-logout:active{background:rgba(163,45,45,.14)}
+.tb-mob-logout .tb-mob-logout-ico{font-size:14px;line-height:1}
 
 /* ── VIEWS ── */
 .views{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
@@ -409,25 +421,25 @@ button,input,select{font-family:var(--fb)}
 .ggrid{display:grid;grid-template-columns:1fr repeat(5,minmax(88px,110px));gap:0;
   background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);overflow:hidden}
 .gghc{padding:9px 14px;background:var(--s2);border-bottom:1px solid var(--b0);
-  font-size:10px;font-weight:700;color:var(--navy)}
+  font-size:12px;font-weight:700;color:var(--navy)}
 .gghr{padding:8px 6px;background:var(--s2);border-bottom:1px solid var(--b0);
   border-left:1px solid var(--b0);display:flex;flex-direction:column;align-items:center;gap:1px}
-.gghl{font-family:var(--fh);font-size:15px;font-weight:700;line-height:1}
-.gghln{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
-.ggcc{padding:8px 14px;border-bottom:1px solid var(--b0);font-size:12px;color:var(--t0);
+.gghl{font-family:var(--fh);font-size:17px;font-weight:700;line-height:1}
+.gghln{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.ggcc{padding:8px 14px;border-bottom:1px solid var(--b0);font-size:13px;color:var(--t0);
   font-weight:500;display:flex;align-items:center;gap:6px;background:var(--s0)}
 .gdrop{border-left:1px solid var(--b0);border-bottom:1px solid var(--b0);background:var(--s0);
   display:flex;flex-wrap:wrap;align-items:flex-start;align-content:flex-start;
   gap:3px;padding:5px 6px;min-height:42px;transition:background .12s}
-.gpl{display:flex;align-items:center;gap:3px;padding:2px 4px 2px 3px;border-radius:10px;
-  font-size:9px;font-weight:700;color:#fff;cursor:grab;border:none;position:relative}
+.gpl{display:flex;align-items:center;gap:3px;padding:3px 5px 3px 4px;border-radius:10px;
+  font-size:11px;font-weight:700;color:#fff;cursor:grab;border:none;position:relative}
 .gpl:hover{box-shadow:0 0 0 2px rgba(255,255,255,.5) inset}
 .gpl.gpl-dragging{opacity:.35}
-.gpl-rm{display:flex;align-items:center;justify-content:center;width:12px;height:12px;
-  border-radius:50%;background:rgba(0,0,0,.25);color:#fff;font-size:8px;line-height:1;
+.gpl-rm{display:flex;align-items:center;justify-content:center;width:13px;height:13px;
+  border-radius:50%;background:rgba(0,0,0,.25);color:#fff;font-size:9px;line-height:1;
   cursor:pointer;flex-shrink:0;margin-left:1px}
 .gpl-rm:hover{background:rgba(0,0,0,.5)}
-.gplav{width:12px;height:12px;border-radius:50%;overflow:hidden;flex-shrink:0}
+.gplav{width:14px;height:14px;border-radius:50%;overflow:hidden;flex-shrink:0}
 .gplav img{width:100%;height:100%;object-fit:cover}
 /* chip done state -- person fully scored in current category */
 .gchip.gdone{opacity:.45;background:var(--s2)}
@@ -440,12 +452,22 @@ button,input,select{font-family:var(--fb)}
 /* per-row evaluated-so-far indicator */
 .ggcc{flex-wrap:wrap;row-gap:4px}
 .ggcc-done{display:flex;align-items:center;gap:3px;margin-left:auto;flex-shrink:0}
-.ggcc-done-av{width:16px;height:16px;border-radius:50%;overflow:hidden;border:1.5px solid var(--s0);
+.ggcc-done-av{width:18px;height:18px;border-radius:50%;overflow:hidden;border:1.5px solid var(--s0);
   margin-left:-5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  font-size:6px;font-weight:700;color:#fff}
+  font-size:7px;font-weight:700;color:#fff}
 .ggcc-done-av:first-child{margin-left:0}
 .ggcc-done-av img{width:100%;height:100%;object-fit:cover}
-.ggcc-done-cnt{font-size:9px;font-weight:700;color:var(--t2);margin-left:4px;white-space:nowrap}
+.ggcc-done-cnt{font-size:11px;font-weight:700;color:var(--t2);margin-left:4px;white-space:nowrap}
+.ggcc-done-tap{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:var(--b1)}
+.ggcc-done-tap:active{color:var(--pb)}
+/* Positioned absolutely (not as a normal grid-flow child) so revealing it
+   never shifts the CSS-grid row layout of the criteria table below it --
+   .ggcc itself is given position:relative as the anchor. */
+.ggcc{position:relative}
+.ggcc-pending-list{position:absolute;left:14px;right:14px;top:100%;z-index:5;
+  padding:7px 12px;font-size:11px;color:var(--t1);line-height:1.6;
+  background:var(--s0);border:1px solid var(--b1);border-radius:var(--r);
+  box-shadow:0 6px 16px rgba(8,20,50,.15)}
 
 /* ── DZ CALLOUT ── */
 .dzc{position:fixed;z-index:9998;background:var(--s0);border:1px solid var(--b1);
@@ -717,6 +739,7 @@ button,input,select{font-family:var(--fb)}
   .sb.open{transform:translateX(0)}
   .mob-overlay.open{display:block}
   .hbg-btn{display:none!important}
+  .tb-mob-logout{display:flex}
   .mob-nav{display:block}
   .main{width:100%}
   #sa.on{padding-bottom:90px}
@@ -725,18 +748,18 @@ button,input,select{font-family:var(--fb)}
   .ggrid{grid-template-columns:1.3fr repeat(5,1fr);min-width:0}
   .ggrid-scroll{overflow-x:visible;border-radius:var(--rl);box-shadow:var(--sd0);position:relative}
   .ggrid-scroll .ggrid{box-shadow:none;border-radius:0}
-  .ggcc{padding:6px 4px;font-size:9px;flex-wrap:wrap;row-gap:3px}
-  .ggcc>span:first-child{width:14px!important;height:14px!important;font-size:6px!important}
-  .gghc{padding:6px 3px;font-size:8px}
+  .ggcc{padding:6px 4px;font-size:11px;flex-wrap:wrap;row-gap:3px}
+  .ggcc>span:first-child{width:16px!important;height:16px!important;font-size:7px!important}
+  .gghc{padding:6px 3px;font-size:10px}
   .gghr{padding:6px 1px}
-  .gghl{font-size:11px}
-  .gghln{font-size:6px;letter-spacing:0}
-  .gdrop{padding:3px 2px;min-height:34px;gap:2px}
-  .gpl{font-size:7px;padding:2px 3px 2px 2px;gap:1px}
-  .gplav{width:9px;height:9px}
+  .gghl{font-size:13px}
+  .gghln{font-size:7px;letter-spacing:0}
+  .gdrop{padding:3px 2px;min-height:36px;gap:2px}
+  .gpl{font-size:9px;padding:3px 4px 3px 3px;gap:2px}
+  .gplav{width:11px;height:11px}
   .gpl-rm{display:none} /* too cramped to show on mobile -- tap the chip itself to open the edit/remove popup instead */
   .ggcc-done-av{display:none} /* avatar row doesn't fit in the cramped mobile width -- the "เหลือ X คน" count text alone is enough signal and stays visible */
-  .ggcc-done-cnt{font-size:8px;margin-left:0}
+  .ggcc-done-cnt{font-size:10px;margin-left:0}
   .focus-chart-wrap{grid-template-columns:1fr!important}
 
   /* ── Criterion row: stack label on top, rating + note below (mobile) ──
@@ -753,9 +776,13 @@ button,input,select{font-family:var(--fb)}
   /* ── Prevent iOS/Android auto-zoom on input focus ──
      Mobile browsers zoom in when a focused text field has font-size < 16px.
      Forcing 16px here (mobile only) keeps desktop's tighter, denser sizing
-     untouched while eliminating the zoom-jump on every tap-to-type. */
+     untouched while eliminating the zoom-jump on every tap-to-type.
+     EXCEPTION: .gcatsel (the FOCUS-category dropdown) is intentionally
+     excluded and kept small to visually match the person-chip text size
+     below it -- per explicit request, even though this means iOS may
+     briefly zoom in when this particular dropdown is tapped open. */
   input,textarea,select{font-size:16px!important}
-  .gcatsel{font-size:16px!important;padding:8px 12px}
+  .gcatsel{font-size:12px!important;padding:6px 11px}
 }
 @media(max-width:420px){
   .fg{grid-template-columns:repeat(2,1fr)}
@@ -904,6 +931,17 @@ button,input,select{font-family:var(--fb)}
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" id="subcancelbtn">ยกเลิก</button>
         <button class="btn bt" id="subconfirmbtn">&#10003; ยืนยัน Submit</button>
+      </div>
+    </div>
+  </div>
+  <!-- LOGOUT CONFIRM -->
+  <div class="ovl" id="logoutovl">
+    <div class="mbox subm">
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#9211; ออกจากระบบ?</div>
+      <div style="font-size:13px;color:var(--t1);margin-bottom:1.25rem">ข้อมูลที่บันทึก (Save) ไว้แล้วจะยังอยู่ครบ \u2014 เข้าสู่ระบบใหม่เพื่อกลับมาทำต่อได้ทุกเมื่อ</div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn bo" id="logoutcancelbtn">ยกเลิก</button>
+        <button class="btn bb" id="logoutconfirmbtn" style="background:var(--I);box-shadow:0 2px 10px rgba(163,45,45,.28)">&#9211; ออกจากระบบ</button>
       </div>
     </div>
   </div>
@@ -1114,6 +1152,7 @@ button,input,select{font-family:var(--fb)}
         <div class="tb-sub" id="tbsub"></div>
       </div>
       <div class="tb-right" id="tbright"></div>
+      <button class="tb-mob-logout" id="tbMobLogout" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico">&#9211;</span>ออกจากระบบ</button>
     </div>
 
     <!-- VIEWS -->
@@ -1301,6 +1340,7 @@ button,input,select{font-family:var(--fb)}
         <div class="tb-sub" id="atbsub"></div>
       </div>
       <div class="tb-right"></div>
+      <button class="tb-mob-logout" id="tbMobLogoutA" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico">&#9211;</span>ออกจากระบบ</button>
     </div>
     <div class="views">
       <div class="view" id="va-status"><div class="vi" id="adminStatusBody"></div></div>
@@ -2330,7 +2370,7 @@ function doLogout(){
   gmCat=CATS[0];gmSM=false;gmSel={};gmDP=null;gmRI=null;gmArmed=null;subTgt=null;cdIdx=null;orgMode='dept';orgQ='';
   h('lu').value='';h('lp').value='';h('lp').type='password';h('eyb').textContent='\uD83D\uDC41';h('lerr').style.display='none';
   /* close all overlays */
-  ['wovl','subovl','addovl','drillovl','rsnovl','batchrsnovl','closeRoundOvl'].forEach(function(id){h(id).classList.remove('on');});
+  ['wovl','subovl','addovl','drillovl','rsnovl','batchrsnovl','closeRoundOvl','logoutovl'].forEach(function(id){h(id).classList.remove('on');});
   /* switch screens: hide app (employee or admin), show login */
   h('sa').classList.remove('on');
   h('saAdmin').classList.remove('on');
@@ -2339,7 +2379,14 @@ function doLogout(){
   if(h('mobNavAdmin'))h('mobNavAdmin').style.display='none';
   if(h('mobNav'))h('mobNav').style.display='';
 }
-/* loutbtn uses onclick="doLogout()" in HTML */
+/* loutbtn uses onclick="doLogout()" in HTML (desktop sidebar -- already an
+   explicit, deliberate click away from the main nav, no extra confirm
+   needed there). The mobile topbar shortcut goes through a confirm step
+   instead, since it sits right next to other frequently-tapped controls
+   and a stray tap shouldn't silently end the session. */
+function openLogoutConfirm(){h('logoutovl').classList.add('on');}
+if(h('logoutcancelbtn'))h('logoutcancelbtn').addEventListener('click',function(){h('logoutovl').classList.remove('on');});
+if(h('logoutconfirmbtn'))h('logoutconfirmbtn').addEventListener('click',function(){h('logoutovl').classList.remove('on');doLogout();});
 
 /* WELCOME */
 h('wchk').addEventListener('change',function(){h('wsbtn').disabled=!this.checked;});
@@ -3134,7 +3181,7 @@ function renderChipBar(cid){
     var c=document.createElement('div');c.className='chip';
     if(!locked){c.draggable=true;c.dataset.i=i;}
     var rm=(!locked&&!defs[p.empId])?'<button class="chrm" onclick="removePerson(\''+p.empId+'\')">&#10005;</button>':'';
-    c.innerHTML=avH+'<span>'+p.name.split(' ')[0]+'<span style="font-size:9px;color:var(--t2);margin-left:3px">('+p.nick+')</span></span>'+rm;
+    c.innerHTML=avH+'<span>'+p.name.split(' ')[0]+'<span class="gchip-nick" style="font-size:9px;color:var(--t2);margin-left:3px">('+p.nick+')</span></span>'+rm;
     if(!locked){
       (function(idx){
         c.addEventListener('dragstart',function(){cdIdx=idx;setTimeout(function(){c.classList.add('gdg');},0);});
@@ -3263,7 +3310,7 @@ function renderGrid(){
     var avH=ph?'<div class="gcav"><img src="'+ph+'" alt="'+p.name+'"></div>':'<div class="gcav" style="background:'+p.color+'">'+ini(p.name)+'</div>';
     var drag=!locked?'draggable="true"':'';
     html+='<div class="gchip'+(isSel?' gsel':'')+(allDone?' gdone':'')+(isArmed?' garmed':'')+'" '+drag+' data-idx="'+i+'" data-pid="'+p.empId+'" id="gc_'+p.empId+'">';
-    html+=avH+'<span>'+p.name.split(' ')[0]+'<span style="font-size:9px;color:var(--t2);margin-left:2px">('+p.nick+')</span></span>';
+    html+=avH+'<span>'+p.name.split(' ')[0]+'<span class="gchip-nick" style="font-size:9px;color:var(--t2);margin-left:2px">('+p.nick+')</span></span>';
     if(allDone)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2713</span>';
     if(isSel)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2714</span>';
     html+='</div>';
@@ -3304,9 +3351,15 @@ function renderGrid(){
         var av3=ph3?'<img src="'+ph3+'" alt="'+p.name+'">':'<span style="background:'+p.color+';width:100%;height:100%;display:flex;align-items:center;justify-content:center">'+ini(p.name)+'</span>';
         html+='<div class="ggcc-done-av" title="'+p.name+' \u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e44\u0e14\u0e49\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19">'+av3+'</div>';
       });
-      html+='<span class="ggcc-done-cnt">เหลือ '+pendingList.length+' คน</span>';
+      /* the count text is also tappable on mobile (where the avatar row
+         above is hidden for space) -- tapping it toggles an inline list
+         of names right below the row, since "เหลือ X คน" alone doesn't
+         say WHO is still pending. */
+      var pendingNames=pendingList.map(function(p){return p.name.split(' ')[0]+' ('+p.nick+')';}).join(', ');
+      html+='<span class="ggcc-done-cnt ggcc-done-tap" data-names="'+pendingNames.replace(/"/g,'&quot;')+'" onclick="event.stopPropagation();togglePendingList(this)">เหลือ '+pendingList.length+' คน</span>';
     }
     html+='</div>';
+    html+='<div class="ggcc-pending-list" style="display:none"></div>';
     html+='</div>';
     RATINGS.forEach(function(r){
       var pl=placed(c.id,r);
@@ -3474,6 +3527,20 @@ function renderGrid(){
     });
   });
 }
+/* Tap "เหลือ X คน" to reveal who's still pending right below the row --
+ * mainly useful on mobile, where the avatar-stack indicator is hidden for
+ * space and the count alone doesn't say WHO is still owed a score. */
+function togglePendingList(el){
+  var row=el.closest('.ggcc');
+  var listEl=row?row.querySelector('.ggcc-pending-list'):null;
+  if(!listEl)return;
+  var isOpen=listEl.style.display==='block';
+  /* close any other open pending-list first, only one open at a time */
+  document.querySelectorAll('.ggcc-pending-list').forEach(function(x){x.style.display='none';});
+  if(isOpen)return; /* tapping the same row again just closes it */
+  listEl.textContent=el.dataset.names;
+  listEl.style.display='block';
+}
 function gmEnterSel(pid){gmSM=true;gmSel={};gmSel[pid]=true;gmArmed=_isHoverDevice?null:'__multi__';renderGrid();}
 function gmExitSel(){gmSM=false;gmSel={};gmArmed=null;renderGrid();}
 function gmSelAll(){persons.forEach(function(p){gmSel[p.empId]=true;});renderGrid();}
@@ -3639,13 +3706,20 @@ function yPct(v){
       break;
     }
   }
-  /* Keep the avg-dot's center a few % away from the chart's outer top/bottom
-     edge (so it doesn't get clipped or sit flush on the border), but never
-     push it outside the boundaries of the band it actually belongs to --
-     a perfect 5.00 must stay visually inside the E band (0-10%), not get
-     shoved down toward the E/G border. */
-  var margin=Math.min(3,(bandBottom-bandTop)/2);
-  return Math.max(bandTop+margin,Math.min(bandBottom-margin,raw));
+  /* Keep the avg-dot's center far enough from the chart box's OUTER edges
+     (0% / 100%) that the dot itself never pokes past the box and overlaps
+     the "ภาพรวม FOCUS" title sitting just above it (or anything below the
+     box). The dot can be up to 56px across (see the clamp(40px,11vw,56px)
+     sizing where it's drawn) -- on a 260px-tall box its radius is ~28px,
+     ~10.8% of the box height, so that's the real minimum margin needed.
+     This intentionally does NOT clamp to the matched band's own (often
+     much smaller) boundaries: a 56px dot is taller than the 26px-tall E
+     band at full score, so it will naturally spill into the neighboring
+     band visually -- that's fine and expected, since the dot floats over
+     the zone chart rather than being strictly contained by one band. The
+     only real failure case being fixed here is poking outside the BOX. */
+  var dotRadiusPct=11; /* ~28px radius over a 260px-tall box, rounded up for safety */
+  return Math.max(dotRadiusPct,Math.min(100-dotRadiusPct,raw));
 }
 
 function renderDash(){
