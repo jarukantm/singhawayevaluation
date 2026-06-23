@@ -818,8 +818,7 @@ button,input,select{font-family:var(--fb)}
   body.pdf-hide-singhaway [data-pdf-sec="singhaway"],
   body.pdf-hide-focus [data-pdf-sec="focus"],
   body.pdf-hide-feedback [data-pdf-sec="feedback"],
-  body.pdf-hide-overview [data-pdf-sec="overview"],
-  body.pdf-hide-trend [data-pdf-sec="trend"]{display:none!important}
+  body.pdf-hide-overview [data-pdf-sec="overview"]{display:none!important}
 }
 </style>
 </head>
@@ -1618,8 +1617,7 @@ var PDF_SECTIONS=[
   {id:'singhaway',label:'ผลการประเมิน Singhaway Values'},
   {id:'focus',label:'ผลการประเมินคะแนน FOCUS'},
   {id:'feedback',label:'ข้อเสนอแนะจากการประเมิน'},
-  {id:'overview',label:'ภาพรวมคะแนนรายบุคคล'},
-  {id:'trend',label:'แนวโน้มคะแนนตามรอบประเมิน'}
+  {id:'overview',label:'ภาพรวมคะแนนรายบุคคล'}
 ];
 function exportDashPDF(){
   var wrap=h('exportPdfOpts');if(!wrap)return;
@@ -3805,6 +3803,7 @@ function hideDz(){h('dzc').classList.remove('on');}
 ------------------------------------ */
 var dbFilter='overall'; /* overall | self | other | p | k | s */
 var dbScale=5; /* 5 or 7.5 -- display scale for numeric scores, managers+ only */
+var sovSortDir='desc'; /* 'desc' (มาก→น้อย, default) or 'asc' (น้อย→มาก) -- Score Overview table sort, within each role tier */
 function scaleScore(v){return v?(v/5*dbScale):v;}
 function canChooseScale(){
   return CU&&['ผู้บริหารระดับกลาง','ผู้บริหารระดับสูง','ผู้ช่วยผู้อำนวยการกลุ่ม','ผู้อำนวยการกลุ่ม'].indexOf(CU.role)>=0;
@@ -4313,55 +4312,15 @@ function renderDash(){
     html+='<div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128200;</div>';
     html+='<div class="db-sh-ttl">ภาพรวมคะแนนรายบุคคล</div>';
     if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px;margin-right:6px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
-    html+='<span style="font-size:10px;color:var(--t2)">เรียงตามระดับ ส &gt; ก &gt; ป \u00B7 คะแนนมาก&gt;น้อย</span></div>';
+    html+='<span style="font-size:10px;color:var(--t2)">เรียงตามระดับ ส &gt; ก &gt; ป \u00B7 </span>';
+    html+='<button class="db-ftab on" style="font-size:10px;padding:3px 10px" onclick="sovSortDir=sovSortDir===\'desc\'?\'asc\':\'desc\';renderDash()">คะแนน'+(sovSortDir==='asc'?'น้อย\u2192มาก &#9650;':'มาก\u2192น้อย &#9660;')+'</button>';
+    html+='</div>';
     html+='<div style="padding:14px 16px">';
     if(noData){
       html+='<div style="padding:1.5rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน</div>';
     } else {
       html+=scoreOverviewSection();
     }
-    html+='</div></div>';
-  }
-
-  /* --- 6. ROUND TREND (org-wide FOCUS average across rounds) ---
-     Only meaningful once at least one round has been closed -- otherwise
-     there is nothing to compare yet. Always uses the live current-round
-     scores for the "current" point regardless of which round is being
-     browsed above, so the trend line itself never gets stuck mid-swap. */
-  if(ROUNDS.length>0){
-    html+='<div class="card" data-pdf-sec="trend">';
-    html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128201;</div>';
-    html+='<div class="db-sh-ttl">แนวโน้มคะแนนรวมตามรอบประเมิน</div>';
-    html+='<span style="font-size:10px;color:var(--t2)">เฉลี่ยรวมทุก FOCUS \u2014 ทั้งองค์กร</span></div>';
-    html+='<div style="padding:14px 16px">';
-    var trendPoints=ROUNDS.map(function(r){
-      var savedSelf=selfSc,savedOth=othSc;
-      selfSc=r.selfSc;othSc=r.othSc;
-      var avg=avgScore2(allIds,CRITERIA,'overall');
-      selfSc=savedSelf;othSc=savedOth;
-      return{label:r.label,avg:avg,closed:true};
-    });
-    var savedSelf2=selfSc,savedOth2=othSc;
-    selfSc=_liveSelfSc;othSc=_liveOthSc;
-    var liveAvg=avgScore2(allIds,CRITERIA,'overall');
-    selfSc=savedSelf2;othSc=savedOth2;
-    trendPoints.push({label:currentRound.label+' (ปัจจุบัน)',avg:liveAvg,closed:false});
-    var trendMax=5;
-    html+='<div style="display:flex;align-items:flex-end;gap:18px;height:140px;border-bottom:1.5px solid var(--b0);padding:0 6px 0 30px;position:relative">';
-    [5,4,3,2,1,0].forEach(function(v){
-      var top=(1-v/5)*100;
-      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--t2);width:24px;text-align:right">'+v+'</div>';
-    });
-    trendPoints.forEach(function(tp,ti){
-      var h2=tp.avg?Math.max(1,Math.round(tp.avg/trendMax*120)):0;
-      var lbl=s2l(tp.avg);
-      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;max-width:90px">';
-      html+='<div style="font-size:11px;font-weight:800;color:'+lbl.c+'">'+(tp.avg?tp.avg.toFixed(2):'\u2013')+'</div>';
-      html+='<div style="width:100%;height:'+h2+'px;background:'+(tp.closed?'var(--S)':'var(--pb)')+';border-radius:5px 5px 0 0"></div>';
-      html+='<div style="font-size:10px;color:var(--t2);text-align:center">'+tp.label+'</div>';
-      html+='</div>';
-    });
-    html+='</div>';
     html+='</div></div>';
   }
 
@@ -4436,20 +4395,44 @@ function scoreOverviewSection(){
   var roleBg={'ผู้บริหารระดับสูง':'rgba(83,74,183,.08)','เชี่ยวชาญ':'rgba(83,74,183,.06)','ผู้บริหารระดับกลาง':'rgba(13,110,231,.05)','ปฏิบัติการ':'var(--s0)'};
   var roleColor={'ผู้บริหารระดับสูง':'#534AB7','เชี่ยวชาญ':'#534AB7','ผู้บริหารระดับกลาง':'#185FA5','ปฏิบัติการ':'#5B6F95'};
 
-  /* visible persons based on role */
-  var visible=persons;
+  /* visible persons: this is meant to be an ORG-WIDE overview (only
+     shown to ก/ส level managers per the showOverview check below), so it
+     must pull from the full roster (ALL_EMP) -- NOT `persons`, which is
+     just the logged-in user's personal list of who THEY evaluate. Using
+     `persons` here was the bug: a ส-level user's own evaluation roster
+     (per getDefaults()) only ever includes ก-level people, so ป-level
+     staff could never appear in this "overview" at all. ก-level users
+     still only see their own department, matching the existing design. */
+  var visible=ALL_EMP;
   if(CU.role==='ผู้บริหารระดับกลาง'){
-    visible=persons.filter(function(p){return p.dept===CU.dept;});
+    visible=ALL_EMP.filter(function(p){return p.dept===CU.dept;});
   }
 
-  /* sort by role then by score desc */
+  /* คะแนนรวม (ovAll) is the same Singhaway+FOCUS averaged score shown to
+     the user as "รวม" elsewhere -- compute it once per person BEFORE
+     sorting so the sort genuinely uses this metric, not a different
+     all-criteria average. Kept out of the visible table (per request)
+     but driving the row order. */
+  var fkeysSort=Object.keys(FDEF);
+  function ovAllFor(empId){
+    var pcAs=CATS.map(function(cat){return avgScore2([empId],CRITERIA.filter(function(c){return c.cat===cat;}),dbFilter);});
+    var pfAs=fkeysSort.map(function(f){return avgScore2([empId],CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);});
+    var swS=pcAs.filter(function(a){return a>0;});var swM=swS.length?swS.reduce(function(a,b){return a+b;},0)/swS.length:0;
+    var focS=pfAs.filter(function(a){return a>0;});var focM=focS.length?focS.reduce(function(a,b){return a+b;},0)/focS.length:0;
+    return swM||focM?(swM+focM)/2:0;
+  }
+
+  /* sort: by role tier first (ส > ก > ป, always -- not affected by the
+     toggle), then by คะแนนรวม descending or ascending within each tier
+     depending on sovSortDir (default desc = มาก→น้อย). */
+  var sortDirMul=sovSortDir==='asc'?1:-1;
   var sorted=visible.slice().sort(function(a,b){
     var ra=roleOrder[a.role]!==undefined?roleOrder[a.role]:99;
     var rb=roleOrder[b.role]!==undefined?roleOrder[b.role]:99;
     if(ra!==rb)return ra-rb;
-    var sa=avgScore2([a.empId],CRITERIA,dbFilter);
-    var sb=avgScore2([b.empId],CRITERIA,dbFilter);
-    return sb-sa;
+    var sa=ovAllFor(a.empId);
+    var sb=ovAllFor(b.empId);
+    return (sb-sa)*-sortDirMul;
   });
 
   /* search box */
@@ -4470,10 +4453,9 @@ function scoreOverviewSection(){
   html+='<th style="text-align:left;min-width:180px">พนักงาน</th>';
   html+='<th>ระดับ</th>';
   CATS.forEach(function(c){var m=CAT_META[c];html+='<th style="color:'+m.cl+';font-size:9px">'+c.split(' ').slice(-1)[0]+'</th>';});
-  html+='<th style="color:#1D9E75;font-size:10px">SW</th>';
+  html+='<th style="color:#1D9E75;font-size:10px;min-width:90px">คะแนนรวม Singhaway</th>';
   fkeys.forEach(function(f){html+='<th style="color:'+FDEF[f].cl+';font-size:9px">'+f+'</th>';});
-  html+='<th style="color:#534AB7;font-size:10px">FOC</th>';
-  html+='<th style="font-weight:700">รวม</th>';
+  html+='<th style="color:#534AB7;font-size:10px;min-width:90px">คะแนนรวม FOCUS</th>';
   html+='</tr></thead><tbody>';
 
   var prevRole='';var roleRank=0;
@@ -4488,7 +4470,7 @@ function scoreOverviewSection(){
     if(p.role!==prevRole){
       prevRole=p.role;roleRank=0;
       var rLb=roleLb[p.role]||p.role;var rCol=roleColor[p.role]||'var(--gray)';
-      html+='<tr><td colspan="'+(4+CATS.length+fkeys.length+2)+'" style="background:'+roleBg[p.role]+';padding:5px 10px;border:1px solid var(--b0)">';
+      html+='<tr><td colspan="'+(4+CATS.length+fkeys.length)+'" style="background:'+roleBg[p.role]+';padding:5px 10px;border:1px solid var(--b0)">';
       html+='<span style="display:inline-block;padding:2px 10px;border-radius:5px;background:'+rCol+';color:#fff;font-size:10px;font-weight:700">'+rLb+'</span>';
       html+='</td></tr>';
     }
@@ -4506,7 +4488,6 @@ function scoreOverviewSection(){
     html+='<td>'+(swM?'<b style="color:'+s2l(swM).c+'">'+scaleScore(swM).toFixed(2)+'</b>':'\u2013')+'</td>';
     pfAs.forEach(function(a){var l=s2l(a);html+='<td>'+(a?'<span class="rb-inl" style="background:'+RCOL[l.l]+';font-size:10px">'+l.l+'</span>':'\u2013')+'</td>';});
     html+='<td>'+(focM?'<b style="color:'+s2l(focM).c+'">'+scaleScore(focM).toFixed(2)+'</b>':'\u2013')+'</td>';
-    html+='<td>'+(ovAll?'<span class="scbd" style="background:'+RCOL[ovL.l]+'">'+ovL.l+'</span>':'\u2013')+'</td>';
     html+='</tr>';
   });
   html+='</tbody></table></div>';
