@@ -69,7 +69,7 @@ button,input,select{font-family:var(--fb)}
 .sl-wrap{min-height:100vh;width:100%;display:flex;align-items:center;justify-content:center;padding:1rem}
 
 /* ── OVERLAY ── */
-.ovl{display:none;position:fixed;inset:0;background:rgba(8,20,50,.55);z-index:500;
+.ovl{display:none;position:fixed;inset:0;background:rgba(8,20,50,.55);z-index:200000;
   backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:1rem}
 .ovl.on{display:flex}
 .mbox{background:var(--s0);border-radius:var(--rx);padding:1.75rem;width:100%;
@@ -176,9 +176,10 @@ button,input,select{font-family:var(--fb)}
 
 /* ── TOPBAR (header gradient) ── */
 .topbar{background:var(--hg);border-bottom:1px solid var(--b0);padding:.8rem 1.5rem;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+  display:flex;flex-direction:column;gap:8px;
   flex-shrink:0;box-shadow:0 2px 8px rgba(13,110,231,.06)}
-.tb-left{}
+.tb-top-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tb-left{min-width:0}
 .tb-title{font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);letter-spacing:-.2px}
 .tb-sub{font-size:11px;color:var(--t1);margin-top:2px}
 .tb-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -251,7 +252,7 @@ button,input,select{font-family:var(--fb)}
 
 /* ── PERSON CARD ── */
 .pc{background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);overflow:visible;transition:.15s;position:relative}
-.pc:has(.rbw:hover){z-index:10000}
+.pc:has(.rbw:hover){z-index:80}
 .pc>.pch2{border-radius:var(--rl) var(--rl) 0 0}
 .pc:hover{box-shadow:var(--sd1);border-color:var(--pb2)}
 .pch2{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;transition:background .1s}
@@ -326,7 +327,7 @@ button,input,select{font-family:var(--fb)}
 /* Override old .cr to not conflict */
 .ra{display:flex;gap:4px;flex-shrink:0}
 .rbw{position:relative;display:inline-flex}
-.rbw:hover{z-index:10000}
+.rbw:hover{z-index:80}
 .rb{width:38px;height:32px;border-radius:9px;border:1.5px solid var(--b1);
   background:var(--s1);box-shadow:0 1px 2px rgba(8,20,50,.06),inset 0 1px 0 rgba(255,255,255,.6);
   cursor:pointer;font-size:11px;font-weight:700;color:var(--t1);
@@ -353,7 +354,7 @@ button,input,select{font-family:var(--fb)}
    undercut by a sibling row's own background/border. */
 .rpop{display:none;position:fixed;left:0;top:0;
   background:var(--s0);border:2px solid var(--navy);border-color:rgba(8,20,50,.35);border-radius:var(--rl);
-  box-shadow:0 14px 36px rgba(8,20,50,.28),0 3px 10px rgba(8,20,50,.16);padding:12px 14px;width:240px;z-index:99999;
+  box-shadow:0 14px 36px rgba(8,20,50,.28),0 3px 10px rgba(8,20,50,.16);padding:12px 14px;width:240px;z-index:90;
   pointer-events:none;text-align:left;white-space:normal}
 .rpop::after{content:'';position:absolute;top:100%;left:calc(50% + var(--arrow-shift,0px));transform:translateX(-50%);
   border:8px solid transparent;border-top-color:rgba(8,20,50,.35)}
@@ -395,8 +396,8 @@ button,input,select{font-family:var(--fb)}
   position:sticky;top:0;z-index:30}
 .gmt{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin-bottom:8px}
 .gml{font-size:11px;font-weight:700;color:var(--t1)}
-.gstep{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;
-  border-radius:50%;background:var(--pb);color:#fff;font-size:9px;font-weight:700;
+.gstep{display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;
+  color:var(--pb);font-size:13px;font-weight:700;
   margin-right:4px;margin-left:8px;flex-shrink:0}
 .gstep:first-child{margin-left:0}
 .gmc{display:flex;flex-wrap:wrap;gap:5px}
@@ -746,6 +747,15 @@ button,input,select{font-family:var(--fb)}
   .tb-mob-logout{display:flex;order:2;flex-shrink:0;padding:5px 10px;font-size:11px}
   .tb-mob-logout-ico{font-size:12px}
   .mob-nav{display:block}
+  /* ── Recipient chip bar (ผู้รับการประเมิน) on mobile ──
+     Puts the label + "เพิ่มบุคคล" button on their own top row, and lets
+     the chip list wrap left-to-right on its own full-width row below --
+     squeezing everything onto one row was cramped, and this still flows
+     left-to-right (not a vertical stack) per the request. */
+  .cbr{flex-wrap:wrap}
+  .cbl{order:1}
+  .ach{order:2;margin-left:auto}
+  .chw{order:3;width:100%;flex-basis:100%}
   .main{width:100%}
   #sa.on{padding-bottom:64px}
   .d2{grid-template-columns:1fr}
@@ -1149,12 +1159,14 @@ button,input,select{font-family:var(--fb)}
   <div class="main">
     <!-- TOPBAR -->
     <div class="topbar">
-      <div class="tb-left">
-        <div class="tb-title" id="tbtitle">ประเมินตนเอง</div>
-        <div class="tb-sub" id="tbsub"></div>
+      <div class="tb-top-row">
+        <div class="tb-left">
+          <div class="tb-title" id="tbtitle">ประเมินตนเอง</div>
+          <div class="tb-sub" id="tbsub"></div>
+        </div>
+        <button class="tb-mob-logout" id="tbMobLogout" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico">&#9211;</span>ออกจากระบบ</button>
       </div>
       <div class="tb-right" id="tbright"></div>
-      <button class="tb-mob-logout" id="tbMobLogout" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico">&#9211;</span>ออกจากระบบ</button>
     </div>
 
     <!-- VIEWS -->
@@ -1343,12 +1355,14 @@ button,input,select{font-family:var(--fb)}
   <!-- ADMIN MAIN CONTENT -->
   <div class="main">
     <div class="topbar">
-      <div class="tb-left">
-        <div class="tb-title" id="atbtitle">คะแนนรายบุคคล</div>
-        <div class="tb-sub" id="atbsub"></div>
+      <div class="tb-top-row">
+        <div class="tb-left">
+          <div class="tb-title" id="atbtitle">คะแนนรายบุคคล</div>
+          <div class="tb-sub" id="atbsub"></div>
+        </div>
+        <button class="tb-mob-logout" id="tbMobLogoutA" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico">&#9211;</span>ออกจากระบบ</button>
       </div>
       <div class="tb-right"></div>
-      <button class="tb-mob-logout" id="tbMobLogoutA" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico">&#9211;</span>ออกจากระบบ</button>
     </div>
     <div class="views">
       <div class="view" id="va-status"><div class="vi" id="adminStatusBody"></div></div>
@@ -3698,8 +3712,8 @@ function renderGrid(){
   var html=sumHtml2+'<div class="gm">';
   /* bank */
   html+='<div class="gmb"><div class="gmt">';
-  html+='<div class="gml lgn-hover"><span class="gstep">1</span>สามารถจัดเรียงรายชื่อได้ <span class="gstep">2</span>กดค้าง 0.5 วินาทีเพื่อเข้าสู่โหมดเลือกหลายคน <span class="gstep">3</span>ลากชื่อใส่ในตาราง</div>';
-  html+='<div class="gml lgn-touch"><span class="gstep">1</span>แตะชื่อเพื่อเลือก <span class="gstep">2</span>กดค้าง 0.5 วินาทีเพื่อเลือกหลายคน <span class="gstep">3</span>แตะช่องในตารางเพื่อประเมิน</div>';
+  html+='<div class="gml lgn-hover"><span class="gstep">&#8226;</span>เลื่อนซ้ายขวาเพื่อจัดลำดับ <span class="gstep">&#8226;</span>กดค้าง 0.5 วินาทีเพื่อเข้าสู่โหมดเลือกหลายคน <span class="gstep">&#8226;</span>ลากชื่อใส่ในตารางเพื่อประเมิน</div>';
+  html+='<div class="gml lgn-touch"><span class="gstep">&#8226;</span>แตะชื่อเพื่อเลือก <span class="gstep">&#8226;</span>กดค้าง 0.5 วินาทีเพื่อเลือกหลายคน <span class="gstep">&#8226;</span>แตะช่องในตารางเพื่อประเมิน</div>';
   html+='<select class="gcatsel" id="gcatsel">';
   CATS.forEach(function(c){
     var mark=catIsDone(c)?'\u2713 ':'';
@@ -3868,13 +3882,23 @@ function renderGrid(){
         /* Score all selected persons */
         pids.forEach(function(pid){othSc[sk(pid,cid)]=r;});
         autoSave();gmDP=null;gmSM=false;gmSel={};
-        /* Open SINGLE batch popup for ALL selected persons at once */
-        openBatchReason(pids,cid,r,function(){renderTab();});
+        /* L/I ratings require a written reason -- auto-open the batch
+           popup ONLY for those levels, matching how single-person rating
+           already behaves (setRating). E/G/S ratings save silently;
+           reasons for those stay optional via "+ เหตุผล". */
+        if(r==='L'||r==='I'){
+          openBatchReason(pids,cid,r,function(){renderTab();});
+        } else {
+          renderTab();
+        }
       }else{
         var pid=gmDP;gmDP=null;gmRI=null;
         othSc[sk(pid,cid)]=r;autoSave();
-        /* Single person -> single popup */
-        openReason(pid,cid,r,function(){renderTab();});
+        if((r==='L'||r==='I')&&!rsnNotes[pid+'|'+cid]){
+          openReason(pid,cid,r,function(){renderTab();});
+        } else {
+          renderTab();
+        }
       }
     });
     /* touch-mode tap-to-place: tapping a rating cell while a chip (or a
@@ -3888,11 +3912,19 @@ function renderGrid(){
           if(!pids2.length){gmArmed=null;return;}
           pids2.forEach(function(pid){othSc[sk(pid,cid)]=r;});
           autoSave();gmArmed=null;gmSM=false;gmSel={};
-          openBatchReason(pids2,cid,r,function(){renderTab();});
+          if(r==='L'||r==='I'){
+            openBatchReason(pids2,cid,r,function(){renderTab();});
+          } else {
+            renderTab();
+          }
         }else{
           var pid2=gmArmed;gmArmed=null;
           othSc[sk(pid2,cid)]=r;autoSave();
-          openReason(pid2,cid,r,function(){renderTab();});
+          if((r==='L'||r==='I')&&!rsnNotes[pid2+'|'+cid]){
+            openReason(pid2,cid,r,function(){renderTab();});
+          } else {
+            renderTab();
+          }
         }
       });
     }
