@@ -228,8 +228,9 @@ button,input,select{font-family:var(--fb)}
 .plb{font-size:11px;font-weight:700}
 
 /* ── LEGEND ── */
-.lgd{display:flex;gap:6px;flex-wrap:wrap;padding:9px 14px;background:var(--s0);
+.lgd{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:9px 14px;background:var(--s0);
   border-radius:var(--r);border:1px solid var(--b0);box-shadow:var(--sd0)}
+.lgd-lbl{font-size:11px;font-weight:700;color:var(--t0)}
 .lgi{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1);font-weight:500}
 .lgb{width:8px;height:8px;border-radius:2px}
 .lgn{margin-left:auto;font-size:10px;color:var(--t2)}
@@ -738,7 +739,12 @@ button,input,select{font-family:var(--fb)}
   .sb.open{transform:translateX(0)}
   .mob-overlay.open{display:block}
   .hbg-btn{display:none!important}
-  .tb-mob-logout{display:flex}
+  .topbar{flex-wrap:nowrap;align-items:flex-start;padding:.7rem 1rem;gap:8px}
+  .tb-left{flex:1;min-width:0}
+  .tb-title{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tb-right{order:3;width:100%}
+  .tb-mob-logout{display:flex;order:2;flex-shrink:0;padding:5px 10px;font-size:11px}
+  .tb-mob-logout-ico{font-size:12px}
   .mob-nav{display:block}
   .main{width:100%}
   #sa.on{padding-bottom:64px}
@@ -880,7 +886,7 @@ button,input,select{font-family:var(--fb)}
     <div class="ls">Evaluation Platform v6.0</div>
   </div>
   <label class="lfl">Username</label>
-  <input class="lin" id="lu" type="text" placeholder="เช่น Jarukan_t">
+  <input class="lin" id="lu" type="text" placeholder="Username Boonrawd">
   <label class="lfl">Password</label>
   <div class="pwr">
     <input class="lin" id="lp" type="password" placeholder="กรอก Password">
@@ -888,7 +894,6 @@ button,input,select{font-family:var(--fb)}
   </div>
   <button class="lbtn" id="lbtn" onclick="doLogin()">เข้าสู่ระบบ</button>
   <div class="lerr" id="lerr">Username หรือ Password ไม่ถูกต้อง</div>
-  <div class="lnote">\u0e17\u0e14\u0e2a\u0e2d\u0e1a: <b>Jarukan_t / 111111</b> (\u0e1b.) &nbsp;|&nbsp; <b>Sarun_v / 222222</b> (\u0e1c\u0e08\u0e01.\u0e41\u0e1c\u0e19\u0e01) &nbsp;|&nbsp; <b>Parichat_l / 333333</b> (\u0e1c\u0e08\u0e01.\u0e1d\u0e48\u0e32\u0e22)</div>
 </div>
 </div>
 </div>
@@ -1077,7 +1082,6 @@ button,input,select{font-family:var(--fb)}
   <div class="ovl" id="fwAllovl">
     <div class="mbox" style="max-width:500px">
       <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px">&#128172; ข้อเสนอแนะทั้งหมด</div>
-      <div style="font-size:11px;color:var(--t2);margin-bottom:14px">ไม่เปิดเผยตัวตนผู้ให้ข้อมูล</div>
       <div id="fwAllBody" style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:4px"></div>
       <div style="display:flex;justify-content:flex-end;margin-top:14px">
         <button class="btn bo" onclick="cov('fwAllovl')">ปิด</button>
@@ -1159,12 +1163,12 @@ button,input,select{font-family:var(--fb)}
       <div class="view on" id="v-self">
         <div class="vi">
           <div class="lgd">
-            <div class="lgi"><div class="lgb" style="background:var(--E)"></div><b>E</b> Excellence</div>
-            <div class="lgi"><div class="lgb" style="background:var(--G)"></div><b>G</b> Good</div>
-            <div class="lgi"><div class="lgb" style="background:var(--S)"></div><b>S</b> Standard</div>
-            <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> Low</div>
-            <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> Improve</div>
-            <div class="lgn"><span class="lgn-hover">ชี้ระดับคะแนนเพื่อดูนิยาม</span><span class="lgn-touch">เลือกระดับคะแนนเพื่อดูนิยาม</span></div>
+            <span class="lgd-lbl">ระดับการให้คะแนน:</span>
+            <div class="lgi"><div class="lgb" style="background:var(--E)"></div><b>E</b> - Excellence</div>
+            <div class="lgi"><div class="lgb" style="background:var(--G)"></div><b>G</b> - Good</div>
+            <div class="lgi"><div class="lgb" style="background:var(--S)"></div><b>S</b> - Standard</div>
+            <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> - Low</div>
+            <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> - Improve</div>
           </div>
           <div class="card">
             <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-bottom:1px solid var(--b0);background:var(--hg)">
@@ -1184,12 +1188,12 @@ button,input,select{font-family:var(--fb)}
       <div class="view" id="v-person">
         <div class="vi">
           <div class="lgd">
-            <div class="lgi"><div class="lgb" style="background:var(--E)"></div><b>E</b> Excellence</div>
-            <div class="lgi"><div class="lgb" style="background:var(--G)"></div><b>G</b> Good</div>
-            <div class="lgi"><div class="lgb" style="background:var(--S)"></div><b>S</b> Standard</div>
-            <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> Low</div>
-            <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> Improve</div>
-            <div class="lgn"><span class="lgn-hover">ชี้ระดับคะแนนเพื่อดูนิยาม</span><span class="lgn-touch">เลือกระดับคะแนนเพื่อดูนิยาม</span></div>
+            <span class="lgd-lbl">ระดับการให้คะแนน:</span>
+            <div class="lgi"><div class="lgb" style="background:var(--E)"></div><b>E</b> - Excellence</div>
+            <div class="lgi"><div class="lgb" style="background:var(--G)"></div><b>G</b> - Good</div>
+            <div class="lgi"><div class="lgb" style="background:var(--S)"></div><b>S</b> - Standard</div>
+            <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> - Low</div>
+            <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> - Improve</div>
           </div>
           <div class="cbr"><span class="cbl">ผู้รับการประเมิน :</span><div class="chw" id="pchips"></div><button class="ach" id="padd">+ เพิ่มบุคคล</button></div>
           <div id="pcards"></div>
@@ -1199,11 +1203,12 @@ button,input,select{font-family:var(--fb)}
       <div class="view" id="v-grid">
         <div class="vi">
           <div class="lgd">
-            <div class="lgi"><div class="lgb" style="background:var(--E)"></div><b>E</b> Excellence</div>
-            <div class="lgi"><div class="lgb" style="background:var(--G)"></div><b>G</b> Good</div>
-            <div class="lgi"><div class="lgb" style="background:var(--S)"></div><b>S</b> Standard</div>
-            <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> Low</div>
-            <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> Improve</div>
+            <span class="lgd-lbl">ระดับการให้คะแนน:</span>
+            <div class="lgi"><div class="lgb" style="background:var(--E)"></div><b>E</b> - Excellence</div>
+            <div class="lgi"><div class="lgb" style="background:var(--G)"></div><b>G</b> - Good</div>
+            <div class="lgi"><div class="lgb" style="background:var(--S)"></div><b>S</b> - Standard</div>
+            <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> - Low</div>
+            <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> - Improve</div>
           </div>
           <div class="cbr"><span class="cbl">ผู้รับการประเมิน :</span><div class="chw" id="gchips"></div><button class="ach" id="gadd">+ เพิ่มบุคคล</button></div>
           <div id="gcontent"></div>
@@ -1231,9 +1236,14 @@ button,input,select{font-family:var(--fb)}
   <!-- ADMIN: CLOSE ROUND (reuses the same modal markup/logic as the employee dashboard) -->
   <div class="ovl" id="closeRoundOvlA">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128197; ปิดรอบประเมินปัจจุบัน?</div>
-      <div class="wb"><span>&#9888;&#65039;</span><span>คะแนนของรอบ "<b id="crCurLabelA"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
-      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px">กำหนดช่วงเวลารอบถัดไป</div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128197; เพิ่มรอบการประเมิน</div>
+      <div style="display:flex;gap:6px;margin-bottom:14px">
+        <button class="db-ftab on" id="crModeNowBtn" style="flex:1" onclick="setCrMode('now')">ปิดรอบปัจจุบัน &amp; เริ่มรอบใหม่ทันที</button>
+        <button class="db-ftab" id="crModeScheduleBtn" style="flex:1" onclick="setCrMode('schedule')">กำหนดรอบล่วงหน้า (ไม่ปิดรอบปัจจุบัน)</button>
+      </div>
+      <div class="wb" id="crModeWarnNow"><span>&#9888;&#65039;</span><span>คะแนนของรอบ "<b id="crCurLabelA"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
+      <div class="wb" id="crModeWarnSchedule" style="display:none;background:rgba(13,110,231,.06);border-color:rgba(13,110,231,.25);color:var(--pb)"><span>\u2139\uFE0F</span><span>รอบ "<b id="crCurLabelA2"></b>" จะยังดำเนินการต่อตามปกติ \u2014 รอบที่กำหนดไว้นี้จะรอเป็น <b>"รอบที่กำหนดไว้แล้ว"</b> จนกว่าจะกดเริ่มใช้งานจริงด้วยตัวเอง</span></div>
+      <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px" id="crNextLabelHeading">กำหนดช่วงเวลารอบถัดไป</div>
       <div style="display:flex;gap:8px;margin-bottom:6px">
         <div style="flex:1">
           <div style="font-size:10px;color:var(--t2);margin-bottom:3px">วันเริ่มต้น</div>
@@ -1574,6 +1584,40 @@ var currentRound={id:'r1',year:buddhistYear(new Date().toISOString().slice(0,10)
   label:''};
 currentRound.label=roundLabel(currentRound.year,currentRound.roundNo);
 var ROUNDS=[]; /* closed rounds, most recent last */
+var SCHEDULED_ROUNDS=[]; /* rounds planned in advance but not yet activated -- the current round keeps running normally until one of these is manually started */
+/* ── Demo: seed a mock historical round (1/2568) ──
+ * Per item 5 of this request: simulate a full prior round of evaluation
+ * data so the Dashboard can show what a round-over-round comparison
+ * looks like once real history exists.
+ *
+ * This app's real selfSc/othSc are scoped to ONE logged-in person's own
+ * session (selfSc[cid], othSc[pid|cid] -- no evaluator prefix), so a
+ * full multi-person historical snapshot doesn't fit that same shape for
+ * every possible viewer at once. For this demo, each person's PRIOR
+ * round overall average is stored directly instead (deterministically
+ * seeded, same style as the Admin shell's mockScoreFor) -- simple and
+ * enough to drive a meaningful round-over-round comparison panel without
+ * inventing a parallel multi-user data model just for one history seed.
+ * Skipped entirely once a real round has actually been closed
+ * (ROUNDS.length>0), so it never overwrites real data. */
+var mockRound1=null; /* {year,roundNo,startDate,endDate,label,avgByEmp:{empId:overallAvg}} */
+function ensureMockRound1(){
+  if(mockRound1||ROUNDS.length)return;
+  var avgByEmp={};
+  ALL_EMP.forEach(function(e){
+    var seed=_seedFor(e.empId+'_round1_2568');
+    avgByEmp[e.empId]=1.5+((seed%351)/100); /* same spread style as mockScoreFor(), 1.50-5.00 */
+  });
+  /* per-FOCUS-letter org-wide averages for the prior round -- this is
+     what the FOCUS chart actually overlays as a second (muted) bar next
+     to each F/O/C/U/S bar, instead of a separate standalone card. */
+  var focByLetter={};
+  Object.keys(FDEF).forEach(function(f){
+    var seed=_seedFor('focus_'+f+'_round1_2568');
+    focByLetter[f]=1.5+((seed%351)/100);
+  });
+  mockRound1={year:2568,roundNo:1,startDate:'2025-01-15',endDate:'2025-06-30',label:'รอบที่ 1/2568',avgByEmp:avgByEmp,focByLetter:focByLetter};
+}
 var dbRoundView='current'; /* 'current' or a closed round's id -- which round the Dashboard is viewing */
 function isAdmin(){return !!(CU&&CU.isAdmin);}
 
@@ -2138,7 +2182,6 @@ function renderAdminScoresBody(html){
       html+='</div>';
     });
     html+='</div>';
-    html+='<div style="font-size:10px;color:var(--t2);margin-top:8px;text-align:center">คะแนนเฉลี่ยของหัวข้อนั้น \u2014 '+scopeLabel+' ('+scopeRowsForAgg.length+' คน) \u2014 ระดับ E/G/S/L/I คำนวณจากคะแนนเฉลี่ยของหัวข้อนั้นโดยเฉพาะ (อาจต่างจากระดับรวมของแต่ละคนในแท็บ "แยกตามระดับคะแนน")</div>';
   } else {
     /* ── bars by E/G/S/L/I -- org-wide: how many PEOPLE land in each level
        (using each person's overall avg); per-person: how many of their 5
@@ -2208,7 +2251,6 @@ function renderAdminScoresBody(html){
       html+='</div>';
     });
     html+='</div>';
-    html+='<div style="font-size:10px;color:var(--t2);margin-top:8px;text-align:center">จำนวนคน (จากค่าเฉลี่ยรวมของแต่ละคน) \u2014 '+scopeLabel+' ('+scopeRowsForAgg.length+' คน)</div>';
   }
   html+='</div></div>';
 
@@ -2412,7 +2454,7 @@ function renderAdminRounds(){
   var html='<div class="phd"><div><div class="ptitle">&#128197; รอบการประเมิน</div></div></div>';
   html+='<div class="card" style="padding:16px;margin-bottom:14px">';
   html+='<div style="font-size:12px;color:var(--t2);margin-bottom:4px">รอบปัจจุบัน</div>';
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">';
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">';
   html+='<div>';
   html+='<div style="font-family:var(--fh);font-size:20px;font-weight:800;color:var(--t0)">'+roundLabel(currentRound.year,currentRound.roundNo)+' <span style="font-size:12px;font-weight:600;color:var(--E)">(กำลังดำเนินการ)</span></div>';
   if(currentRound.startDate&&currentRound.endDate)html+='<div style="font-size:12px;color:var(--t1);margin-top:3px">ระหว่างวันที่ '+fmtThaiDate(currentRound.startDate)+' \u2013 '+fmtThaiDate(currentRound.endDate)+'</div>';
@@ -2425,14 +2467,42 @@ function renderAdminRounds(){
     html+='</div>';
   }
   html+='</div>';
-  html+='<div style="display:flex;gap:8px"><button class="btn bt" onclick="openCloseRoundDialogAdmin()">&#10003; ปิดรอบ &amp; เริ่มรอบใหม่</button>';
-  html+='<button class="btn bo" onclick="openEditRoundDatesDialog()">&#9999;&#65039; แก้ไขวันที่รอบนี้</button></div>';
   html+='</div>';
-  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#128193;</div><div class="db-sh-ttl">ประวัติรอบที่ปิดแล้ว</div></div>';
-  if(!ROUNDS.length){
-    html+='<div style="padding:1.5rem;text-align:center;color:var(--t2)">ยังไม่มีรอบที่ปิดแล้ว</div>';
-  } else {
-    html+='<div style="padding:6px 16px 16px">';
+
+  /* ── ประวัติรอบการประเมิน: lists EVERY round (the in-progress one
+     included) in one place, instead of separating "current" from
+     "closed history" into two cards -- the in-progress round gets an
+     "แก้ไขวันที่" button right here since that's the only round whose
+     dates can still change; closed rounds are frozen and read-only.
+     "เพิ่มรอบการประเมิน" (same row as the section title) opens the same
+     close-current/open-next flow as before, just relabeled per item 3. */
+  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#128193;</div><div class="db-sh-ttl">ประวัติรอบการประเมิน</div>';
+  html+='<button class="btn bt" style="font-size:11px;padding:6px 12px;margin-left:auto" onclick="openCloseRoundDialogAdmin()">&#10003; เพิ่มรอบการประเมิน</button></div>';
+  html+='<div style="padding:6px 16px 16px">';
+  /* current (in-progress) round, listed first */
+  html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)">';
+  html+='<div><div style="font-weight:700;font-size:13px;color:var(--t0)">'+roundLabel(currentRound.year,currentRound.roundNo)+' <span style="font-size:11px;font-weight:600;color:var(--E)">(กำลังดำเนินการ)</span></div>';
+  if(currentRound.startDate&&currentRound.endDate)html+='<div style="font-size:10px;color:var(--t2)">'+fmtThaiDate(currentRound.startDate)+' \u2013 '+fmtThaiDate(currentRound.endDate)+'</div>';
+  html+='</div>';
+  html+='<button class="btn bo" style="font-size:10px;padding:5px 10px" onclick="openEditRoundDatesDialog()">&#9999;&#65039; แก้ไขวันที่</button>';
+  html+='</div>';
+  /* scheduled rounds -- planned ahead but not active yet; current round
+     keeps running untouched until one of these is started manually */
+  if(SCHEDULED_ROUNDS.length){
+    SCHEDULED_ROUNDS.forEach(function(r){
+      html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0);background:rgba(13,110,231,.04)">';
+      html+='<div><div style="font-weight:700;font-size:13px;color:var(--t0)">'+r.label+' <span style="font-size:11px;font-weight:600;color:var(--pb)">(กำหนดไว้แล้ว)</span></div>';
+      if(r.startDate&&r.endDate)html+='<div style="font-size:10px;color:var(--t2)">'+fmtThaiDate(r.startDate)+' \u2013 '+fmtThaiDate(r.endDate)+'</div>';
+      html+='</div>';
+      html+='<div style="display:flex;gap:6px">';
+      html+='<button class="btn bo" style="font-size:10px;padding:5px 10px" onclick="activateScheduledRound(\''+r.id+'\')">&#9654; เริ่มใช้งานตอนนี้</button>';
+      html+='<button class="btn bo" style="font-size:10px;padding:5px 8px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="removeScheduledRound(\''+r.id+'\')">&#10005;</button>';
+      html+='</div>';
+      html+='</div>';
+    });
+  }
+  /* closed rounds -- frozen, no edit action */
+  if(ROUNDS.length){
     ROUNDS.slice().reverse().forEach(function(r){
       var d=new Date(r.closedAt);
       html+='<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b0)">';
@@ -2441,15 +2511,12 @@ function renderAdminRounds(){
       html+='<div style="font-size:10px;color:var(--t2)">ปิดรอบเมื่อ '+d.toLocaleDateString('th-TH')+'</div></div>';
       html+='</div>';
     });
-    html+='</div>';
   }
   html+='</div>';
+  html+='</div>';
 
-  /* ── สิทธิ์การประเมิน: which role levels must evaluate which other role
-     levels. Falls back to the hardcoded department/division logic
-     (getDefaults) until an Admin actually edits and saves a rule here. */
-  html+='<div class="card"><div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128274;</div><div class="db-sh-ttl">สิทธิ์การประเมิน</div>';
-  html+='<span style="font-size:10px;color:var(--t2)">กำหนดว่าระดับใดต้องประเมินระดับใดบ้าง</span></div>';
+  /* ── กำหนดสิทธิ์การประเมิน (item 4: renamed, subtitle removed) ── */
+  html+='<div class="card"><div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128274;</div><div class="db-sh-ttl">กำหนดสิทธิ์การประเมิน</div></div>';
   html+='<div style="padding:14px 16px">';
   if(!EVAL_RULES){
     html+='<div class="wb" style="margin-bottom:12px"><span>\u2139\uFE0F</span><span>ยังใช้กฎเริ่มต้นของระบบอยู่ (ตามแผนก/ฝ่าย) \u2014 ยังไม่มีการกำหนดสิทธิ์เอง</span></div>';
@@ -2515,22 +2582,79 @@ if(h('editRoundConfirmBtnA'))h('editRoundConfirmBtnA').addEventListener('click',
   toast('&#9999;\uFE0F','แก้ไขวันที่รอบเรียบร้อย',roundLabel(currentRound.year,currentRound.roundNo),'var(--E)');
   renderAdminTab();
 });
+var crMode='now'; /* 'now' (close current, start immediately) or 'schedule' (plan a future round, current keeps running) */
+function activateScheduledRound(roundId){
+  var sched=SCHEDULED_ROUNDS.filter(function(r){return r.id===roundId;})[0];
+  if(!sched)return;
+  /* same archiving step as the normal close-round flow: the current
+     round (still in progress) gets frozen into history, then the
+     scheduled round becomes the new current round immediately. */
+  ROUNDS.push({
+    id:'r_'+Date.now(),
+    year:currentRound.year,roundNo:currentRound.roundNo,
+    startDate:currentRound.startDate,endDate:currentRound.endDate,
+    label:roundLabel(currentRound.year,currentRound.roundNo),
+    closedAt:Date.now(),
+    selfSc:{},othSc:{},rsnNotes:{}
+  });
+  SCHEDULED_ROUNDS=SCHEDULED_ROUNDS.filter(function(r){return r.id!==roundId;});
+  currentRound={id:sched.id+'_cur',year:sched.year,roundNo:sched.roundNo,
+    startDate:sched.startDate,endDate:sched.endDate,label:sched.label};
+  saveRoundsData();
+  toast('&#9654;','เริ่มใช้งานรอบที่กำหนดไว้แล้ว',currentRound.label,'var(--E)');
+  renderAdminTab();
+}
+function removeScheduledRound(roundId){
+  SCHEDULED_ROUNDS=SCHEDULED_ROUNDS.filter(function(r){return r.id!==roundId;});
+  saveRoundsData();
+  toast('&#10005;','ลบรอบที่กำหนดไว้แล้ว','','var(--L)');
+  renderAdminTab();
+}
+function setCrMode(mode){
+  crMode=mode;
+  h('crModeNowBtn').classList.toggle('on',mode==='now');
+  h('crModeScheduleBtn').classList.toggle('on',mode==='schedule');
+  h('crModeWarnNow').style.display=mode==='now'?'flex':'none';
+  h('crModeWarnSchedule').style.display=mode==='schedule'?'flex':'none';
+  h('crNextLabelHeading').textContent=mode==='now'?'กำหนดช่วงเวลารอบถัดไป':'กำหนดช่วงเวลารอบที่จะวางแผนไว้';
+  h('crConfirmBtnA').innerHTML=mode==='now'?'&#10003; ยืนยันปิดรอบ':'&#10003; บันทึกรอบที่กำหนดไว้';
+  /* schedule mode should default to starting after the LATEST already-
+     scheduled round (if any), not necessarily right after the current
+     round -- lets several future rounds be queued up in sequence */
+  if(mode==='schedule'){
+    var lastScheduled=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1]:null;
+    var base=lastScheduled?lastScheduled.endDate:currentRound.endDate;
+    var defStart2=base?new Date(new Date(base+'T00:00:00').getTime()+86400000).toISOString().slice(0,10):new Date().toISOString().slice(0,10);
+    var defEnd2=new Date(new Date(defStart2+'T00:00:00').getTime()+30*86400000).toISOString().slice(0,10);
+    h('crNextStartA').value=defStart2;
+    h('crNextEndA').value=defEnd2;
+  } else {
+    var defStart=currentRound.endDate
+      ?new Date(new Date(currentRound.endDate+'T00:00:00').getTime()+86400000).toISOString().slice(0,10)
+      :new Date().toISOString().slice(0,10);
+    var defEnd=new Date(new Date(defStart+'T00:00:00').getTime()+30*86400000).toISOString().slice(0,10);
+    h('crNextStartA').value=defStart;
+    h('crNextEndA').value=defEnd;
+  }
+  _updateCrNextPreviewA();
+}
 function openCloseRoundDialogAdmin(){
   h('crCurLabelA').textContent=roundLabel(currentRound.year,currentRound.roundNo);
-  /* default the next round to start the day after the current one ends */
-  var defStart=currentRound.endDate
-    ?new Date(new Date(currentRound.endDate+'T00:00:00').getTime()+86400000).toISOString().slice(0,10)
-    :new Date().toISOString().slice(0,10);
-  var defEnd=new Date(new Date(defStart+'T00:00:00').getTime()+30*86400000).toISOString().slice(0,10);
-  h('crNextStartA').value=defStart;
-  h('crNextEndA').value=defEnd;
-  _updateCrNextPreviewA();
+  h('crCurLabelA2').textContent=roundLabel(currentRound.year,currentRound.roundNo);
+  setCrMode('now');
   h('closeRoundOvlA').classList.add('on');
 }
 function _updateCrNextPreviewA(){
   var s=h('crNextStartA').value,e=h('crNextEndA').value;
   var preview=h('crNextPreviewA');if(!preview)return;
   if(!s||!e){preview.textContent='';return;}
+  if(crMode==='schedule'){
+    var prevYear=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1].year:currentRound.year;
+    var prevNo=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1].roundNo:currentRound.roundNo;
+    var meta2=nextRoundMeta(prevYear,prevNo,s);
+    preview.textContent='\u2192 จะถูกบันทึกเป็น '+roundLabel(meta2.year,meta2.roundNo)+' ('+fmtThaiDate(s)+' \u2013 '+fmtThaiDate(e)+') \u2014 รอเริ่มใช้งานเอง';
+    return;
+  }
   var meta=nextRoundMeta(currentRound.year,currentRound.roundNo,s);
   preview.textContent='\u2192 จะเป็น '+roundLabel(meta.year,meta.roundNo)+' ('+fmtThaiDate(s)+' \u2013 '+fmtThaiDate(e)+')';
 }
@@ -2541,6 +2665,28 @@ if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
   var nextStart=h('crNextStartA').value,nextEnd=h('crNextEndA').value;
   if(!nextStart||!nextEnd){if(!nextStart)h('crNextStartA').focus();else h('crNextEndA').focus();return;}
   if(nextEnd<nextStart){toast('\u26A0\uFE0F','วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
+
+  if(crMode==='schedule'){
+    /* schedule a future round WITHOUT touching the current one --
+       just appended to SCHEDULED_ROUNDS, queued in start-date order so
+       several can be planned ahead of time. */
+    var prevYear2=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1].year:currentRound.year;
+    var prevNo2=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1].roundNo:currentRound.roundNo;
+    var meta2=nextRoundMeta(prevYear2,prevNo2,nextStart);
+    SCHEDULED_ROUNDS.push({
+      id:'r_sched_'+Date.now(),
+      year:meta2.year,roundNo:meta2.roundNo,
+      startDate:nextStart,endDate:nextEnd,
+      label:roundLabel(meta2.year,meta2.roundNo)
+    });
+    saveRoundsData();
+    h('closeRoundOvlA').classList.remove('on');
+    toast('&#128197;','กำหนดรอบล่วงหน้าเรียบร้อย',roundLabel(meta2.year,meta2.roundNo)+' \u2014 รอบปัจจุบันยังดำเนินการต่อตามปกติ','var(--pb)');
+    renderAdminTab();
+    return;
+  }
+
+  /* crMode === 'now': close the current round immediately and start the new one right away */
   var meta=nextRoundMeta(currentRound.year,currentRound.roundNo,nextStart);
   /* IMPORTANT LIMITATION: each employee's scores only ever exist in their
      own browser session (wiped on logout, never aggregated anywhere
@@ -2557,8 +2703,17 @@ if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
     closedAt:Date.now(),
     selfSc:{},othSc:{},rsnNotes:{}
   });
-  currentRound={id:'r_'+Date.now()+'_cur',year:meta.year,roundNo:meta.roundNo,
-    startDate:nextStart,endDate:nextEnd,label:roundLabel(meta.year,meta.roundNo)};
+  /* if a scheduled round happens to match what's being started now, pull
+     it out of the queue instead of creating a duplicate entry */
+  var matchedScheduled=SCHEDULED_ROUNDS.filter(function(r){return r.startDate===nextStart&&r.endDate===nextEnd;})[0];
+  if(matchedScheduled){
+    SCHEDULED_ROUNDS=SCHEDULED_ROUNDS.filter(function(r){return r.id!==matchedScheduled.id;});
+    currentRound={id:matchedScheduled.id+'_cur',year:matchedScheduled.year,roundNo:matchedScheduled.roundNo,
+      startDate:matchedScheduled.startDate,endDate:matchedScheduled.endDate,label:matchedScheduled.label};
+  } else {
+    currentRound={id:'r_'+Date.now()+'_cur',year:meta.year,roundNo:meta.roundNo,
+      startDate:nextStart,endDate:nextEnd,label:roundLabel(meta.year,meta.roundNo)};
+  }
   saveRoundsData();
   h('closeRoundOvlA').classList.remove('on');
   toast('&#128197;','ปิดรอบเรียบร้อย (Demo)','เริ่ม '+currentRound.label+' \u2014 ยังไม่มีข้อมูลคะแนนจริงให้เก็บประวัติ','var(--L)');
@@ -2574,6 +2729,7 @@ function doLogin(){
   h('lerr').style.display='none';
   CU=Object.assign({},ud,{username:u});
   loadRoundsData(); /* round/history is organizational state, shared across logins on this browser */
+  ensureMockRound1(); /* demo: simulate a prior round's data if no real round history exists yet */
   loadEvalRules(); /* evaluation-rights rules, also organizational state shared across logins */
   dbRoundView='current';
   if(CU.isAdmin){
@@ -2590,7 +2746,7 @@ function doLogin(){
     renderAdminTab();
     return;
   }
-  persons=getDefaults(CU);
+  persons=getDefaults(CU).slice().sort(function(a,b){return a.name.localeCompare(b.name,'th');});
   persons.forEach(function(p2){expd[p2.empId]=false;CATS.forEach(function(c){catOp[p2.empId+c]=true;});});
   /* All person cards start collapsed so the user sees the full list (and count) before opening any */
   /* setup welcome popup */
@@ -3155,11 +3311,11 @@ function autoLoad(){
 /* Round/history persistence -- separate key so it isn't wiped by per-person
  * autosave/load cycles above. Saved on every round open/close action. */
 function saveRoundsData(){
-  try{localStorage.setItem('sf_rounds',JSON.stringify({currentRound:currentRound,ROUNDS:ROUNDS}));}catch(e){}
+  try{localStorage.setItem('sf_rounds',JSON.stringify({currentRound:currentRound,ROUNDS:ROUNDS,SCHEDULED_ROUNDS:SCHEDULED_ROUNDS}));}catch(e){}
 }
 function loadRoundsData(){
   try{var d=JSON.parse(localStorage.getItem('sf_rounds')||'null');
-    if(d){currentRound=d.currentRound||currentRound;ROUNDS=d.ROUNDS||[];}}catch(e){}
+    if(d){currentRound=d.currentRound||currentRound;ROUNDS=d.ROUNDS||[];SCHEDULED_ROUNDS=d.SCHEDULED_ROUNDS||[];}}catch(e){}
 }
 
 /* ── Admin: close the current round & start a new one ──
@@ -3984,11 +4140,6 @@ function renderDash(){
   [['overall','\uD83C\uDF10 Overall'],['self','\uD83E\uDDD1 ตนเอง'],['other','\uD83D\uDC65 ผู้อื่น'],['p','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e1b'],['k','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e01'],['s','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e2a']].forEach(function(f){
     html+='<button class="db-ftab'+(dbFilter===f[0]?' on':'')+'" onclick="dbFilter=\''+f[0]+'\';renderDash()">'+f[1]+'</button>';
   });
-  /* data status indicator */
-  var selfDone=Object.keys(selfSc).filter(function(k){return selfSc[k];}).length;
-  var otherDone=Object.keys(othSc).filter(function(k){return othSc[k];}).length;
-  var totalPossible=(persons.length+1)*CRITERIA.length;
-  var totalDone=selfDone+otherDone;
   html+='<div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
   if(canChooseScale()){
     html+='<span style="font-size:10px;color:var(--t2)">\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e15\u0e47\u0e21:</span>';
@@ -3997,9 +4148,6 @@ function renderDash(){
     html+='<option value="7.5"'+(dbScale===7.5?' selected':'')+'>7.50</option>';
     html+='</select>';
   }
-  html+='<span style="font-size:10px;color:var(--t2)">ข้อมูลที่มี:</span>';
-  html+='<span style="font-size:10px;font-weight:600;color:'+(selfDone>0?'var(--E)':'var(--t2)')+'">'+(selfDone>0?'&#10003;':'\u2013')+' ตนเอง ('+selfDone+'/'+CRITERIA.length+')</span>';
-  html+='<span style="font-size:10px;font-weight:600;color:'+(otherDone>0?'var(--G)':'var(--t2)')+'">'+(otherDone>0?'&#10003;':'\u2013')+' ผู้อื่น ('+otherDone+'/'+(persons.length*CRITERIA.length)+')</span>';
   html+='<button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">&#128190; Export PDF</button>';
   html+='</div>';
   html+='</div></div>';
@@ -4031,17 +4179,7 @@ function renderDash(){
     html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:5px">&#128065; กำลังดูข้อมูลย้อนหลัง \u2014 อ่านอย่างเดียว</span>';
   }
   html+='</div>';
-  if(ROUNDS.length){
-    html+='<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--b0);display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
-    html+='<span style="font-size:10px;color:var(--t2)">ดูรอบอื่น:</span>';
-    html+='<button class="db-ftab'+(dbRoundView==='current'?' on':'')+'" onclick="dbRoundView=\'current\';renderDash()">'+roundLabel(currentRound.year,currentRound.roundNo)+' (ปัจจุบัน)</button>';
-    ROUNDS.slice().reverse().forEach(function(r){
-      html+='<button class="db-ftab'+(dbRoundView===r.id?' on':'')+'" onclick="dbRoundView=\''+r.id+'\';renderDash()">'+roundLabel(r.year,r.roundNo)+'</button>';
-    });
-    html+='</div>';
-  }
   html+='</div>';
-
   /* if viewing a past round, swap in its frozen data for every widget below;
      remember the live (current-round) data so we can restore it after render */
   var _liveSelfSc=selfSc,_liveOthSc=othSc,_liveRsnNotes=rsnNotes,_viewingPast=false;
@@ -4172,7 +4310,15 @@ function renderDash(){
     var focValsHas=fkeys.map(function(f){return focScores[f];}).filter(function(a){return a>0;});
     var focAvgAll=focValsHas.length?focValsHas.reduce(function(a,b){return a+b;},0)/focValsHas.length:0;
     var avgLinePct=focAvgAll?(1-focAvgAll/5)*100:null; /* position of the dashed average line, top-down, within the 0-5 scaled area only */
-    html+='<div style="padding:0 16px 16px"><div class="focus-chart-wrap" style="align-items:end">';
+    var showPrevRound=mockRound1&&mockRound1.focByLetter;
+    html+='<div style="padding:0 16px 16px">';
+    if(showPrevRound){
+      html+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;font-size:10px;color:var(--t2)">';
+      html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--pb)"></span>'+roundLabel(currentRound.year,currentRound.roundNo)+' (ปัจจุบัน)</span>';
+      html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--b1)"></span>'+mockRound1.label+' (ตัวอย่าง)</span>';
+      html+='</div>';
+    }
+    html+='<div class="focus-chart-wrap" style="align-items:end">';
     html+='<div>';
     /* ── Badge lane: vs-average % + E/G/S/L/I level badge ──
        Rendered as its own fixed-height row OUTSIDE the scaled 0-5 chart
@@ -4216,12 +4362,24 @@ function renderDash(){
       var cur=focScores[f];
       var barH=cur?Math.max(1,Math.round(cur/5*chartAreaH)):0; /* strictly proportional to the 0-5 scale -- matches the gridlines above exactly */
       var numFits=barH>=26; /* enough room to center the score number inside the bar */
-      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;min-width:0">';
+      var prevVal=showPrevRound?mockRound1.focByLetter[f]:null;
+      var prevBarH=prevVal?Math.max(1,Math.round(prevVal/5*chartAreaH)):0;
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;min-width:0">';
+      /* current round bar */
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0">';
       if(cur&&!numFits)html+='<span style="position:relative;bottom:'+(barH+2)+'px;font-size:clamp(9px,2.2vw,11px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
       html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
       if(cur&&numFits)html+='<span style="font-size:clamp(9px,2.2vw,11px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
       if(!cur)html+='<span style="position:absolute;bottom:2px;font-size:clamp(9px,2vw,11px);color:var(--t2)">\u2013</span>';
       html+='</div></div>';
+      /* prior round bar (muted) -- only rendered when mock history exists */
+      if(showPrevRound){
+        html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0">';
+        html+='<div style="width:100%;height:'+prevBarH+'px;background:var(--b1);border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
+        html+='<span style="font-size:clamp(8px,2vw,10px);font-weight:700;color:var(--t1)">'+prevVal.toFixed(2)+'</span>';
+        html+='</div></div>';
+      }
+      html+='</div>';
     });
     html+='</div>';
     /* ── FOCUS letter + name labels: own fixed-height row below the scaled area ── */
@@ -4312,7 +4470,6 @@ function renderDash(){
     html+='<div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128200;</div>';
     html+='<div class="db-sh-ttl">ภาพรวมคะแนนรายบุคคล</div>';
     if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px;margin-right:6px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
-    html+='<span style="font-size:10px;color:var(--t2)">เรียงตามระดับ ส &gt; ก &gt; ป \u00B7 </span>';
     html+='<button class="db-ftab on" style="font-size:10px;padding:3px 10px" onclick="sovSortDir=sovSortDir===\'desc\'?\'asc\':\'desc\';renderDash()">คะแนน'+(sovSortDir==='asc'?'น้อย\u2192มาก &#9650;':'มาก\u2192น้อย &#9660;')+'</button>';
     html+='</div>';
     html+='<div style="padding:14px 16px">';
