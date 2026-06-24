@@ -70,7 +70,8 @@ button,input,select{font-family:var(--fb)}
 
 /* ── OVERLAY ── */
 .ovl{display:none;position:fixed;inset:0;background:rgba(8,20,50,.55);z-index:200000;
-  backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:1rem}
+  -webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:1rem;
+  -webkit-transform:translateZ(0);transform:translateZ(0)}
 .ovl.on{display:flex}
 .mbox{background:var(--s0);border-radius:var(--rx);padding:1.75rem;width:100%;
   box-shadow:var(--sd2);border:1px solid var(--b0);max-height:90vh;overflow-y:auto}
@@ -83,7 +84,7 @@ button,input,select{font-family:var(--fb)}
 .toast.on{transform:translateY(0);opacity:1}
 
 /* ══ LOGIN (dark navy) ══ */
-.lc{background:rgba(255,255,255,.05);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);
+.lc{background:rgba(255,255,255,.05);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);
   border-radius:var(--rx);padding:2.5rem 2rem;width:100%;max-width:420px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
 .li{width:68px;height:68px;border-radius:var(--rl);background:var(--pb);
   display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:28px;
@@ -372,13 +373,13 @@ button,input,select{font-family:var(--fb)}
 .rpd{font-size:11px;color:var(--t1);line-height:1.5}
 
 /* ── CHIP BAR ── */
-.cbr{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 14px;
+.cbr{display:flex;flex-direction:row;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 14px;
   background:var(--s0);border-radius:var(--rl);border:1px solid var(--b0);box-shadow:var(--sd0)}
 .cbl{font-size:11px;font-weight:600;color:var(--t1);white-space:nowrap}
-.chw{display:flex;gap:5px;flex-wrap:wrap;flex:1}
-.chip{display:flex;align-items:center;gap:5px;padding:4px 8px 4px 4px;border-radius:var(--r);
+.chw{display:flex;flex-direction:row;gap:5px;flex-wrap:wrap;flex:1;min-width:0}
+.chip{display:flex;flex:0 0 auto;align-items:center;gap:5px;padding:4px 8px 4px 4px;border-radius:var(--r);
   border:1px solid var(--b1);background:var(--s1);font-size:11px;color:var(--t0);
-  cursor:grab;font-weight:500;transition:.1s;user-select:none}
+  cursor:grab;font-weight:500;transition:.1s;user-select:none;max-width:100%}
 .chip:hover{border-color:var(--pb);background:var(--s2)}
 .chip.dt{border-color:var(--pb);background:var(--s2);outline:2px solid var(--pb);outline-offset:1px}
 .chav{width:20px;height:20px;border-radius:50%;overflow:hidden;flex-shrink:0;
@@ -400,10 +401,10 @@ button,input,select{font-family:var(--fb)}
   color:var(--pb);font-size:13px;font-weight:700;
   margin-right:4px;margin-left:8px;flex-shrink:0}
 .gstep:first-child{margin-left:0}
-.gmc{display:flex;flex-wrap:wrap;gap:5px}
-.gchip{display:flex;align-items:center;gap:5px;padding:5px 9px 5px 4px;border-radius:var(--r);
+.gmc{display:flex;flex-direction:row;flex-wrap:wrap;gap:5px}
+.gchip{display:flex;flex:0 0 auto;align-items:center;gap:5px;padding:5px 9px 5px 4px;border-radius:var(--r);
   border:1px solid var(--b1);background:var(--s1);font-size:11px;color:var(--t0);
-  cursor:grab;font-weight:500;transition:.12s;user-select:none}
+  cursor:grab;font-weight:500;transition:.12s;user-select:none;max-width:100%}
 .gchip:hover{border-color:var(--pb)}
 .gchip.gsel{border-color:var(--pb);background:var(--s2);outline:2px solid var(--pb);outline-offset:1px}
 .gchip.gdg{opacity:.3;transform:scale(.95)}
@@ -740,11 +741,11 @@ button,input,select{font-family:var(--fb)}
   .sb.open{transform:translateX(0)}
   .mob-overlay.open{display:block}
   .hbg-btn{display:none!important}
-  .topbar{flex-wrap:nowrap;align-items:flex-start;padding:.7rem 1rem;gap:8px}
+  .topbar{padding:.7rem 1rem;gap:6px}
+  .tb-top-row{flex-wrap:nowrap}
   .tb-left{flex:1;min-width:0}
   .tb-title{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .tb-right{order:3;width:100%}
-  .tb-mob-logout{display:flex;order:2;flex-shrink:0;padding:5px 10px;font-size:11px}
+  .tb-mob-logout{display:flex;flex-shrink:0;padding:5px 10px;font-size:11px}
   .tb-mob-logout-ico{font-size:12px}
   .mob-nav{display:block}
   /* ── Recipient chip bar (ผู้รับการประเมิน) on mobile ──
@@ -1016,6 +1017,15 @@ button,input,select{font-family:var(--fb)}
           <div id="rsnPersonSub" style="font-size:11px;color:var(--t2);margin-top:1px"></div>
         </div>
         <div id="rsnTag" style="flex-shrink:0"></div>
+      </div>
+
+      <!-- ②b Move-to-different-level / remove (mobile-friendly equivalent of
+           drag-to-move and the desktop-only remove button) -- only shown
+           when editing an ALREADY-PLACED rating, not a brand-new one. -->
+      <div id="rsnMoveBlock" style="display:none;padding:10px 14px;background:var(--s2);border-radius:var(--r);border:1px solid var(--b0);margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:8px">เปลี่ยนระดับคะแนนนี้:</div>
+        <div id="rsnMoveBtns" style="display:flex;gap:6px;margin-bottom:10px"></div>
+        <button id="rsnRemoveBtn" type="button" class="btn bo" style="width:100%;color:var(--I);border-color:rgba(163,45,45,.3)">&#128465;&#65039; ลบการให้คะแนนนี้ออก</button>
       </div>
 
       <!-- ③ Criterion + FOCUS info -->
@@ -3055,7 +3065,12 @@ function personAvHTML(pObj,sz){
 /* -- SINGLE PERSON REASON POPUP (????????) -- */
 var rsnCurrent={pid:null,cid:null,r:null,cb:null};
 
-function openReason(pid,cid,r,onDone){
+function closeAllOverlaysExcept(keepId){
+  document.querySelectorAll('.ovl.on').forEach(function(el){
+    if(el.id!==keepId)el.classList.remove('on');
+  });
+}
+function openReason(pid,cid,r,onDone,isPlaced){
   rsnCurrent={pid:pid,cid:cid,r:r,cb:onDone};
   var crit=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){crit=CRITERIA[i];break;}}
   var fLetter=crit?crit.foc:'';var fd=fLetter?FDEF[fLetter]:null;
@@ -3094,6 +3109,47 @@ function openReason(pid,cid,r,onDone){
     }
   }
 
+  /* 6b. move-to-different-level / remove controls -- only for editing an
+     ALREADY-PLACED rating (the grid view's mobile-friendly equivalent of
+     drag-to-move and the desktop-only remove button, per item 6). */
+  if(h('rsnMoveBlock')){
+    if(isPlaced){
+      h('rsnMoveBlock').style.display='block';
+      var moveBtnsHtml='';
+      RATINGS.forEach(function(rt){
+        var isCur=rt===r;
+        moveBtnsHtml+='<button type="button" class="rsn-move-btn" data-rt="'+rt+'" style="flex:1;padding:8px 0;border-radius:var(--r);border:1.5px solid '+(isCur?RCOL[rt]:'var(--b1)')+';background:'+(isCur?RCOL[rt]:'var(--s0)')+';color:'+(isCur?'#fff':'var(--t1)')+';font-weight:700;font-size:13px;cursor:'+(isCur?'default':'pointer')+'" '+(isCur?'disabled':'')+'>'+rt+'</button>';
+      });
+      h('rsnMoveBtns').innerHTML=moveBtnsHtml;
+      h('rsnMoveBtns').querySelectorAll('.rsn-move-btn:not([disabled])').forEach(function(btn){
+        btn.addEventListener('click',function(){
+          var newR=this.dataset.rt;
+          /* moving to a different rating invalidates any existing reason --
+             it was written for the OLD rating, not this one (item 6) */
+          delete rsnNotes[pid+'|'+cid];
+          othSc[sk(pid,cid)]=newR;autoSave();
+          cov('rsnovl');
+          if(newR==='L'||newR==='I'){
+            openReason(pid,cid,newR,onDone,true);
+          } else {
+            if(onDone)onDone();
+          }
+        });
+      });
+      if(h('rsnRemoveBtn')){
+        h('rsnRemoveBtn').onclick=function(){
+          delete othSc[sk(pid,cid)];
+          delete rsnNotes[pid+'|'+cid];
+          autoSave();
+          cov('rsnovl');
+          if(onDone)onDone();
+        };
+      }
+    } else {
+      h('rsnMoveBlock').style.display='none';
+    }
+  }
+
   /* 7. textarea + char counter */
   var ta=h('rsnText');var cc=h('rsnCharCount');
   if(ta){
@@ -3103,6 +3159,7 @@ function openReason(pid,cid,r,onDone){
   }
   /* 8. mandatory-reason state for L/I ratings */
   _rsnUpdateReqState();
+  closeAllOverlaysExcept('rsnovl'); /* defensive: guarantee no other modal is left open underneath this one */
   h('rsnovl').classList.add('on');
   setTimeout(function(){if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}},80);
 }
@@ -3128,7 +3185,7 @@ function _rsnUpdateReqState(){
 
 function openReasonFromNote(pid,cid){
   var r=gS(pid,cid)||'G';
-  openReason(pid,cid,r,function(){renderTab();});
+  openReason(pid,cid,r,function(){renderTab();},true);
 }
 /* Quick-clear a saved reason directly from the table row's note preview,
  * without opening the full reason popup. Blocked when the rating is L/I
@@ -3277,6 +3334,7 @@ function openBatchReason(pids,cid,r,onDone){
     /* focus first textarea */
     setTimeout(function(){var first=listEl.querySelector('textarea');if(first)first.focus();},80);
   }
+  closeAllOverlaysExcept('batchrsnovl');
   h('batchrsnovl').classList.add('on');
 }
 
@@ -3870,9 +3928,16 @@ function renderGrid(){
         if(moveCid!==cid){return;} /* safety: only allow moving within the same criterion row */
         var oldR=othSc[sk(movePid,moveCid)];
         if(oldR===r)return; /* dropped on the same cell -- no change */
+        /* moving to a different rating invalidates any existing reason --
+           it was written for the OLD rating, not this one, so it must not
+           be left behind silently attached to the new rating (item 6) */
+        delete rsnNotes[movePid+'|'+moveCid];
         othSc[sk(movePid,moveCid)]=r;autoSave();
-        /* keep existing comment as-is; let the user review/edit it for the new rating */
-        openReason(movePid,moveCid,r,function(){renderTab();});
+        if(r==='L'||r==='I'){
+          openReason(movePid,moveCid,r,function(){renderTab();},true);
+        } else {
+          renderTab();
+        }
         return;
       }
       /* CASE B: dragging from the person bank (new evaluation) */
@@ -3935,7 +4000,7 @@ function renderGrid(){
       e.stopPropagation();
       if(locked)return;
       var pid=this.dataset.pid;var cid=this.dataset.cid;var r=this.dataset.r;
-      openReason(pid,cid,r,function(){renderTab();});
+      openReason(pid,cid,r,function(){renderTab();},true);
     });
   });
   /* remove button -- explicit delete, separate from click-to-edit */
