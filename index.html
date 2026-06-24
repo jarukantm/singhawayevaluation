@@ -395,6 +395,8 @@ button,input,select{font-family:var(--fb)}
 .gm{display:flex;flex-direction:column;gap:10px}
 .gmb{padding:10px 14px;background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);
   position:sticky;top:0;z-index:30}
+.gmb-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--b0)}
 .gmt{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;margin-bottom:8px}
 .gml{font-size:11px;font-weight:700;color:var(--t1)}
 .gstep{display:inline-flex;align-items:center;justify-content:center;width:auto;height:auto;
@@ -773,7 +775,7 @@ button,input,select{font-family:var(--fb)}
   .gdrop{padding:3px 2px;min-height:36px;gap:2px}
   .gpl{font-size:9px;padding:3px 4px 3px 3px;gap:2px}
   .gplav{width:11px;height:11px}
-  .gpl-rm{display:none} /* too cramped to show on mobile -- tap the chip itself to open the edit/remove popup instead */
+  .gpl-rm{width:16px;height:16px;font-size:10px}
   .ggcc-done-av{display:none} /* avatar row doesn't fit in the cramped mobile width -- the "เหลือ X คน" count text alone is enough signal and stays visible */
   .ggcc-done-cnt{font-size:10px;margin-left:0}
   .focus-chart-wrap{grid-template-columns:1fr!important}
@@ -1019,15 +1021,6 @@ button,input,select{font-family:var(--fb)}
         <div id="rsnTag" style="flex-shrink:0"></div>
       </div>
 
-      <!-- ②b Move-to-different-level / remove (mobile-friendly equivalent of
-           drag-to-move and the desktop-only remove button) -- only shown
-           when editing an ALREADY-PLACED rating, not a brand-new one. -->
-      <div id="rsnMoveBlock" style="display:none;padding:10px 14px;background:var(--s2);border-radius:var(--r);border:1px solid var(--b0);margin-bottom:14px">
-        <div style="font-size:11px;font-weight:700;color:var(--t1);margin-bottom:8px">เปลี่ยนระดับคะแนนนี้:</div>
-        <div id="rsnMoveBtns" style="display:flex;gap:6px;margin-bottom:10px"></div>
-        <button id="rsnRemoveBtn" type="button" class="btn bo" style="width:100%;color:var(--I);border-color:rgba(163,45,45,.3)">&#128465;&#65039; ลบการให้คะแนนนี้ออก</button>
-      </div>
-
       <!-- ③ Criterion + FOCUS info -->
       <div id="rsnCritBlock" style="padding:10px 14px;background:var(--s2);border-radius:var(--r);border:1px solid var(--b0);margin-bottom:14px">
         <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px">
@@ -1232,7 +1225,6 @@ button,input,select{font-family:var(--fb)}
             <div class="lgi"><div class="lgb" style="background:var(--L)"></div><b>L</b> - Low</div>
             <div class="lgi"><div class="lgb" style="background:var(--I)"></div><b>I</b> - Improve</div>
           </div>
-          <div class="cbr"><span class="cbl">ผู้รับการประเมิน :</span><div class="chw" id="gchips"></div><button class="ach" id="gadd">+ เพิ่มบุคคล</button></div>
           <div id="gcontent"></div>
         </div>
       </div>
@@ -3070,7 +3062,7 @@ function closeAllOverlaysExcept(keepId){
     if(el.id!==keepId)el.classList.remove('on');
   });
 }
-function openReason(pid,cid,r,onDone,isPlaced){
+function openReason(pid,cid,r,onDone){
   rsnCurrent={pid:pid,cid:cid,r:r,cb:onDone};
   var crit=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){crit=CRITERIA[i];break;}}
   var fLetter=crit?crit.foc:'';var fd=fLetter?FDEF[fLetter]:null;
@@ -3109,47 +3101,6 @@ function openReason(pid,cid,r,onDone,isPlaced){
     }
   }
 
-  /* 6b. move-to-different-level / remove controls -- only for editing an
-     ALREADY-PLACED rating (the grid view's mobile-friendly equivalent of
-     drag-to-move and the desktop-only remove button, per item 6). */
-  if(h('rsnMoveBlock')){
-    if(isPlaced){
-      h('rsnMoveBlock').style.display='block';
-      var moveBtnsHtml='';
-      RATINGS.forEach(function(rt){
-        var isCur=rt===r;
-        moveBtnsHtml+='<button type="button" class="rsn-move-btn" data-rt="'+rt+'" style="flex:1;padding:8px 0;border-radius:var(--r);border:1.5px solid '+(isCur?RCOL[rt]:'var(--b1)')+';background:'+(isCur?RCOL[rt]:'var(--s0)')+';color:'+(isCur?'#fff':'var(--t1)')+';font-weight:700;font-size:13px;cursor:'+(isCur?'default':'pointer')+'" '+(isCur?'disabled':'')+'>'+rt+'</button>';
-      });
-      h('rsnMoveBtns').innerHTML=moveBtnsHtml;
-      h('rsnMoveBtns').querySelectorAll('.rsn-move-btn:not([disabled])').forEach(function(btn){
-        btn.addEventListener('click',function(){
-          var newR=this.dataset.rt;
-          /* moving to a different rating invalidates any existing reason --
-             it was written for the OLD rating, not this one (item 6) */
-          delete rsnNotes[pid+'|'+cid];
-          othSc[sk(pid,cid)]=newR;autoSave();
-          cov('rsnovl');
-          if(newR==='L'||newR==='I'){
-            openReason(pid,cid,newR,onDone,true);
-          } else {
-            if(onDone)onDone();
-          }
-        });
-      });
-      if(h('rsnRemoveBtn')){
-        h('rsnRemoveBtn').onclick=function(){
-          delete othSc[sk(pid,cid)];
-          delete rsnNotes[pid+'|'+cid];
-          autoSave();
-          cov('rsnovl');
-          if(onDone)onDone();
-        };
-      }
-    } else {
-      h('rsnMoveBlock').style.display='none';
-    }
-  }
-
   /* 7. textarea + char counter */
   var ta=h('rsnText');var cc=h('rsnCharCount');
   if(ta){
@@ -3185,7 +3136,7 @@ function _rsnUpdateReqState(){
 
 function openReasonFromNote(pid,cid){
   var r=gS(pid,cid)||'G';
-  openReason(pid,cid,r,function(){renderTab();},true);
+  openReason(pid,cid,r,function(){renderTab();});
 }
 /* Quick-clear a saved reason directly from the table row's note preview,
  * without opening the full reason popup. Blocked when the rating is L/I
@@ -3680,7 +3631,6 @@ function removePerson(eid){
 
 /* ADD PERSON */
 h('padd').addEventListener('click',function(){openAdd();});
-h('gadd').addEventListener('click',function(){openAdd();});
 h('addclosebtn').addEventListener('click',function(){cov('addovl');});
 h('addq').addEventListener('input',function(){filterAdd(this.value);});
 function openAdd(){
@@ -3752,8 +3702,6 @@ function renderGrid(){
   persons.forEach(function(p){CRITERIA.forEach(function(c){if(gS(p.empId,c.id))done++;});});
   if(h('tbsub'))h('tbsub').textContent='ประเมินแล้ว '+done+'/'+total+' รายการ';
   if(h('tbright'))h('tbright').innerHTML=actBtns(false);
-  if(h('gadd'))h('gadd').style.display=locked?'none':'inline-flex';
-  renderChipBar('gchips');
   if(!persons.length){h('gcontent').innerHTML='<div style="padding:2rem;text-align:center;color:var(--t1)">ยังไม่มีผู้รับการประเมิน</div>';return;}
   var cc=CRITERIA.filter(function(c){return c.cat===gmCat;});
   var m=CAT_META[gmCat];
@@ -3768,8 +3716,11 @@ function renderGrid(){
   }
   var sumHtml2=oSaved?scoreSummaryCard():'';
   var html=sumHtml2+'<div class="gm">';
-  /* bank */
-  html+='<div class="gmb"><div class="gmt">';
+  /* bank -- merged with what used to be a separate "ผู้รับการประเมิน" card:
+     this header row (label left, add-person button right) now lives
+     directly inside the same card as the person-selection bank below it,
+     instead of two stacked cards saying mostly the same thing. */
+  html+='<div class="gmb"><div class="gmb-hdr"><span class="cbl">ผู้รับการประเมิน</span><button class="ach" id="gadd">+ เพิ่มบุคคล</button></div><div class="gmt">';
   html+='<div class="gml lgn-hover"><span class="gstep">&#8226;</span>เลื่อนซ้ายขวาเพื่อจัดลำดับ <span class="gstep">&#8226;</span>กดค้าง 0.5 วินาทีเพื่อเข้าสู่โหมดเลือกหลายคน <span class="gstep">&#8226;</span>ลากชื่อใส่ในตารางเพื่อประเมิน</div>';
   html+='<div class="gml lgn-touch"><span class="gstep">&#8226;</span>แตะชื่อเพื่อเลือก <span class="gstep">&#8226;</span>กดค้าง 0.5 วินาทีเพื่อเลือกหลายคน <span class="gstep">&#8226;</span>แตะช่องในตารางเพื่อประเมิน</div>';
   html+='<select class="gcatsel" id="gcatsel">';
@@ -3856,6 +3807,10 @@ function renderGrid(){
   html+='</div></div></div>';
   h('gcontent').innerHTML=html;
   /* bind events after render */
+  if(h('gadd')){
+    h('gadd').style.display=locked?'none':'inline-flex';
+    h('gadd').addEventListener('click',function(){openAdd();});
+  }
   var catSelEl=document.getElementById('gcatsel');
   if(catSelEl)catSelEl.addEventListener('change',function(){gmCat=this.value;renderGrid();});
   /* gchip events */
@@ -3934,7 +3889,7 @@ function renderGrid(){
         delete rsnNotes[movePid+'|'+moveCid];
         othSc[sk(movePid,moveCid)]=r;autoSave();
         if(r==='L'||r==='I'){
-          openReason(movePid,moveCid,r,function(){renderTab();},true);
+          openReason(movePid,moveCid,r,function(){renderTab();});
         } else {
           renderTab();
         }
@@ -4000,7 +3955,7 @@ function renderGrid(){
       e.stopPropagation();
       if(locked)return;
       var pid=this.dataset.pid;var cid=this.dataset.cid;var r=this.dataset.r;
-      openReason(pid,cid,r,function(){renderTab();},true);
+      openReason(pid,cid,r,function(){renderTab();});
     });
   });
   /* remove button -- explicit delete, separate from click-to-edit */
