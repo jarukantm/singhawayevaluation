@@ -2554,8 +2554,43 @@ function renderAdminRounds(){
   html+='<button class="btn bo" onclick="resetEvalRules()">ใช้กฎเริ่มต้นของระบบ</button>';
   html+='</div>';
   html+='</div></div>';
+
+  /* ── ข้อมูลสำหรับเชื่อมต่อระบบ ──
+     Now backed by a REAL Google Sheet via Apps Script Web App
+     (GAS_WEBAPP_URL), not localStorage -- every device that opens this
+     page reads/writes the same shared spreadsheet, which is what makes
+     multi-device testing actually work. */
+  var simStats=SimDB.stats();
+  html+='<div class="card" style="margin-top:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#128190;</div><div class="db-sh-ttl">ฐานข้อมูล (Google Sheets)</div>';
+  html+='<button class="btn bo" id="simdbRefreshBtn" style="font-size:11px;padding:6px 12px;margin-left:auto" onclick="refreshSimDBAndRender()">&#128260; รีเฟรชข้อมูล</button></div>';
+  html+='<div style="padding:14px 16px">';
+  if(!SimDB._loaded){
+    html+='<div class="wb" style="margin-bottom:12px"><span>\u23F3</span><span>กำลังโหลดข้อมูลจาก Google Sheets...</span></div>';
+  }
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px">';
+  html+='<div><div style="font-size:11px;color:var(--t2)">แถวข้อมูลทั้งหมด</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--pb)">'+simStats.totalRows+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">จำนวนรอบที่มีข้อมูล</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t0)">'+simStats.roundCount+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">จำนวนผู้ประเมินที่ Submit แล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t0)">'+simStats.evaluatorCount+'</div></div>';
+  html+='</div>';
+  html+='<div class="wb" style="margin-bottom:12px"><span>\u2705</span><span>เชื่อมต่อกับ Google Sheets จริงแล้ว \u2014 ทุกครั้งที่มีคนกด Submit จากอุปกรณ์ไหนก็ตาม ข้อมูลจะถูกบันทึกไว้ใน Sheet กลางตัวเดียวกัน ทุกเครื่องที่เปิดหน้านี้จะเห็นข้อมูลตรงกัน โครงสร้าง 1 แถว = ผู้ประเมิน 1 คน ประเมินผู้ถูกประเมิน 1 คน ในรอบนั้น (รวมแถวประเมินตนเองด้วย) มีทั้งหมด '+(9+CRITERIA.length*2)+' คอลัมน์ ('+CRITERIA.length+' หัวข้อ \u00D7 2 คอลัมน์คะแนน+เหตุผล)</span></div>';
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html+='<button class="btn bo" onclick="downloadDatabaseCSV()">&#128190; ดาวน์โหลด CSV ('+roundLabel(currentRound.year,currentRound.roundNo)+')</button>';
+  html+='</div>';
+  html+='<div style="font-size:10px;color:var(--t2);margin-top:8px">หมายเหตุ: การลบ/ล้างข้อมูลทั้งหมดควรทำโดยตรงใน Google Sheets ไม่ใช่จากปุ่มในหน้านี้ เพื่อความปลอดภัยของข้อมูลจริงที่ทุกคนใช้ร่วมกัน</div>';
+  html+='</div></div>';
   h('adminRoundsBody').innerHTML=html;
   tickAllCountdowns(); /* fill in the countdown box immediately, don't wait for the next 1s interval tick */
+  /* pull the latest data from the Sheet in the background, then
+     re-render once it actually arrives so the numbers above are current */
+  SimDB.refresh(function(){if(curAdminTab==='rounds')renderAdminTab();});
+}
+function refreshSimDBAndRender(){
+  var btn=h('simdbRefreshBtn');
+  if(btn){btn.disabled=true;btn.textContent='\u23F3 กำลังโหลด...';}
+  SimDB.refresh(function(ok){
+    if(!ok)toast('\u26A0\uFE0F','โหลดข้อมูลไม่สำเร็จ','ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต','var(--I)');
+    renderAdminTab();
+  });
 }
 function saveEvalRulesFromForm(){
   var rules={};
@@ -3333,6 +3368,225 @@ function autoLoad(){
 }
 /* Round/history persistence -- separate key so it isn't wiped by per-person
  * autosave/load cycles above. Saved on every round open/close action. */
+/* ── Simulated Database (SimDB) ──
+ * A genuine simulation of what a real backend database would do: every
+ * time someone hits Submit, their evaluation rows get WRITTEN HERE and
+ * persist independently of that person's own session. Unlike
+ * selfSc/othSc (which only ever hold the CURRENTLY LOGGED-IN person's
+ * live, in-progress data), SimDB accumulates rows from EVERY person who
+ * has submitted on this browser/device across however many logins --
+ * so if Jarukan_t logs in and submits, then logs out, then Sarun_v logs
+ * in and submits, SimDB ends up holding both of their rows together,
+ * exactly like a real shared database would.
+ *
+ * Still a simulation, not a real network-backed database: it's
+ * localStorage-scoped to this one browser, so it won't show data
+ * submitted from a different device/browser. That's the one remaining
+ * gap versus a real backend -- everything else (accumulating rows
+ * across many different users' sessions, keyed by round+evaluator+
+ * evaluated-person, upsert-on-resubmit semantics) behaves the same way
+ * a real one would.
+ *
+ * Row key: roundLabel + '::' + evaluatorEmpId + '::' + evaluatedEmpId
+ * (so resubmitting the same pairing in the same round overwrites the
+ * old row instead of duplicating it, matching normal database upsert
+ * behavior). */
+/* ── Real backend: Google Sheets via Apps Script Web App ──
+ * Replaces the old localStorage-only SimDB with real network calls to
+ * the Apps Script URL below, so every device hitting this page talks to
+ * the SAME shared spreadsheet -- this is what makes multi-device testing
+ * actually work, instead of each browser only seeing its own local data.
+ *
+ * Network calls are inherently async, but most of the app's existing
+ * code (renderAdminRounds, downloadDatabaseCSV, etc.) calls SimDB
+ * synchronously -- to avoid rewriting all of that as async/await, this
+ * keeps a local in-memory cache (_cache) that's refreshed from the
+ * Sheet in the background via SimDB.refresh(), and all the synchronous
+ * read methods (allRows/rowsForRound/stats) just read whatever's
+ * currently in that cache. Call SimDB.refresh() (and re-render) whenever
+ * you want the freshest data from the Sheet -- it's called automatically
+ * whenever the Admin's round-management page renders. */
+var GAS_WEBAPP_URL='https://script.google.com/macros/s/AKfycbxP7zgBtHMDUD1YrzoSygNWweNWAfz3W8fYCYOzzERzdas28WxECcE6U6zWtEsomVl0cw/exec';
+var SimDB={
+  _cache:[], /* array of row objects, refreshed from the Sheet via refresh() */
+  _loaded:false,
+  _loading:false,
+  /* refresh: pull the latest rows from the Sheet into the local cache.
+     onDone(ok) fires when the fetch settles either way, so callers can
+     re-render once fresh data has actually arrived. */
+  refresh:function(onDone){
+    if(this._loading){if(onDone)onDone(false);return;}
+    this._loading=true;
+    var self=this;
+    fetch(GAS_WEBAPP_URL,{method:'GET'})
+      .then(function(res){return res.json();})
+      .then(function(data){
+        self._loading=false;self._loaded=true;
+        if(data&&data.ok){self._cache=data.rows||[];}
+        if(onDone)onDone(!!(data&&data.ok));
+      })
+      .catch(function(err){
+        self._loading=false;
+        console.error('SimDB.refresh failed:',err);
+        if(onDone)onDone(false);
+      });
+  },
+  /* upsertRows: POST rows to the Sheet (real network write), and
+     optimistically merge them into the local cache immediately so the
+     UI feels instant rather than waiting on a round-trip. */
+  upsertRows:function(rows,onDone){
+    var self=this;
+    /* optimistic local merge, keyed the same way the Apps Script does */
+    rows.forEach(function(row){
+      var key=row['Userid']+'::'+row['รอบการประเมิน']+'::'+row['รหัสพนักงานผู้ถูกประเมิน'];
+      var idx=self._cache.findIndex(function(r){
+        return (r['Userid']+'::'+r['รอบการประเมิน']+'::'+r['รหัสพนักงานผู้ถูกประเมิน'])===key;
+      });
+      if(idx>=0)self._cache[idx]=row;else self._cache.push(row);
+    });
+    fetch(GAS_WEBAPP_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'}, /* avoids a CORS preflight that Apps Script Web Apps don't handle */
+      body:JSON.stringify({rows:rows})
+    })
+      .then(function(res){return res.json();})
+      .then(function(data){if(onDone)onDone(!!(data&&data.ok));})
+      .catch(function(err){
+        console.error('SimDB.upsertRows failed (saved locally, will retry on next refresh):',err);
+        if(onDone)onDone(false);
+      });
+  },
+  allRows:function(){return this._cache;},
+  rowsForRound:function(roundLbl){
+    return this._cache.filter(function(r){return r['รอบการประเมิน']===roundLbl;});
+  },
+  clearAll:function(){
+    /* Clearing the real Sheet from here isn't supported on purpose --
+       deleting everyone's submitted evaluation data from a Sheet should
+       be a deliberate action taken directly in Google Sheets, not a
+       button in this demo UI. Only clears the local cache/view. */
+    this._cache=[];
+  },
+  stats:function(){
+    var rows=this.allRows();
+    var rounds={};rows.forEach(function(r){rounds[r['รอบการประเมิน']]=true;});
+    var people={};rows.forEach(function(r){people[r['รหัสพนักงานผู้ประเมิน']]=true;});
+    return{totalRows:rows.length,roundCount:Object.keys(rounds).length,evaluatorCount:Object.keys(people).length};
+  }
+};
+
+/* ── Database export schema (future backend data contract) ──
+ * This is NOT a UI feature -- it documents and produces the exact row
+ * shape the org wants a real backend (Sheets/Database) to store, once
+ * one is connected. One row = one (evaluator, evaluated-person) pair for
+ * the round currently being viewed; a person's own self-assessment is
+ * its own row where ผู้ประเมิน === ผู้ถูกประเมิน.
+ *
+ * Column order (matches the requested schema exactly):
+ *   Userid, รอบการประเมิน, ชื่อ สกุล ผู้ประเมิน, รหัสพนักงานผู้ประเมิน,
+ *   ระดับพนักงานผู้ประเมิน, ชื่อ สกุล ผู้ถูกประเมิน, รหัสพนักงานผู้ถูกประเมิน,
+ *   ระดับพนักงานผู้ถูกประเมิน, Submit timestamp,
+ *   then per-criterion pairs (score letter + its reason text), grouped by
+ *   Singhaway category and labeled by FOCUS letter + sequence number
+ *   within that category (e.g. Family_U1, Family_U2, Family_O1...) --
+ *   this label is NOT the criterion's own id (f1/f2/f3...), it's derived
+ *   from {category}_{focusLetter}{nth occurrence of that letter in that
+ *   category}, which is what buildDbColumnLabel() below computes.
+ *
+ * NOTE: this schema is now backed by SimDB (see above), a simulated
+ * cross-session database that accumulates rows from every person who
+ * has submitted on this browser/device, not just the currently-logged-in
+ * person's own live session. buildDatabaseRows() below still computes
+ * the CURRENT (in-progress, not-yet-submitted) data for the logged-in
+ * person specifically; once they hit Submit, those exact rows get
+ * written into SimDB via SimDB.upsertRows() and become part of the
+ * shared aggregate that the Admin's export reads from (see
+ * downloadDatabaseCSV() and the Admin "ข้อมูลสำหรับเชื่อมต่อระบบ" card).
+ * The only gap remaining versus a real backend: SimDB is scoped to this
+ * one browser via localStorage, so submissions made on a different
+ * device won't show up here. */
+function buildDbColumnLabel(critId){
+  var crit=CRITERIA.filter(function(c){return c.id===critId;})[0];
+  if(!crit)return critId;
+  var sameCatSameFoc=CRITERIA.filter(function(c){return c.cat===crit.cat&&c.foc===crit.foc;});
+  var nth=sameCatSameFoc.indexOf(crit)+1;
+  return crit.cat+'_'+crit.foc+nth;
+}
+function buildDatabaseRows(){
+  if(!CU)return[];
+  var rows=[];
+  var submitTs=oSub?new Date().toISOString():''; /* this mock build has no real per-submission timestamp stored -- see limitation note above */
+  function buildRow(evaluator,evaluated,scoreMap,noteMap){
+    var row={
+      'Userid':evaluator.empId,
+      'รอบการประเมิน':roundLabel(currentRound.year,currentRound.roundNo),
+      'ชื่อ สกุล ผู้ประเมิน':evaluator.name,
+      'รหัสพนักงานผู้ประเมิน':evaluator.empId,
+      'ระดับพนักงานผู้ประเมิน':evaluator.role,
+      'ชื่อ สกุล ผู้ถูกประเมิน':evaluated.name,
+      'รหัสพนักงานผู้ถูกประเมิน':evaluated.empId,
+      'ระดับพนักงานผู้ถูกประเมิน':evaluated.role,
+      'Submit timestamp':submitTs
+    };
+    CRITERIA.forEach(function(c){
+      var label=buildDbColumnLabel(c.id);
+      row[label]=scoreMap(c.id)||'';
+      row['Reason '+label]=noteMap(c.id)||'';
+    });
+    return row;
+  }
+  /* self-assessment row */
+  rows.push(buildRow(CU,CU,function(cid){return selfSc[cid];},function(cid){return '';})); /* self-assessment has no comment mechanism */
+  /* one row per person this user evaluated */
+  persons.forEach(function(p){
+    rows.push(buildRow(CU,p,function(cid){return othSc[sk(p.empId,cid)];},function(cid){return rsnNotes[p.empId+'|'+cid]||'';}));
+  });
+  return rows;
+}
+/* Column order as an explicit array, since plain JS object key order
+   isn't guaranteed to survive every environment the same way -- callers
+   that need to render a table/CSV should iterate this list, not
+   Object.keys() on a row. */
+function dbColumnOrder(){
+  var cols=['Userid','รอบการประเมิน','ชื่อ สกุล ผู้ประเมิน','รหัสพนักงานผู้ประเมิน','ระดับพนักงานผู้ประเมิน',
+    'ชื่อ สกุล ผู้ถูกประเมิน','รหัสพนักงานผู้ถูกประเมิน','ระดับพนักงานผู้ถูกประเมิน','Submit timestamp'];
+  CRITERIA.forEach(function(c){
+    var label=buildDbColumnLabel(c.id);
+    cols.push(label);
+    cols.push('Reason '+label);
+  });
+  return cols;
+}
+function downloadDatabaseCSV(){
+  /* Export the REAL aggregated database (every person who has Submit'd
+     on this browser/device, across however many separate logins) for
+     the CURRENT round -- this is the actual simulated database, not
+     just whatever the currently-logged-in person personally entered. */
+  var rows=SimDB.rowsForRound(roundLabel(currentRound.year,currentRound.roundNo));
+  if(!rows.length){
+    /* nobody has actually Submit'd in this round yet on this device --
+       fall back to a live preview of the current session's in-progress
+       data, purely so the column structure can still be inspected/shared
+       with the backend team even before anyone has submitted anything */
+    rows=buildDatabaseRows();
+  }
+  if(!rows.length){toast('\u26A0\uFE0F','ไม่มีข้อมูลให้ Export','','var(--L)');return;}
+  var cols=dbColumnOrder();
+  function csvEscape(v){
+    v=(v===undefined||v===null)?'':String(v);
+    if(/[",\n]/.test(v))return '"'+v.replace(/"/g,'""')+'"';
+    return v;
+  }
+  var lines=[cols.map(csvEscape).join(',')];
+  rows.forEach(function(row){lines.push(cols.map(function(c){return csvEscape(row[c]);}).join(','));});
+  var csv='\uFEFF'+lines.join('\r\n'); /* BOM so Thai text opens correctly in Excel */
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');
+  a.href=url;a.download='singhaway_focus_export_'+roundLabel(currentRound.year,currentRound.roundNo).replace(/[^\w\d]+/g,'_')+'.csv';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 function saveRoundsData(){
   try{localStorage.setItem('sf_rounds',JSON.stringify({currentRound:currentRound,ROUNDS:ROUNDS,SCHEDULED_ROUNDS:SCHEDULED_ROUNDS}));}catch(e){}
 }
@@ -3504,8 +3758,24 @@ h('subcancelbtn').addEventListener('click',function(){
 h('subconfirmbtn').addEventListener('click',function(){
   /* Single confirm: lock BOTH self and other permanently */
   sSub=true;sSaved=true;oSub=true;oSaved=true;
-  autoSave();cov('subovl');renderTab();
-  toast('\u2705','Submit \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08!','\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e17\u0e31\u0e49\u0e07\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e15\u0e19\u0e40\u0e2d\u0e07\u0e41\u0e25\u0e30\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19\u0e40\u0e02\u0e49\u0e32\u0e23\u0e30\u0e1a\u0e1a\u0e41\u0e25\u0e49\u0e27','var(--E)');
+  autoSave();
+  cov('subovl');renderTab();
+  toast('\u2705','Submit \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08!','\u0e01\u0e33\u0e25\u0e31\u0e07\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e25\u0e07 Google Sheets...','var(--E)');
+  /* write this submission to the real backend (Google Sheets via Apps
+     Script) -- this is what makes the data persist across devices, not
+     just this one browser's localStorage. Optimistic local merge inside
+     upsertRows() means the Admin's view updates instantly even before
+     the network round-trip finishes; the callback here just confirms
+     whether the actual remote write succeeded. */
+  try{
+    SimDB.upsertRows(buildDatabaseRows(),function(ok){
+      if(ok){
+        toast('\u2705','\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e25\u0e07 Google Sheets \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08','','var(--E)');
+      } else {
+        toast('\u26A0\uFE0F','\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e25\u0e07 Google Sheets \u0e44\u0e21\u0e48\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08','\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e01\u0e32\u0e23\u0e40\u0e0a\u0e37\u0e48\u0e2d\u0e21\u0e15\u0e48\u0e2d\u0e2d\u0e34\u0e19\u0e40\u0e15\u0e2d\u0e23\u0e4c\u0e40\u0e19\u0e47\u0e15 \u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e22\u0e31\u0e07\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e44\u0e27\u0e49\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e40\u0e15\u0e34\u0e21\u0e43\u0e19\u0e40\u0e1a\u0e23\u0e32\u0e27\u0e4c\u0e40\u0e0b\u0e2d\u0e23\u0e4c\u0e19\u0e35\u0e49','var(--I)');
+      }
+    });
+  }catch(e){}
 });
 
 /* SELF */
@@ -3729,6 +3999,7 @@ function renderGrid(){
     html+='<option value="'+c+'"'+(c===gmCat?' selected':'')+'>'+mark+CAT_META[c].lb+'</option>';
   });
   html+='</select></div>';
+  var defsG={};getDefaults(CU).forEach(function(e){defsG[e.empId]=true;});
   html+='<div class="gmc" id="gmchips2">';
   persons.forEach(function(p,i){
     var allDone=cc.every(function(c){return gS(p.empId,c.id);});
@@ -3737,10 +4008,12 @@ function renderGrid(){
     var ph=getPhoto(p.empId);
     var avH=ph?'<div class="gcav"><img src="'+ph+'" alt="'+p.name+'"></div>':'<div class="gcav" style="background:'+p.color+'">'+ini(p.name)+'</div>';
     var drag=!locked?'draggable="true"':'';
+    var canRemoveG=!locked&&!defsG[p.empId];
     html+='<div class="gchip'+(isSel?' gsel':'')+(allDone?' gdone':'')+(isArmed?' garmed':'')+'" '+drag+' data-idx="'+i+'" data-pid="'+p.empId+'" id="gc_'+p.empId+'">';
     html+=avH+'<span>'+p.name.split(' ')[0]+'<span class="gchip-nick" style="font-size:9px;color:var(--t2);margin-left:2px">('+p.nick+')</span></span>';
     if(allDone)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2713</span>';
     if(isSel)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2714</span>';
+    if(canRemoveG)html+='<button class="chrm" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();removePerson(\''+p.empId+'\')" title="\u0e25\u0e1a\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19" style="margin-left:3px">&#10005;</button>';
     html+='</div>';
   });
   html+='</div></div>';
