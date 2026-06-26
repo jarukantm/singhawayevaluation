@@ -664,9 +664,19 @@ button,input,select{font-family:var(--fb)}
 .db-reco-def{font-size:11px;color:var(--t2);margin-top:3px;line-height:1.5}
 .db-allgood{font-size:12px;color:var(--E);font-weight:700;padding:10px;text-align:center;background:rgba(29,158,117,.08);border-radius:var(--r)}
 /* ── Grouped bar chart (new) ── */
-.db-gbar-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:10px;color:var(--t2)}
+.db-gbar-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:2px;font-size:10px;color:var(--t2);row-gap:6px}
 .db-gbar-legend-sw{display:inline-flex;align-items:center;gap:5px}
 .db-gbar-legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+/* ── Animations (spec item 9): bar grow, number count-in, bubble slide ──
+   300-500ms, eased -- fires whenever a bar/number/bubble's height, content,
+   or position changes (i.e. every time renderDash() runs after a dropdown
+   change), since the browser animates the CSS transition between the old
+   and new computed values automatically. */
+.db-anim-bar{transition:height .4s cubic-bezier(.22,.61,.36,1),background-color .3s}
+.db-bar-label{font-size:inherit;animation:dbNumberIn .35s ease}
+.db-anim-number{animation:dbNumberIn .4s ease}
+.db-anim-bubble{transition:top .45s cubic-bezier(.22,.61,.36,1),left .45s cubic-bezier(.22,.61,.36,1),background-color .3s}
+@keyframes dbNumberIn{from{opacity:0;transform:translateY(3px) scale(.92)}to{opacity:1;transform:translateY(0) scale(1)}}
 .db-sh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .db-sh-ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .db-sh-ttl{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t0);flex:1}
@@ -1666,7 +1676,15 @@ function _mockScoreForRound(empId,roundKey){
     var s=_seedFor(empId+'_'+roundKey+'_foc_'+f);
     byFocus[f]=Math.max(1,Math.min(5,1.5+((s%351)/100)));
   });
-  return{overall:overall,byCat:byCat,byFocus:byFocus};
+  /* per-criterion (16 rows) -- needed for the Singhaway table's
+     row-by-row comparison columns, since byCat/byFocus alone only cover
+     the category/summary rows, not each individual criterion line. */
+  var byCriterion={};
+  CRITERIA.forEach(function(c){
+    var s=_seedFor(empId+'_'+roundKey+'_crit_'+c.id);
+    byCriterion[c.id]=Math.max(1,Math.min(5,1.5+((s%351)/100)));
+  });
+  return{overall:overall,byCat:byCat,byFocus:byFocus,byCriterion:byCriterion};
 }
 function ensureMockRound1(){
   if(MOCK_ROUNDS.length||ROUNDS.length)return;
@@ -1710,6 +1728,18 @@ function allSelectableRounds(){
   MOCK_ROUNDS.slice().reverse().forEach(function(r){list.push({id:r.id,year:r.year,roundNo:r.roundNo,label:r.label,isMock:true});});
   return list;
 }
+/* Returns {older, newer} round-info objects (from allSelectableRounds)
+   for whichever two round ids are passed in, sorted chronologically by
+   year+roundNo regardless of which dropdown (A/B) the person actually
+   put each round into -- per spec "เรียงเก่า←ซ้าย ใหม่←ขวา ไม่ให้สลับตำแหน่ง". */
+function chronologicalOrder(roundIdX,roundIdY){
+  var all=allSelectableRounds();
+  var rx=all.filter(function(r){return r.id===roundIdX;})[0];
+  var ry=all.filter(function(r){return r.id===roundIdY;})[0];
+  if(!rx||!ry)return{older:rx||ry,newer:ry||rx};
+  var keyX=rx.year*100+rx.roundNo,keyY=ry.year*100+ry.roundNo;
+  return keyX<=keyY?{older:rx,newer:ry}:{older:ry,newer:rx};
+}
 /* Resolve a round id (from allSelectableRounds) into {overall,byCat,byFocus}
    lookups for a given employee -- handles all 3 sources (live current
    round via getDefaults-style avgScore2, real closed ROUNDS, or
@@ -1726,8 +1756,9 @@ function getRoundScoreFor(roundId,empId){
     if(CU&&empId===CU.empId){
       var byCat={};CATS.forEach(function(cat){byCat[cat]=avgScore2([empId],CRITERIA.filter(function(c){return c.cat===cat;}),'overall');});
       var byFocus={};Object.keys(FDEF).forEach(function(f){byFocus[f]=avgScore2([empId],CRITERIA.filter(function(c){return c.foc===f;}),'overall');});
+      var byCriterion={};CRITERIA.forEach(function(c){byCriterion[c.id]=avgScore2([empId],[c],'overall');});
       var overall=avgScore2([empId],CRITERIA,'overall');
-      if(overall)return{overall:overall,byCat:byCat,byFocus:byFocus};
+      if(overall)return{overall:overall,byCat:byCat,byFocus:byFocus,byCriterion:byCriterion};
     }
     return _mockScoreForRound(empId,'current_'+currentRound.id);
   }
@@ -1771,8 +1802,8 @@ function recommendationItems(items){
     .sort(function(a,b){return a.value-b.value;});
 }
 var dbRoundView='current'; /* 'current' or a closed round's id -- which round the Dashboard is viewing */
-var dbCompareA=''; /* left dropdown -- primary round for the new comparison feature; '' = default to most recent on first render */
-var dbCompareB=''; /* right dropdown -- round to compare against; '' = default to the round before dbCompareA */
+var dbCompareA=''; /* left dropdown -- "รอบล่าสุด" side, defaults to the most recent round; freely selectable */
+var dbCompareB=''; /* right dropdown -- "รอบเปรียบเทียบ" side; '' = ไม่เปรียบเทียบ (no comparison, the default) */
 function isAdmin(){return !!(CU&&CU.isAdmin);}
 
 /* UTILS */
@@ -4726,25 +4757,44 @@ function renderDash(){
   html+='</div>';
   html+='</div>';
 
-  /* --- 1c. ROUND COMPARISON DROPDOWNS (new) ---
-     2 dropdowns let the person pick any round + a round to compare it
-     against, sourced from allSelectableRounds() (live current round,
-     real closed ROUNDS, and -- only if no real rounds exist yet -- the
-     MOCK_ROUNDS history generated purely for testing this feature).
-     Changing either dropdown just re-renders the Dashboard, so every
-     widget below updates reactively without a page reload. */
+  /* --- 1c. ROUND COMPARISON DROPDOWNS ---
+     A ("รอบล่าสุด") defaults to the most recent selectable round; B
+     ("รอบเปรียบเทียบ") defaults to '' (ไม่เปรียบเทียบ) so the Dashboard
+     shows ONLY the latest round on first load, per spec section 1. Both
+     are freely selectable -- choosing anything in B switches the whole
+     page into comparison mode automatically; clearing it back to "ไม่
+     เปรียบเทียบ" returns to single-round mode. dbCompareMode (computed
+     below) is the single source of truth every widget checks. */
   var selectableRounds=allSelectableRounds();
   if(!dbCompareA||!selectableRounds.some(function(r){return r.id===dbCompareA;}))dbCompareA=selectableRounds[0].id;
-  if(!dbCompareB||!selectableRounds.some(function(r){return r.id===dbCompareB;}))dbCompareB=selectableRounds[1]?selectableRounds[1].id:selectableRounds[0].id;
+  if(dbCompareB&&!selectableRounds.some(function(r){return r.id===dbCompareB;}))dbCompareB='';
+  /* same-round guard: if both dropdowns end up pointing at the identical
+     round, comparison mode would just draw two identical bars on top of
+     each other -- treat this exactly like "ไม่เปรียบเทียบ" and fall back
+     to the single-bar view automatically, per explicit request. */
+  var dbCompareMode=!!dbCompareB&&dbCompareB!==dbCompareA;
+  /* single source of truth for "which round is older/newer" -- every
+     widget below (charts, table, summary cards) reads cmpOlder/cmpNewer
+     instead of re-deriving this itself, so they can never disagree. */
+  var cmpOlder=null,cmpNewer=null;
+  if(dbCompareMode){
+    var ord=chronologicalOrder(dbCompareA,dbCompareB);
+    cmpOlder=ord.older;cmpNewer=ord.newer;
+  } else {
+    cmpNewer=selectableRounds.filter(function(r){return r.id===dbCompareA;})[0]||selectableRounds[0];
+  }
   html+='<div class="card" data-pdf-sec="controls" style="padding:14px 16px">';
-  html+='<div style="font-size:11px;color:var(--t2);margin-bottom:8px">&#128202; เปรียบเทียบรอบการประเมิน</div>';
+  html+='<div style="font-size:11px;color:var(--t2);margin-bottom:8px">&#128202; รอบที่คุณต้องการ</div>';
   html+='<div class="db-compare-row">';
+  html+='<div style="flex:1;min-width:160px">';
   html+='<select class="db-compare-sel" id="dbCompareASel" onchange="dbCompareA=this.value;renderDash()">';
   selectableRounds.forEach(function(r){html+='<option value="'+r.id+'"'+(dbCompareA===r.id?' selected':'')+'>ปี '+r.year+' '+r.label+(r.isCurrent?' (ปัจจุบัน)':'')+'</option>';});
-  html+='</select>';
+  html+='</select></div>';
+  html+='<div style="flex:1;min-width:160px">';
   html+='<select class="db-compare-sel" id="dbCompareBSel" onchange="dbCompareB=this.value;renderDash()">';
+  html+='<option value=""'+(dbCompareB===''?' selected':'')+'>\u2014 ไม่เปรียบเทียบ \u2014</option>';
   selectableRounds.forEach(function(r){html+='<option value="'+r.id+'"'+(dbCompareB===r.id?' selected':'')+'>ปี '+r.year+' '+r.label+(r.isCurrent?' (ปัจจุบัน)':'')+'</option>';});
-  html+='</select>';
+  html+='</select></div>';
   html+='</div>';
   html+='</div>';
 
@@ -4759,64 +4809,99 @@ function renderDash(){
   /* empty state check */
   var noData=!hasData(dbFilter);
 
-  /* --- 1d. SINGHAWAY SUMMARY CARD (new) ---
-     Left (40%): rank among all employees by Singhaway Overall score in
-     the round picked via dbCompareA, plus a recommendation list of
-     categories not yet at level E (ascending by score).
-     Right (60%): grouped bar chart comparing the 4 Singhaway categories
-     across dbCompareA vs dbCompareB. */
+  /* --- 1d. SINGHAWAY SUMMARY CARD ---
+     Left (40%): rank among all employees by Singhaway Overall score
+     (always computed against the latest/newer round), plus a
+     recommendation list of categories not yet at level E. When every
+     category is already E, show ONLY the celebration message (per spec
+     item 2 -- no "เพิ่มการแสดงพฤติกรรมเหล่านี้..." line in that case).
+     Right (60%): bar chart for the categories -- single bar per category
+     by default (latest round only); becomes a grouped bar (older+newer)
+     once dbCompareMode is on. Bars scale against the SAME height the
+     y-axis is drawn against (this is the bug the spec reported: bars
+     used to scale against 140px while the axis was drawn against the
+     160px container, so 4.80 and 4.50 looked almost the same height). */
   if(CU&&CU.empId&&!noData){
-    var cmpRoundA=selectableRounds.filter(function(r){return r.id===dbCompareA;})[0]||selectableRounds[0];
-    var cmpRoundB=selectableRounds.filter(function(r){return r.id===dbCompareB;})[0]||selectableRounds[0];
-    var allScoresA_sw=ALL_EMP.map(function(e){
-      var sc=getRoundScoreFor(dbCompareA,e.empId);
+    var allScoresNewer_sw=ALL_EMP.map(function(e){
+      var sc=getRoundScoreFor(cmpNewer.id,e.empId);
       var catVals=CATS.map(function(c){return sc.byCat[c];});
       var overall=catVals.reduce(function(a,b){return a+b;},0)/catVals.length;
       return{empId:e.empId,value:overall};
     });
-    var swRank=competitionRank(allScoresA_sw,CU.empId);
-    var myScoreA_sw=getRoundScoreFor(dbCompareA,CU.empId);
-    var myScoreB_sw=getRoundScoreFor(dbCompareB,CU.empId);
-    var swReco=recommendationItems(CATS.map(function(c){return{key:c,value:myScoreA_sw.byCat[c],label:CAT_META[c].lb};}));
+    var swRank=competitionRank(allScoresNewer_sw,CU.empId);
+    var myScoreNewer_sw=getRoundScoreFor(cmpNewer.id,CU.empId);
+    var myScoreOlder_sw=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId):null;
+    var swReco=recommendationItems(CATS.map(function(c){return{key:c,value:myScoreNewer_sw.byCat[c],label:CAT_META[c].lb};}));
+    var swAllE=swReco.length===0;
 
     html+='<div class="db-summary-row" style="margin-bottom:14px">';
     /* left card */
     html+='<div class="db-summary-left"><div class="card" style="height:100%;padding:16px">';
     html+='<div class="db-sh-ttl" style="margin-bottom:10px">คะแนน Singhaway</div>';
-    html+='<div class="db-rank-of">คุณอยู่ในลำดับที่</div>';
-    html+='<div class="db-rank-num">'+(swRank.rank||'\u2013')+' <span style="font-size:14px;font-weight:600;color:var(--t2)">จาก '+swRank.total+' คน</span></div>';
-    html+='<div style="font-size:11px;color:var(--t1);margin-top:10px">เพิ่มการแสดงพฤติกรรมเหล่านี้ให้บ่อยขึ้น</div>';
-    if(swReco.length){
+    if(swAllE){
+      html+='<div class="db-allgood">&#127881; ยอดเยี่ยม! คุณได้รับคะแนนระดับ E ทุกหัวข้อแล้ว</div>';
+    } else {
+      html+='<div class="db-rank-of">คุณอยู่ในลำดับที่</div>';
+      html+='<div class="db-rank-num db-anim-number">'+(swRank.rank||'\u2013')+' <span style="font-size:14px;font-weight:600;color:var(--t2)">จาก '+swRank.total+' คน</span></div>';
+      html+='<div style="font-size:11px;color:var(--t1);margin-top:10px">เพิ่มการแสดงพฤติกรรมเหล่านี้ให้บ่อยขึ้น</div>';
       html+='<div class="db-reco-list">';
       swReco.forEach(function(it){html+='<div class="db-reco-item">\u2022 '+it.label+'</div>';});
       html+='</div>';
-    } else {
-      html+='<div class="db-allgood" style="margin-top:8px">&#127881; ยอดเยี่ยม! คุณได้รับคะแนนระดับ E ทุกหัวข้อแล้ว</div>';
     }
     html+='</div></div>';
-    /* right card: grouped bar chart */
+    /* right card: bar chart -- single bar by default, grouped once comparing */
     html+='<div class="db-summary-right"><div class="card" style="height:100%;padding:16px">';
     html+='<div class="db-sh-ttl" style="margin-bottom:6px">กราฟคะแนน Singhaway</div>';
-    html+='<div class="db-gbar-legend">';
-    html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpRoundA.label+'</span>';
-    html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--b1)"></span>'+cmpRoundB.label+'</span>';
-    html+='</div>';
-    html+='<div style="display:flex;align-items:flex-end;gap:18px;height:160px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 8px 0 26px;position:relative">';
+    if(dbCompareMode){
+      html+='<div class="db-gbar-legend">';
+      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--b1)"></span>'+cmpOlder.label+'</span>';
+      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpNewer.label+'</span>';
+      html+='</div>';
+    } else {
+      html+='<div class="db-gbar-legend"><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpNewer.label+'</span></div>';
+    }
+    var swChartH=170; /* bars scale against this EXACT height -- must match the y-axis below, or bars land on the wrong gridline (this was the reported bug) */
+    html+='<div style="display:flex;align-items:flex-end;gap:14px;height:'+swChartH+'px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 6px 0 24px;position:relative">';
     [5,4,3,2,1,0].forEach(function(v){
       var top=(1-v/5)*100;
-      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:9px;font-weight:700;color:var(--t2);width:20px;text-align:right">'+v+'</div>';
+      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:8px;font-weight:700;color:var(--t2);width:18px;text-align:right">'+v+'</div>';
+      html+='<div style="position:absolute;left:24px;right:6px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
     });
     CATS.forEach(function(cat){
       var m=CAT_META[cat];
-      var valA=myScoreA_sw.byCat[cat],valB=myScoreB_sw.byCat[cat];
-      var barHA=Math.max(1,Math.round(valA/5*140)),barHB=Math.max(1,Math.round(valB/5*140));
-      var lblA=s2l(valA),lblB=s2l(valB);
-      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0">';
-      html+='<div style="display:flex;align-items:flex-end;gap:3px;height:140px;width:100%;justify-content:center">';
-      html+='<div title="'+cmpRoundA.label+': '+valA.toFixed(2)+' ('+lblA.l+')" style="flex:1;max-width:26px;height:'+barHA+'px;background:var(--pb);border-radius:4px 4px 0 0"></div>';
-      html+='<div title="'+cmpRoundB.label+': '+valB.toFixed(2)+' ('+lblB.l+')" style="flex:1;max-width:26px;height:'+barHB+'px;background:var(--b1);border-radius:4px 4px 0 0"></div>';
+      var valNewer=myScoreNewer_sw.byCat[cat];
+      var barHNewer=Math.max(1,Math.round(valNewer/5*swChartH));
+      var lblNewer=s2l(valNewer);
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0">';
+      html+='<div style="display:flex;align-items:flex-end;gap:3px;height:'+swChartH+'px;width:100%;justify-content:center">';
+      if(dbCompareMode){
+        var valOlder=myScoreOlder_sw.byCat[cat];
+        var barHOlder=Math.max(1,Math.round(valOlder/5*swChartH));
+        var lblOlder=s2l(valOlder);
+        var diffPct_sw=valOlder?Math.round((valNewer-valOlder)/valOlder*100):0;
+        var oldFits=barHOlder>=22,newFits=barHNewer>=22;
+        html+='<div style="flex:1;max-width:24px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpOlder.label+': '+valOlder.toFixed(2)+' ('+lblOlder.l+')">';
+        if(!oldFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHOlder+2)+'px;font-size:9px;font-weight:700;color:var(--t1)">'+valOlder.toFixed(2)+'</span>';
+        html+='<div class="db-anim-bar" style="width:100%;height:'+barHOlder+'px;background:var(--b1);border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
+          +(oldFits?'<span class="db-bar-label" style="font-size:9px;color:var(--t1)">'+valOlder.toFixed(2)+'</span>':'')+'</div></div>';
+        html+='<div style="flex:1;max-width:24px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
+        if(!newFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:9px;font-weight:700;color:'+m.cl+'">'+valNewer.toFixed(2)+'</span>';
+        html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:var(--pb);border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
+          +(newFits?'<span class="db-bar-label" style="font-size:9px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
+      } else {
+        var fits=barHNewer>=22;
+        html+='<div style="flex:1;max-width:36px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
+        if(!fits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:10px;font-weight:700;color:'+m.cl+'">'+valNewer.toFixed(2)+'</span>';
+        html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:'+m.cl+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
+          +(fits?'<span class="db-bar-label" style="font-size:10px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
+      }
       html+='</div>';
-      html+='<div style="font-size:9px;font-weight:700;color:'+m.cl+';text-align:center">'+m.lb+'</div>';
+      html+='<div style="font-size:8px;font-weight:700;color:'+m.cl+';text-align:center;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis">'+m.lb+'</div>';
+      if(dbCompareMode){
+        var vc=diffPct_sw>0?'var(--E)':diffPct_sw<0?'var(--I)':'var(--t2)';
+        var va=diffPct_sw>0?'&#9650;':diffPct_sw<0?'&#9660;':'&#9644;';
+        html+='<div style="font-size:8px;font-weight:700;color:'+vc+'">'+va+' '+(diffPct_sw>0?'+':'')+diffPct_sw+'%</div>';
+      }
       html+='</div>';
     });
     html+='</div>';
@@ -4833,83 +4918,121 @@ function renderDash(){
   if(noData){
     html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน<br><span style="font-size:11px">กรอกคะแนนในหน้าประเมินก่อน แล้วกลับมาดูที่นี่</span></div>';
   } else {
+    /* table now reads from the SAME comparison data source as every
+       other widget (getRoundScoreFor against cmpNewer/cmpOlder), instead
+       of the old dbFilter/avgScore2 path -- per spec item 7/8, this is
+       what lets the table grow a 2nd round column + Variance column the
+       instant dbCompareMode turns on, sourced from data nothing else
+       independently recomputes. */
+    var tableNewer=getRoundScoreFor(cmpNewer.id,CU.empId);
+    var tableOlder=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId):null;
+    function varianceCellHtml(oldVal,newVal){
+      var diff=newVal-oldVal;
+      var pct=oldVal?Math.round(diff/oldVal*100):0;
+      var col=diff>0?'var(--E)':diff<0?'var(--I)':'var(--t2)';
+      var arrow=diff>0?'&#9650;':diff<0?'&#9660;':'&#9644;';
+      var sign=diff>0?'+':'';
+      return '<span style="color:'+col+';font-weight:700;font-size:11px">'+arrow+' '+sign+diff.toFixed(2)+' ('+sign+pct+'%)</span>';
+    }
     /* ── Desktop: full table (hidden on mobile via CSS) ── */
     html+='<div class="sw-table-wrap"><div style="overflow-x:auto;padding:4px"><table class="sw-table">';
     html+='<thead><tr>';
     html+='<th class="lft" style="min-width:200px">หัวข้อ / เกณฑ์</th>';
     html+='<th>FOCUS</th>';
-    html+='<th style="min-width:70px">คะแนน</th>';
+    if(dbCompareMode){
+      html+='<th style="min-width:70px">'+cmpOlder.label+'</th>';
+      html+='<th style="min-width:70px">'+cmpNewer.label+'</th>';
+      html+='<th style="min-width:90px">Variance</th>';
+    } else {
+      html+='<th style="min-width:70px">คะแนนล่าสุด</th>';
+    }
     html+='<th style="min-width:80px">ระดับ</th>';
-    html+='<th style="min-width:60px">จำนวนข้อมูล</th>';
     html+='</tr></thead><tbody>';
     CATS.forEach(function(cat){
       var m=CAT_META[cat];
-      var cc=CRITERIA.filter(function(c){return c.cat===cat;});
-      var ids=dbFilter==='self'?selfId:allIds;
-      var catAvg=avgScore2(ids,cc,dbFilter);
-      var catL=s2l(catAvg);
-      var cnt=dataCount(ids,cc,dbFilter);
+      var catAvgNewer=tableNewer.byCat[cat];
+      var catL=s2l(catAvgNewer);
       html+='<tr class="cat-hdr"><td class="lft" colspan="2" style="background:'+m.bg+';color:'+m.cl+';font-size:11px;font-weight:700"><span style="margin-right:6px">&#9654;</span>'+m.lb+'</td>';
-      html+='<td style="background:'+m.bg+'">'+( catAvg?'<b style="color:'+catL.c+';font-family:var(--fh)">'+scaleScore(catAvg).toFixed(2)+'</b>':'\u2013')+'</td>';
-      html+='<td style="background:'+m.bg+'">'+( catAvg?'<span class="rb-inl" style="background:'+RCOL[catL.l]+'">'+catL.l+'</span>':'\u2013')+'</td>';
-      html+='<td style="background:'+m.bg+';font-size:10px;color:var(--t2)">'+cnt+' ข้อมูล</td></tr>';
+      if(dbCompareMode){
+        var catAvgOlder=tableOlder.byCat[cat];
+        html+='<td style="background:'+m.bg+'"><b style="color:'+s2l(catAvgOlder).c+';font-family:var(--fh)">'+scaleScore(catAvgOlder).toFixed(2)+'</b></td>';
+        html+='<td style="background:'+m.bg+'"><b style="color:'+catL.c+';font-family:var(--fh)">'+scaleScore(catAvgNewer).toFixed(2)+'</b></td>';
+        html+='<td style="background:'+m.bg+'">'+varianceCellHtml(catAvgOlder,catAvgNewer)+'</td>';
+      } else {
+        html+='<td style="background:'+m.bg+'">'+( catAvgNewer?'<b style="color:'+catL.c+';font-family:var(--fh)">'+scaleScore(catAvgNewer).toFixed(2)+'</b>':'\u2013')+'</td>';
+      }
+      html+='<td style="background:'+m.bg+'">'+( catAvgNewer?'<span class="rb-inl" style="background:'+RCOL[catL.l]+'">'+catL.l+'</span>':'\u2013')+'</td></tr>';
+      var cc=CRITERIA.filter(function(c){return c.cat===cat;});
       cc.forEach(function(c){
         var fd=FDEF[c.foc];
-        var avg=avgScore2(ids,[c],dbFilter);
-        var lbl=s2l(avg);
-        var cnt2=dataCount(ids,[c],dbFilter);
+        var avgNewer=tableNewer.byCriterion[c.id];
+        var lbl=s2l(avgNewer);
         html+='<tr class="crit-row">';
         html+='<td class="lft" style="padding-left:20px;font-size:11px;color:var(--t0)">'+c.lb+'</td>';
         html+='<td><span style="padding:1px 6px;border-radius:4px;background:'+(fd?fd.bg:'transparent')+';color:'+(fd?fd.cl:'var(--t2)')+';font-size:10px;font-weight:700">'+c.foc+'</span></td>';
-        html+='<td>'+( avg?'<b style="color:'+lbl.c+';font-family:var(--fh)">'+scaleScore(avg).toFixed(2)+'</b>':'\u2013')+'</td>';
-        html+='<td>'+( avg?'<span class="rb-inl" style="background:'+RCOL[lbl.l]+'">'+lbl.l+'</span>':'\u2013')+'</td>';
-        html+='<td style="font-size:10px;color:var(--t2)">'+cnt2+'/'+ids.length+' คน</td>';
+        if(dbCompareMode){
+          var avgOlder=tableOlder.byCriterion[c.id];
+          html+='<td>'+( avgOlder?'<b style="color:'+s2l(avgOlder).c+';font-family:var(--fh)">'+scaleScore(avgOlder).toFixed(2)+'</b>':'\u2013')+'</td>';
+          html+='<td>'+( avgNewer?'<b style="color:'+lbl.c+';font-family:var(--fh)">'+scaleScore(avgNewer).toFixed(2)+'</b>':'\u2013')+'</td>';
+          html+='<td>'+(avgOlder&&avgNewer?varianceCellHtml(avgOlder,avgNewer):'\u2013')+'</td>';
+        } else {
+          html+='<td>'+( avgNewer?'<b style="color:'+lbl.c+';font-family:var(--fh)">'+scaleScore(avgNewer).toFixed(2)+'</b>':'\u2013')+'</td>';
+        }
+        html+='<td>'+( avgNewer?'<span class="rb-inl" style="background:'+RCOL[lbl.l]+'">'+lbl.l+'</span>':'\u2013')+'</td>';
         html+='</tr>';
       });
     });
     /* Summary */
-    var ids2=dbFilter==='self'?selfId:allIds;
-    var totAvg=avgScore2(ids2,CRITERIA,dbFilter);var totL=s2l(totAvg);
-    var totCnt=dataCount(ids2,CRITERIA,dbFilter);
+    var totAvgNewer=tableNewer.overall;var totL=s2l(totAvgNewer);
     html+='<tr class="sum-row"><td class="lft" colspan="2">Summary</td>';
-    html+='<td>'+( totAvg?'<span style="color:#FFD080;font-weight:700">'+scaleScore(totAvg).toFixed(2)+'</span>':'\u2013')+'</td>';
-    html+='<td>'+( totAvg?'<span class="rb-inl" style="background:'+RCOL[totL.l]+'">'+totL.l+'</span>':'\u2013')+'</td>';
-    html+='<td style="font-size:10px;color:#aaa">'+totCnt+' ข้อมูล</td>';
+    if(dbCompareMode){
+      var totAvgOlder=tableOlder.overall;
+      html+='<td><span style="color:#FFD080;font-weight:700">'+scaleScore(totAvgOlder).toFixed(2)+'</span></td>';
+      html+='<td><span style="color:#FFD080;font-weight:700">'+scaleScore(totAvgNewer).toFixed(2)+'</span></td>';
+      html+='<td>'+varianceCellHtml(totAvgOlder,totAvgNewer)+'</td>';
+    } else {
+      html+='<td>'+( totAvgNewer?'<span style="color:#FFD080;font-weight:700">'+scaleScore(totAvgNewer).toFixed(2)+'</span>':'\u2013')+'</td>';
+    }
+    html+='<td>'+( totAvgNewer?'<span class="rb-inl" style="background:'+RCOL[totL.l]+'">'+totL.l+'</span>':'\u2013')+'</td>';
     html+='</tr>';
     html+='</tbody></table></div></div>'; /* close table, overflow-x div, sw-table-wrap */
 
     /* ── Mobile: card-list view (hidden on desktop via CSS) ──
        Each criterion becomes a self-contained card so nothing needs
-       horizontal scrolling -- every field (FOCUS, score, level, count)
-       is fully visible and readable at once. */
+       horizontal scrolling -- every field is fully visible at once.
+       Uses the SAME tableNewer/tableOlder data computed above, so mobile
+       and desktop can never disagree (per spec item 8). */
     html+='<div class="sw-card-list">';
-    var idsM=dbFilter==='self'?selfId:allIds;
     CATS.forEach(function(cat){
       var m=CAT_META[cat];
       var cc=CRITERIA.filter(function(c){return c.cat===cat;});
-      var catAvg=avgScore2(idsM,cc,dbFilter);
-      var catL=s2l(catAvg);
-      var cnt=dataCount(idsM,cc,dbFilter);
+      var catAvgNewer=tableNewer.byCat[cat];
+      var catL=s2l(catAvgNewer);
       html+='<div class="sw-card-cathdr" style="background:'+m.bg+';color:'+m.cl+'">';
       html+='<span>&#9654; '+m.lb+'</span>';
       html+='<span class="sw-card-cat-score">'
-        +(catAvg?'<b style="color:'+catL.c+'">'+scaleScore(catAvg).toFixed(2)+'</b> <span class="rb-inl" style="background:'+RCOL[catL.l]+'">'+catL.l+'</span>':'\u2013')
+        +(catAvgNewer?'<b style="color:'+catL.c+'">'+scaleScore(catAvgNewer).toFixed(2)+'</b> <span class="rb-inl" style="background:'+RCOL[catL.l]+'">'+catL.l+'</span>':'\u2013')
         +'</span>';
       html+='</div>';
+      if(dbCompareMode){
+        html+='<div style="padding:4px 14px;font-size:10px;color:var(--t2)">'+cmpOlder.label+' \u2192 '+cmpNewer.label+': '+varianceCellHtml(tableOlder.byCat[cat],catAvgNewer)+'</div>';
+      }
       cc.forEach(function(c){
         var fd=FDEF[c.foc];
-        var avg=avgScore2(idsM,[c],dbFilter);
-        var lbl=s2l(avg);
-        var cnt2=dataCount(idsM,[c],dbFilter);
+        var avgNewer=tableNewer.byCriterion[c.id];
+        var lbl=s2l(avgNewer);
         html+='<div class="sw-card">';
         html+='<div class="sw-card-top">';
         html+='<span class="sw-card-foc" style="background:'+(fd?fd.bg:'transparent')+';color:'+(fd?fd.cl:'var(--t2)')+'">'+c.foc+'</span>';
         html+='<span class="sw-card-lbl">'+c.lb+'</span>';
         html+='</div>';
         html+='<div class="sw-card-bottom">';
-        html+='<span class="sw-card-score">'+( avg?'<b style="color:'+lbl.c+'">'+scaleScore(avg).toFixed(2)+'</b>':'\u2013')+'</span>';
-        html+='<span class="rb-inl" style="background:'+(avg?RCOL[lbl.l]:'var(--t2)')+'">'+(avg?lbl.l:'\u2013')+'</span>';
-        html+='<span class="sw-card-cnt">'+cnt2+'/'+idsM.length+' คน</span>';
+        html+='<span class="sw-card-score">'+( avgNewer?'<b style="color:'+lbl.c+'">'+scaleScore(avgNewer).toFixed(2)+'</b>':'\u2013')+'</span>';
+        html+='<span class="rb-inl" style="background:'+(avgNewer?RCOL[lbl.l]:'var(--t2)')+'">'+(avgNewer?lbl.l:'\u2013')+'</span>';
+        if(dbCompareMode){
+          var avgOlder=tableOlder.byCriterion[c.id];
+          html+='<span class="sw-card-cnt">'+varianceCellHtml(avgOlder,avgNewer)+'</span>';
+        }
         html+='</div>';
         html+='</div>';
       });
@@ -4918,8 +5041,8 @@ function renderDash(){
     html+='<div class="sw-card sw-card-sum">';
     html+='<div class="sw-card-bottom">';
     html+='<span class="sw-card-lbl" style="color:#fff;font-weight:700">Summary</span>';
-    html+='<span class="sw-card-score">'+( totAvg?'<b style="color:#FFD080">'+scaleScore(totAvg).toFixed(2)+'</b>':'\u2013')+'</span>';
-    html+='<span class="rb-inl" style="background:'+(totAvg?RCOL[totL.l]:'var(--t2)')+'">'+(totAvg?totL.l:'\u2013')+'</span>';
+    html+='<span class="sw-card-score">'+( totAvgNewer?'<b style="color:#FFD080">'+scaleScore(totAvgNewer).toFixed(2)+'</b>':'\u2013')+'</span>';
+    html+='<span class="rb-inl" style="background:'+(totAvgNewer?RCOL[totL.l]:'var(--t2)')+'">'+(totAvgNewer?totL.l:'\u2013')+'</span>';
     html+='</div></div>';
     html+='</div>'; /* close sw-card-list */
   }
@@ -4946,7 +5069,7 @@ function renderDash(){
     html+='<div class="card" style="margin-bottom:14px;padding:16px">';
     html+='<div class="db-sh-ttl" style="margin-bottom:10px">คะแนน FOCUS</div>';
     html+='<div class="db-rank-of">คุณอยู่ในลำดับที่</div>';
-    html+='<div class="db-rank-num">'+(focRank.rank||'\u2013')+' <span style="font-size:14px;font-weight:600;color:var(--t2)">จาก '+focRank.total+' คน</span></div>';
+    html+='<div class="db-rank-num db-anim-number">'+(focRank.rank||'\u2013')+' <span style="font-size:14px;font-weight:600;color:var(--t2)">จาก '+focRank.total+' คน</span></div>';
     html+='<div style="font-size:11px;color:var(--t1);margin-top:10px">เพิ่มการแสดงพฤติกรรมเหล่านี้เพื่อพัฒนาคะแนน</div>';
     if(focReco.length){
       html+='<div class="db-reco-list">';
@@ -4968,23 +5091,26 @@ function renderDash(){
   if(noData){
     html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน</div>';
   } else {
-    var ids3=dbFilter==='self'?selfId:allIds;
     var chartAreaH=260; /* total px height of the scaled 0-5 axis area -- bars below scale against this EXACT value, not a separate smaller constant, or the bar will visually land on the wrong gridline */
-    /* overall average across all 5 FOCUS letters -- used as the dashed
-       reference line and the basis for each bar's vs-average % badge,
-       since there is no prior-period data to compare against. */
-    var focScores={};
-    fkeys.forEach(function(f){focScores[f]=avgScore2(ids3,CRITERIA.filter(function(c){return c.foc===f;}),dbFilter);});
+    /* FOCUS scores now come from the SAME round-comparison data source as
+       every other widget (getRoundScoreFor against cmpNewer/cmpOlder),
+       not the old dbFilter/avgScore2/mockRound1 path -- this is what
+       keeps this chart in sync with the dropdowns, the summary card, and
+       the table (spec item 8: one shared data source everywhere). */
+    var myScoreNewer_foc=getRoundScoreFor(cmpNewer.id,CU.empId);
+    var focScores={};fkeys.forEach(function(f){focScores[f]=myScoreNewer_foc.byFocus[f];});
+    var myScoreOlder_foc=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId):null;
     var focValsHas=fkeys.map(function(f){return focScores[f];}).filter(function(a){return a>0;});
     var focAvgAll=focValsHas.length?focValsHas.reduce(function(a,b){return a+b;},0)/focValsHas.length:0;
     var avgLinePct=focAvgAll?(1-focAvgAll/5)*100:null; /* position of the dashed average line, top-down, within the 0-5 scaled area only */
-    var showPrevRound=mockRound1&&mockRound1.focByLetter;
     html+='<div style="padding:0 16px 16px">';
-    if(showPrevRound){
-      html+='<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;font-size:10px;color:var(--t2)">';
-      html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--pb)"></span>'+roundLabel(currentRound.year,currentRound.roundNo)+' (ปัจจุบัน)</span>';
-      html+='<span style="display:flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:2px;background:var(--b1)"></span>'+mockRound1.label+' (ตัวอย่าง)</span>';
+    if(dbCompareMode){
+      html+='<div class="db-gbar-legend">';
+      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--b1)"></span>'+cmpOlder.label+'</span>';
+      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpNewer.label+'</span>';
       html+='</div>';
+    } else {
+      html+='<div class="db-gbar-legend"><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpNewer.label+'</span></div>';
     }
     html+='<div class="focus-chart-wrap" style="align-items:end">';
     html+='<div>';
@@ -4996,13 +5122,20 @@ function renderDash(){
     fkeys.forEach(function(f){
       var cur=focScores[f];
       var lbl=s2l(cur);
-      var diffPct=(cur&&focAvgAll)?Math.round((cur-focAvgAll)/focAvgAll*100):null;
+      var diffPct=null,diffIsVsAvg=true;
+      if(dbCompareMode&&myScoreOlder_foc){
+        var oldVal=myScoreOlder_foc.byFocus[f];
+        diffPct=oldVal?Math.round((cur-oldVal)/oldVal*100):null;
+        diffIsVsAvg=false;
+      } else if(cur&&focAvgAll){
+        diffPct=Math.round((cur-focAvgAll)/focAvgAll*100);
+      }
       html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0">';
-      html+='<div style="min-height:16px;display:flex;align-items:center;font-size:clamp(9px,2.2vw,11px);font-weight:700">';
+      html+='<div style="min-height:16px;display:flex;align-items:center;font-size:clamp(9px,2.2vw,11px);font-weight:700" title="'+(diffIsVsAvg?'เทียบค่าเฉลี่ยองค์กร':'เทียบกับ '+cmpOlder.label)+'">';
       if(diffPct!==null){
         if(diffPct>0)html+='<span style="color:var(--E)">&#9650; '+diffPct+'%</span>';
         else if(diffPct<0)html+='<span style="color:var(--I)">&#9660; '+Math.abs(diffPct)+'%</span>';
-        else html+='<span style="color:var(--t2)">&#9654; 0%</span>';
+        else html+='<span style="color:var(--t2)">&#9644; 0%</span>';
       }
       html+='</div>';
       html+='<div style="min-height:22px;display:flex;align-items:center">';
@@ -5030,23 +5163,26 @@ function renderDash(){
       var cur=focScores[f];
       var barH=cur?Math.max(1,Math.round(cur/5*chartAreaH)):0; /* strictly proportional to the 0-5 scale -- matches the gridlines above exactly */
       var numFits=barH>=26; /* enough room to center the score number inside the bar */
-      var prevVal=showPrevRound?mockRound1.focByLetter[f]:null;
-      var prevBarH=prevVal?Math.max(1,Math.round(prevVal/5*chartAreaH)):0;
+      var oldVal=dbCompareMode&&myScoreOlder_foc?myScoreOlder_foc.byFocus[f]:null;
+      var oldBarH=oldVal?Math.max(1,Math.round(oldVal/5*chartAreaH)):0;
+      var oldNumFits=oldBarH>=26;
       html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;min-width:0">';
-      /* current round bar */
-      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0">';
-      if(cur&&!numFits)html+='<span style="position:relative;bottom:'+(barH+2)+'px;font-size:clamp(9px,2.2vw,11px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
-      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
-      if(cur&&numFits)html+='<span style="font-size:clamp(9px,2.2vw,11px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
-      if(!cur)html+='<span style="position:absolute;bottom:2px;font-size:clamp(9px,2vw,11px);color:var(--t2)">\u2013</span>';
-      html+='</div></div>';
-      /* prior round bar (muted) -- only rendered when mock history exists */
-      if(showPrevRound){
+      /* older round bar (muted) -- LEFT, per spec's chronological ordering rule */
+      if(dbCompareMode){
         html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0">';
-        html+='<div style="width:100%;height:'+prevBarH+'px;background:var(--b1);border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
-        html+='<span style="font-size:clamp(8px,2vw,10px);font-weight:700;color:var(--t1)">'+prevVal.toFixed(2)+'</span>';
+        if(oldVal&&!oldNumFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(oldBarH+2)+'px;font-size:clamp(8px,2vw,10px);font-weight:700;color:var(--t1)">'+oldVal.toFixed(2)+'</span>';
+        html+='<div class="db-anim-bar" style="width:100%;height:'+oldBarH+'px;background:var(--b1);border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
+        if(oldVal&&oldNumFits)html+='<span class="db-bar-label" style="font-size:clamp(8px,2vw,10px);font-weight:700;color:var(--t1)">'+oldVal.toFixed(2)+'</span>';
+        if(!oldVal)html+='<span style="position:absolute;bottom:2px;font-size:clamp(9px,2vw,11px);color:var(--t2)">\u2013</span>';
         html+='</div></div>';
       }
+      /* newer round bar -- RIGHT (or the only bar, in single-round mode) */
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0">';
+      if(cur&&!numFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barH+2)+'px;font-size:clamp(8px,2vw,10px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
+      html+='<div class="db-anim-bar" style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
+      if(cur&&numFits)html+='<span class="db-bar-label" style="font-size:clamp(8px,2vw,10px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
+      if(!cur)html+='<span style="position:absolute;bottom:2px;font-size:clamp(9px,2vw,11px);color:var(--t2)">\u2013</span>';
+      html+='</div></div>';
       html+='</div>';
     });
     html+='</div>';
@@ -5055,8 +5191,8 @@ function renderDash(){
     fkeys.forEach(function(f){
       var fd=FDEF[f];
       html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0">';
-      html+='<div style="font-size:clamp(10px,2.6vw,13px);font-weight:800;color:'+fd.cl+'">'+f+'</div>';
-      html+='<div style="font-size:clamp(8px,1.8vw,10px);font-weight:600;color:var(--t2);text-align:center;max-width:70px;word-break:break-word">'+fd.nm+'</div>';
+      html+='<div style="font-size:clamp(9px,2.2vw,12px);font-weight:800;color:'+fd.cl+'">'+f+'</div>';
+      html+='<div style="font-size:clamp(7px,1.6vw,9px);font-weight:600;color:var(--t2);text-align:center;max-width:64px;word-break:break-word">'+fd.nm+'</div>';
       html+='</div>';
     });
     html+='</div>';
@@ -5080,12 +5216,12 @@ function renderDash(){
     var zTop=0;
     zones.forEach(function(z,zi){
       var zh=z[2];
-      html+='<div style="position:absolute;top:'+zTop+'%;left:0;right:0;height:'+zh+'%;background:'+z[1]+';display:flex;align-items:center;justify-content:flex-end;padding-right:12px">';
-      html+='<span style="font-size:clamp(10px,2.6vw,13px);font-weight:800;color:rgba(0,0,0,.34)">'+z[0]+'</span></div>';
+      html+='<div style="position:absolute;top:'+zTop+'%;left:0;right:0;height:'+zh+'%;display:flex;align-items:center;background:'+z[1]+'">';
+      html+='<span style="flex:1;text-align:center;font-size:clamp(10px,2.6vw,13px);font-weight:800;color:rgba(0,0,0,.34);padding:0 12px">'+z[0]+'</span></div>';
       zTop+=zh;
     });
     if(fm){
-      html+='<div style="position:absolute;left:50%;top:'+yPct(fm)+'%;transform:translate(-50%,-50%);width:clamp(40px,11vw,56px);height:clamp(40px,11vw,56px);border-radius:50%;background:'+RCOL[fmL.l]+';border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--fh)">';
+      html+='<div class="db-anim-bubble" style="position:absolute;left:50%;top:'+yPct(fm)+'%;transform:translate(-50%,-50%);width:clamp(40px,11vw,56px);height:clamp(40px,11vw,56px);border-radius:50%;background:'+RCOL[fmL.l]+';border:3px solid #fff;box-shadow:0 3px 10px rgba(0,0,0,.25);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--fh)">';
       html+='<div style="font-size:clamp(11px,2.8vw,15px);font-weight:800;color:#fff;line-height:1.1">'+fmL.l+'</div>';
       html+='<div style="font-size:clamp(8px,1.8vw,10px);font-weight:700;color:rgba(255,255,255,.9)">'+fm.toFixed(2)+'</div>';
       html+='</div>';
