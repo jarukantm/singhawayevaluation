@@ -638,6 +638,35 @@ button,input,select{font-family:var(--fb)}
 .db-ftab{padding:5px 14px;font-size:11px;font-weight:600;border:1.5px solid var(--b1);border-radius:var(--r);background:transparent;color:var(--t1);cursor:pointer;transition:.12s;white-space:nowrap}
 .db-ftab:hover{border-color:var(--pb);color:var(--pb)}
 .db-ftab.on{background:var(--pb);border-color:var(--pb);color:#fff}
+/* ── Round comparison dropdowns (new) ── */
+.db-compare-row{display:flex;gap:10px;flex-wrap:wrap}
+.db-compare-sel{flex:1;min-width:160px;padding:7px 12px;border:1.5px solid var(--b1);border-radius:var(--r);
+  font-size:12px;font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer}
+/* ── Summary cards (new): rank + recommendation, side-by-side with the
+   bar chart on desktop, stacking responsively per spec section 5 ── */
+.db-summary-row{display:flex;gap:14px;align-items:stretch}
+.db-summary-left{flex:0 0 40%;min-width:0}
+.db-summary-right{flex:0 0 60%;min-width:0}
+@media(max-width:900px) and (min-width:681px){
+  .db-summary-left{flex:0 0 50%}
+  .db-summary-right{flex:0 0 50%}
+}
+@media(max-width:680px){
+  .db-summary-row{flex-direction:column}
+  .db-summary-left,.db-summary-right{flex:1 1 100%}
+  .db-compare-row{flex-direction:column}
+}
+.db-rank-num{font-family:var(--fh);font-weight:800;color:var(--pb);font-size:28px;line-height:1}
+.db-rank-of{font-size:11px;color:var(--t2)}
+.db-reco-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.db-reco-item{font-size:12px;color:var(--t1);padding:6px 10px;background:var(--s1);border-radius:var(--r);border:1px solid var(--b0)}
+.db-reco-item b{color:var(--t0)}
+.db-reco-def{font-size:11px;color:var(--t2);margin-top:3px;line-height:1.5}
+.db-allgood{font-size:12px;color:var(--E);font-weight:700;padding:10px;text-align:center;background:rgba(29,158,117,.08);border-radius:var(--r)}
+/* ── Grouped bar chart (new) ── */
+.db-gbar-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;font-size:10px;color:var(--t2)}
+.db-gbar-legend-sw{display:inline-flex;align-items:center;gap:5px}
+.db-gbar-legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block}
 .db-sh{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .db-sh-ico{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
 .db-sh-ttl{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t0);flex:1}
@@ -1609,32 +1638,141 @@ var SCHEDULED_ROUNDS=[]; /* rounds planned in advance but not yet activated -- t
  * This app's real selfSc/othSc are scoped to ONE logged-in person's own
  * session (selfSc[cid], othSc[pid|cid] -- no evaluator prefix), so a
  * full multi-person historical snapshot doesn't fit that same shape for
- * every possible viewer at once. For this demo, each person's PRIOR
- * round overall average is stored directly instead (deterministically
- * seeded, same style as the Admin shell's mockScoreFor) -- simple and
- * enough to drive a meaningful round-over-round comparison panel without
- * inventing a parallel multi-user data model just for one history seed.
+ * every possible viewer at once. For this demo, each person's score per
+ * round is stored directly instead (deterministically seeded, same style
+ * as the Admin shell's mockScoreFor) -- simple and enough to drive a
+ * meaningful round-over-round comparison panel without inventing a
+ * parallel multi-user data model just for this history seed.
  * Skipped entirely once a real round has actually been closed
  * (ROUNDS.length>0), so it never overwrites real data. */
-var mockRound1=null; /* {year,roundNo,startDate,endDate,label,avgByEmp:{empId:overallAvg}} */
-function ensureMockRound1(){
-  if(mockRound1||ROUNDS.length)return;
-  var avgByEmp={};
-  ALL_EMP.forEach(function(e){
-    var seed=_seedFor(e.empId+'_round1_2568');
-    avgByEmp[e.empId]=1.5+((seed%351)/100); /* same spread style as mockScoreFor(), 1.50-5.00 */
+/* MOCK_ROUNDS: an array of several past rounds across a few different
+   years, generated purely so the round-comparison dropdowns (Dashboard
+   item 1 of the latest spec) have multiple real choices to test against,
+   per explicit request -- NOT meant to represent real evaluation history.
+   Each entry: {id,year,roundNo,startDate,endDate,label,
+                byEmp:{empId:{overall,byCat:{},byFocus:{}}}} */
+var MOCK_ROUNDS=[];
+var mockRound1=null; /* kept for backward compatibility with the existing FOCUS-chart overlay -- now just points at MOCK_ROUNDS[0] */
+function _mockScoreForRound(empId,roundKey){
+  var seed=_seedFor(empId+'_'+roundKey+'_overall');
+  var overall=1.5+((seed%351)/100); /* 1.50-5.00 spread, same style as mockScoreFor() */
+  var byCat={};
+  CATS.forEach(function(cat){
+    var s=_seedFor(empId+'_'+roundKey+'_cat_'+cat);
+    byCat[cat]=Math.max(1,Math.min(5,1.5+((s%351)/100)));
   });
-  /* per-FOCUS-letter org-wide averages for the prior round -- this is
-     what the FOCUS chart actually overlays as a second (muted) bar next
-     to each F/O/C/U/S bar, instead of a separate standalone card. */
-  var focByLetter={};
+  var byFocus={};
   Object.keys(FDEF).forEach(function(f){
-    var seed=_seedFor('focus_'+f+'_round1_2568');
-    focByLetter[f]=1.5+((seed%351)/100);
+    var s=_seedFor(empId+'_'+roundKey+'_foc_'+f);
+    byFocus[f]=Math.max(1,Math.min(5,1.5+((s%351)/100)));
   });
-  mockRound1={year:2568,roundNo:1,startDate:'2025-01-15',endDate:'2025-06-30',label:'รอบที่ 1/2568',avgByEmp:avgByEmp,focByLetter:focByLetter};
+  return{overall:overall,byCat:byCat,byFocus:byFocus};
+}
+function ensureMockRound1(){
+  if(MOCK_ROUNDS.length||ROUNDS.length)return;
+  /* a handful of past rounds spanning a couple of years, purely for
+     exercising the comparison dropdowns -- years/dates are illustrative */
+  var defs=[
+    {year:2567,roundNo:1,startDate:'2024-01-15',endDate:'2024-06-30'},
+    {year:2567,roundNo:2,startDate:'2024-07-01',endDate:'2024-12-31'},
+    {year:2568,roundNo:1,startDate:'2025-01-15',endDate:'2025-06-30'},
+    {year:2568,roundNo:2,startDate:'2025-07-01',endDate:'2025-12-31'}
+  ];
+  defs.forEach(function(d){
+    var roundKey='mock_'+d.year+'_'+d.roundNo;
+    var byEmp={};
+    ALL_EMP.forEach(function(e){byEmp[e.empId]=_mockScoreForRound(e.empId,roundKey);});
+    MOCK_ROUNDS.push({
+      id:roundKey,year:d.year,roundNo:d.roundNo,startDate:d.startDate,endDate:d.endDate,
+      label:roundLabel(d.year,d.roundNo),byEmp:byEmp
+    });
+  });
+  mockRound1=MOCK_ROUNDS[MOCK_ROUNDS.length-1]; /* most recent mock round = closest stand-in for the old single mockRound1 */
+  mockRound1.avgByEmp={};
+  Object.keys(mockRound1.byEmp).forEach(function(eid){mockRound1.avgByEmp[eid]=mockRound1.byEmp[eid].overall;});
+  mockRound1.focByLetter=mockRound1.byEmp[Object.keys(mockRound1.byEmp)[0]]?(function(){
+    /* org-wide average per FOCUS letter across all employees, for the
+       existing FOCUS-chart overlay that reads mockRound1.focByLetter */
+    var avg={};
+    Object.keys(FDEF).forEach(function(f){
+      var vals=ALL_EMP.map(function(e){return mockRound1.byEmp[e.empId].byFocus[f];});
+      avg[f]=vals.reduce(function(a,b){return a+b;},0)/vals.length;
+    });
+    return avg;
+  })():{};
+}
+/* Returns every round selectable in the comparison dropdowns: the live
+   current round first, then real closed ROUNDS, then the mock history
+   (only present if no real rounds have been closed yet). */
+function allSelectableRounds(){
+  var list=[{id:'current',year:currentRound.year,roundNo:currentRound.roundNo,label:roundLabel(currentRound.year,currentRound.roundNo),isCurrent:true}];
+  ROUNDS.slice().reverse().forEach(function(r){list.push({id:r.id,year:r.year,roundNo:r.roundNo,label:r.label});});
+  MOCK_ROUNDS.slice().reverse().forEach(function(r){list.push({id:r.id,year:r.year,roundNo:r.roundNo,label:r.label,isMock:true});});
+  return list;
+}
+/* Resolve a round id (from allSelectableRounds) into {overall,byCat,byFocus}
+   lookups for a given employee -- handles all 3 sources (live current
+   round via getDefaults-style avgScore2, real closed ROUNDS, or
+   MOCK_ROUNDS) behind one consistent interface. */
+function getRoundScoreFor(roundId,empId){
+  if(roundId==='current'){
+    /* live, in-progress round: this only has real data for whoever is
+       actually logged in right now (selfSc/othSc are per-session) -- use
+       the same deterministic mock generator as a stand-in for OTHER
+       employees so the comparison/ranking views still have something to
+       show for everyone, exactly like the Admin shell already does via
+       mockScoreFor(). The logged-in user's own row prefers their real
+       entered scores when available. */
+    if(CU&&empId===CU.empId){
+      var byCat={};CATS.forEach(function(cat){byCat[cat]=avgScore2([empId],CRITERIA.filter(function(c){return c.cat===cat;}),'overall');});
+      var byFocus={};Object.keys(FDEF).forEach(function(f){byFocus[f]=avgScore2([empId],CRITERIA.filter(function(c){return c.foc===f;}),'overall');});
+      var overall=avgScore2([empId],CRITERIA,'overall');
+      if(overall)return{overall:overall,byCat:byCat,byFocus:byFocus};
+    }
+    return _mockScoreForRound(empId,'current_'+currentRound.id);
+  }
+  var mr=MOCK_ROUNDS.filter(function(r){return r.id===roundId;})[0];
+  if(mr)return mr.byEmp[empId];
+  var rr=ROUNDS.filter(function(r){return r.id===roundId;})[0];
+  if(rr)return _mockScoreForRound(empId,'closed_'+roundId); /* real closed rounds still lack a full per-employee mock breakdown -- approximate consistently */
+  return _mockScoreForRound(empId,roundId);
+}
+/* ── Competition ranking (1,2,2,4) ──
+ * scores: array of {empId,value}. Returns {rank,total} for targetEmpId,
+ * using "Competition Ranking" -- tied scores share the same rank, and
+ * the NEXT distinct score continues from (count of people ranked above
+ * it + 1), not from the tie count + 1 (so 1,2,2,4 not 1,2,2,3). */
+function competitionRank(scores,targetEmpId){
+  var sorted=scores.slice().sort(function(a,b){return b.value-a.value;});
+  var total=sorted.length;
+  var rank=null;
+  for(var i=0;i<sorted.length;i++){
+    if(i===0||sorted[i].value<sorted[i-1].value){
+      /* this row starts a new rank = (number of rows strictly above it) + 1 */
+      var r=i+1;
+      if(sorted[i].empId===targetEmpId)rank=r;
+      /* propagate this same rank to any ties immediately following */
+      var j=i;
+      while(j<sorted.length&&sorted[j].value===sorted[i].value){
+        if(sorted[j].empId===targetEmpId)rank=r;
+        j++;
+      }
+    }
+  }
+  return{rank:rank,total:total};
+}
+/* ── Recommendation: criteria/categories/FOCUS-letters whose level isn't
+   E yet, sorted ascending by score (lowest/most-in-need-of-improvement
+   first), per the spec's Recommendation logic for both Singhaway and
+   FOCUS. items: array of {key,value,...extra}. Returns the same shape,
+   filtered+sorted. */
+function recommendationItems(items){
+  return items.filter(function(it){return s2l(it.value).l!=='E';})
+    .sort(function(a,b){return a.value-b.value;});
 }
 var dbRoundView='current'; /* 'current' or a closed round's id -- which round the Dashboard is viewing */
+var dbCompareA=''; /* left dropdown -- primary round for the new comparison feature; '' = default to most recent on first render */
+var dbCompareB=''; /* right dropdown -- round to compare against; '' = default to the round before dbCompareA */
 function isAdmin(){return !!(CU&&CU.isAdmin);}
 
 /* UTILS */
@@ -2564,25 +2702,39 @@ function renderAdminRounds(){
   html+='<div class="card" style="margin-top:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#128190;</div><div class="db-sh-ttl">ฐานข้อมูล (Google Sheets)</div>';
   html+='<button class="btn bo" id="simdbRefreshBtn" style="font-size:11px;padding:6px 12px;margin-left:auto" onclick="refreshSimDBAndRender()">&#128260; รีเฟรชข้อมูล</button></div>';
   html+='<div style="padding:14px 16px">';
-  if(!SimDB._loaded){
+  /* honest connection status -- never claims "connected" until a real
+     fetch has actually succeeded at least once */
+  if(!SimDB._loaded&&!SimDB._lastError){
     html+='<div class="wb" style="margin-bottom:12px"><span>\u23F3</span><span>กำลังโหลดข้อมูลจาก Google Sheets...</span></div>';
+  } else if(SimDB._lastError){
+    html+='<div class="wb" style="margin-bottom:12px;background:rgba(163,45,45,.06);border-color:rgba(163,45,45,.25);color:var(--I)"><span>&#10060;</span><span>เชื่อมต่อ Google Sheets ไม่สำเร็จ: '+SimDB._lastError+'</span></div>';
+  } else {
+    html+='<div class="wb" style="margin-bottom:12px"><span>\u2705</span><span>เชื่อมต่อกับ Google Sheets สำเร็จ \u2014 ทุกครั้งที่มีคนกด Save/Submit จากอุปกรณ์ไหนก็ตาม ข้อมูลจะถูกบันทึกไว้ใน Sheet กลางตัวเดียวกัน ทุกเครื่องที่เปิดหน้านี้จะเห็นข้อมูลตรงกัน โครงสร้าง 1 แถว = ผู้ประเมิน 1 คน ประเมินผู้ถูกประเมิน 1 คน ในรอบนั้น (รวมแถวประเมินตนเองด้วย) มีทั้งหมด '+(9+CRITERIA.length*2)+' คอลัมน์ ('+CRITERIA.length+' หัวข้อ \u00D7 2 คอลัมน์คะแนน+เหตุผล)</span></div>';
   }
   html+='<div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px">';
   html+='<div><div style="font-size:11px;color:var(--t2)">แถวข้อมูลทั้งหมด</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--pb)">'+simStats.totalRows+'</div></div>';
   html+='<div><div style="font-size:11px;color:var(--t2)">จำนวนรอบที่มีข้อมูล</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t0)">'+simStats.roundCount+'</div></div>';
   html+='<div><div style="font-size:11px;color:var(--t2)">จำนวนผู้ประเมินที่ Submit แล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t0)">'+simStats.evaluatorCount+'</div></div>';
   html+='</div>';
-  html+='<div class="wb" style="margin-bottom:12px"><span>\u2705</span><span>เชื่อมต่อกับ Google Sheets จริงแล้ว \u2014 ทุกครั้งที่มีคนกด Submit จากอุปกรณ์ไหนก็ตาม ข้อมูลจะถูกบันทึกไว้ใน Sheet กลางตัวเดียวกัน ทุกเครื่องที่เปิดหน้านี้จะเห็นข้อมูลตรงกัน โครงสร้าง 1 แถว = ผู้ประเมิน 1 คน ประเมินผู้ถูกประเมิน 1 คน ในรอบนั้น (รวมแถวประเมินตนเองด้วย) มีทั้งหมด '+(9+CRITERIA.length*2)+' คอลัมน์ ('+CRITERIA.length+' หัวข้อ \u00D7 2 คอลัมน์คะแนน+เหตุผล)</span></div>';
   html+='<div style="display:flex;gap:8px;flex-wrap:wrap">';
   html+='<button class="btn bo" onclick="downloadDatabaseCSV()">&#128190; ดาวน์โหลด CSV ('+roundLabel(currentRound.year,currentRound.roundNo)+')</button>';
+  html+='<button class="btn bo" onclick="testGASConnection()">&#129514; ทดสอบการเชื่อมต่อ</button>';
   html+='</div>';
+  html+='<div id="gasTestResult" style="font-size:11px;margin-top:10px"></div>';
   html+='<div style="font-size:10px;color:var(--t2);margin-top:8px">หมายเหตุ: การลบ/ล้างข้อมูลทั้งหมดควรทำโดยตรงใน Google Sheets ไม่ใช่จากปุ่มในหน้านี้ เพื่อความปลอดภัยของข้อมูลจริงที่ทุกคนใช้ร่วมกัน</div>';
   html+='</div></div>';
   h('adminRoundsBody').innerHTML=html;
   tickAllCountdowns(); /* fill in the countdown box immediately, don't wait for the next 1s interval tick */
-  /* pull the latest data from the Sheet in the background, then
-     re-render once it actually arrives so the numbers above are current */
-  SimDB.refresh(function(){if(curAdminTab==='rounds')renderAdminTab();});
+  /* pull the latest data from the Sheet ONCE per page visit (not on every
+     re-render) -- the refresh callback re-renders this same page, which
+     would otherwise call refresh() again, then again, forever. The
+     _autoRefreshDone flag is reset whenever a different Admin tab is
+     opened (see showAdminTab) so revisiting this page later still
+     refreshes once. */
+  if(!SimDB._autoRefreshDone){
+    SimDB._autoRefreshDone=true;
+    SimDB.refresh(function(){if(curAdminTab==='rounds')renderAdminTab();});
+  }
 }
 function refreshSimDBAndRender(){
   var btn=h('simdbRefreshBtn');
@@ -2591,6 +2743,33 @@ function refreshSimDBAndRender(){
     if(!ok)toast('\u26A0\uFE0F','โหลดข้อมูลไม่สำเร็จ','ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต','var(--I)');
     renderAdminTab();
   });
+}
+/* Focused connection test, separate from the normal refresh flow --
+   shows the raw outcome of a single GET directly in the page (not just
+   console), so a non-technical person can screenshot/describe exactly
+   what's wrong (wrong URL, deployment not "Anyone", missing header row,
+   network blocked, etc.) without needing devtools. */
+function testGASConnection(){
+  var box=h('gasTestResult');
+  if(box)box.innerHTML='<span style="color:var(--t2)">\u23F3 กำลังทดสอบ...</span>';
+  fetch(GAS_WEBAPP_URL,{method:'GET'})
+    .then(function(res){
+      return res.text().then(function(text){return{status:res.status,text:text};});
+    })
+    .then(function(r){
+      var parsed=null;
+      try{parsed=JSON.parse(r.text);}catch(e){}
+      if(box){
+        if(parsed&&parsed.ok!==undefined){
+          box.innerHTML='<span style="color:var(--E);font-weight:700">&#9989; เชื่อมต่อสำเร็จ</span> \u2014 HTTP '+r.status+', ok:'+parsed.ok+(parsed.error?(', error: '+parsed.error):'')+', แถวที่อ่านได้: '+(parsed.rows?parsed.rows.length:0);
+        } else {
+          box.innerHTML='<span style="color:var(--I);font-weight:700">&#10060; ผลลัพธ์ไม่ใช่รูปแบบที่คาดไว้</span> \u2014 HTTP '+r.status+'<br><span style="color:var(--t2);font-size:10px">เนื้อหาที่ได้รับ (120 ตัวแรก): '+(r.text||'').slice(0,120).replace(/</g,'&lt;')+'</span><br><span style="color:var(--t2);font-size:10px">มักเกิดจาก: Deploy ยังไม่ใช่ Web App ล่าสุด, "Who has access" ไม่ใช่ Anyone, หรือ URL เป็นหน้า Editor ไม่ใช่ /exec</span>';
+        }
+      }
+    })
+    .catch(function(err){
+      if(box)box.innerHTML='<span style="color:var(--I);font-weight:700">&#10060; ยิงคำขอไม่สำเร็จเลย</span> \u2014 '+String(err&&err.message||err)+'<br><span style="color:var(--t2);font-size:10px">มักเกิดจาก: ไม่มีอินเทอร์เน็ต, URL พิมพ์ผิด, หรือ Apps Script ถูกบล็อกโดยเครือข่าย/Firewall</span>';
+    });
 }
 function saveEvalRulesFromForm(){
   var rules={};
@@ -3411,6 +3590,8 @@ var SimDB={
   _cache:[], /* array of row objects, refreshed from the Sheet via refresh() */
   _loaded:false,
   _loading:false,
+  _lastError:null, /* most recent error message from refresh()/upsertRows(), shown in the Admin UI */
+  _autoRefreshDone:false, /* guards against re-fetching on every re-render of the rounds page -- see renderAdminRounds */
   /* refresh: pull the latest rows from the Sheet into the local cache.
      onDone(ok) fires when the fetch settles either way, so callers can
      re-render once fresh data has actually arrived. */
@@ -3419,14 +3600,25 @@ var SimDB={
     this._loading=true;
     var self=this;
     fetch(GAS_WEBAPP_URL,{method:'GET'})
-      .then(function(res){return res.json();})
+      .then(function(res){
+        return res.text().then(function(text){
+          var data;
+          try{data=JSON.parse(text);}
+          catch(parseErr){
+            throw new Error('เซิร์ฟเวอร์ตอบกลับไม่ใช่ JSON (HTTP '+res.status+'): '+text.slice(0,120));
+          }
+          return data;
+        });
+      })
       .then(function(data){
         self._loading=false;self._loaded=true;
-        if(data&&data.ok){self._cache=data.rows||[];}
+        if(data&&data.ok){self._cache=data.rows||[];self._lastError=null;}
+        else{self._lastError=(data&&data.error)||'เซิร์ฟเวอร์ตอบกลับ ok:false โดยไม่ระบุสาเหตุ';}
         if(onDone)onDone(!!(data&&data.ok));
       })
       .catch(function(err){
         self._loading=false;
+        self._lastError=String(err&&err.message||err);
         console.error('SimDB.refresh failed:',err);
         if(onDone)onDone(false);
       });
@@ -3449,11 +3641,32 @@ var SimDB={
       headers:{'Content-Type':'text/plain;charset=utf-8'}, /* avoids a CORS preflight that Apps Script Web Apps don't handle */
       body:JSON.stringify({rows:rows})
     })
-      .then(function(res){return res.json();})
-      .then(function(data){if(onDone)onDone(!!(data&&data.ok));})
+      .then(function(res){
+        return res.text().then(function(text){
+          var data;
+          try{data=JSON.parse(text);}
+          catch(parseErr){
+            /* Apps Script returned something that isn't JSON -- almost
+               always means the deployment itself is misconfigured (e.g.
+               "Who has access" isn't set to Anyone, so Google returns an
+               HTML sign-in/permission page instead of running the
+               script at all), or the URL points at the editor instead
+               of the deployed /exec Web App URL. Surface the raw status
+               + a snippet of what came back so this is debuggable
+               instead of a silent failure. */
+            throw new Error('เซิร์ฟเวอร์ตอบกลับไม่ใช่ JSON (HTTP '+res.status+') \u2014 ตรวจสอบว่า Deploy เป็น Web App แล้วตั้ง "Who has access" เป็น Anyone, และ URL เป็น /exec ตัวล่าสุด: '+text.slice(0,120));
+          }
+          if(!res.ok)throw new Error('HTTP '+res.status+': '+(data&&data.error||text.slice(0,120)));
+          return data;
+        });
+      })
+      .then(function(data){
+        if(data&&data.ok){if(onDone)onDone(true,null);}
+        else{if(onDone)onDone(false,(data&&data.error)||'ไม่ทราบสาเหตุ (เซิร์ฟเวอร์ตอบกลับแต่ ok:false)');}
+      })
       .catch(function(err){
         console.error('SimDB.upsertRows failed (saved locally, will retry on next refresh):',err);
-        if(onDone)onDone(false);
+        if(onDone)onDone(false,String(err&&err.message||err));
       });
   },
   allRows:function(){return this._cache;},
@@ -3515,7 +3728,7 @@ function buildDbColumnLabel(critId){
 function buildDatabaseRows(){
   if(!CU)return[];
   var rows=[];
-  var submitTs=oSub?new Date().toISOString():''; /* this mock build has no real per-submission timestamp stored -- see limitation note above */
+  var submitTs=new Date().toISOString(); /* stamped at whatever moment this function is called -- now called on Save, per request, not just Submit */
   function buildRow(evaluator,evaluated,scoreMap,noteMap){
     var row={
       'Userid':evaluator.empId,
@@ -3717,12 +3930,30 @@ function actBtns(isSelf){
 function doSaveSelf(){
   if(!isSelfComplete()){toast('\u26A0\uFE0F','ยังประเมินไม่ครบ','กรุณากรอกคะแนนทุกหัวข้อก่อน','var(--L)');return;}
   sSaved=true;autoSave();renderTab();
-  toast('\uD83D\uDCBE','บันทึกข้อมูลแล้ว','กด Edit เพื่อแก้ไข \u00B7 ระบบ Auto-save ให้แล้ว','var(--G)');
+  toast('\uD83D\uDCBE','บันทึกชั่วคราวแล้ว','กำลังส่งไป Google Sheets...','var(--G)');
+  syncToGoogleSheets();
 }
 function doSaveOther(){
   if(!isOtherComplete()){toast('\u26A0\uFE0F','ยังประเมินไม่ครบ','กรุณาประเมินครบทุกคนและทุกหัวข้อก่อน','var(--L)');return;}
   oSaved=true;autoSave();renderTab();
-  toast('\uD83D\uDCBE','บันทึกข้อมูลแล้ว','กด Edit เพื่อแก้ไข \u00B7 ระบบ Auto-save ให้แล้ว','var(--G)');
+  toast('\uD83D\uDCBE','บันทึกชั่วคราวแล้ว','กำลังส่งไป Google Sheets...','var(--G)');
+  syncToGoogleSheets();
+}
+/* shared by both Save handlers above (and still called again on Submit,
+   harmlessly re-syncing the same/updated rows) -- per request, data now
+   reaches Google Sheets starting from Save, not only on final Submit. */
+function syncToGoogleSheets(){
+  try{
+    SimDB.upsertRows(buildDatabaseRows(),function(ok,errMsg){
+      if(ok){
+        toast('\u2705','บันทึกลง Google Sheets สำเร็จ','','var(--E)');
+      } else {
+        toast('\u26A0\uFE0F','บันทึกลง Google Sheets ไม่สำเร็จ',errMsg||'ตรวจสอบการเชื่อมต่ออินเทอร์เน็ตหรือการตั้งค่า Apps Script','var(--I)');
+      }
+    });
+  }catch(e){
+    toast('\u26A0\uFE0F','เกิดข้อผิดพลาด',String(e&&e.message||e),'var(--I)');
+  }
 }
 function doEditSelf(){sSaved=false;renderTab();}
 function doEditOther(){oSaved=false;renderTab();}
@@ -3761,21 +3992,10 @@ h('subconfirmbtn').addEventListener('click',function(){
   autoSave();
   cov('subovl');renderTab();
   toast('\u2705','Submit \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08!','\u0e01\u0e33\u0e25\u0e31\u0e07\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e25\u0e07 Google Sheets...','var(--E)');
-  /* write this submission to the real backend (Google Sheets via Apps
-     Script) -- this is what makes the data persist across devices, not
-     just this one browser's localStorage. Optimistic local merge inside
-     upsertRows() means the Admin's view updates instantly even before
-     the network round-trip finishes; the callback here just confirms
-     whether the actual remote write succeeded. */
-  try{
-    SimDB.upsertRows(buildDatabaseRows(),function(ok){
-      if(ok){
-        toast('\u2705','\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e25\u0e07 Google Sheets \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08','','var(--E)');
-      } else {
-        toast('\u26A0\uFE0F','\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e25\u0e07 Google Sheets \u0e44\u0e21\u0e48\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08','\u0e15\u0e23\u0e27\u0e08\u0e2a\u0e2d\u0e1a\u0e01\u0e32\u0e23\u0e40\u0e0a\u0e37\u0e48\u0e2d\u0e21\u0e15\u0e48\u0e2d\u0e2d\u0e34\u0e19\u0e40\u0e15\u0e2d\u0e23\u0e4c\u0e40\u0e19\u0e47\u0e15 \u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e22\u0e31\u0e07\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e44\u0e27\u0e49\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e40\u0e15\u0e34\u0e21\u0e43\u0e19\u0e40\u0e1a\u0e23\u0e32\u0e27\u0e4c\u0e40\u0e0b\u0e2d\u0e23\u0e4c\u0e19\u0e35\u0e49','var(--I)');
-      }
-    });
-  }catch(e){}
+  /* re-syncs the final, locked state to Google Sheets -- data already
+     started flowing there on every Save before this point (per request),
+     this just ensures the Submit-locked version is the last thing written. */
+  syncToGoogleSheets();
 });
 
 /* SELF */
@@ -4505,6 +4725,29 @@ function renderDash(){
   }
   html+='</div>';
   html+='</div>';
+
+  /* --- 1c. ROUND COMPARISON DROPDOWNS (new) ---
+     2 dropdowns let the person pick any round + a round to compare it
+     against, sourced from allSelectableRounds() (live current round,
+     real closed ROUNDS, and -- only if no real rounds exist yet -- the
+     MOCK_ROUNDS history generated purely for testing this feature).
+     Changing either dropdown just re-renders the Dashboard, so every
+     widget below updates reactively without a page reload. */
+  var selectableRounds=allSelectableRounds();
+  if(!dbCompareA||!selectableRounds.some(function(r){return r.id===dbCompareA;}))dbCompareA=selectableRounds[0].id;
+  if(!dbCompareB||!selectableRounds.some(function(r){return r.id===dbCompareB;}))dbCompareB=selectableRounds[1]?selectableRounds[1].id:selectableRounds[0].id;
+  html+='<div class="card" data-pdf-sec="controls" style="padding:14px 16px">';
+  html+='<div style="font-size:11px;color:var(--t2);margin-bottom:8px">&#128202; เปรียบเทียบรอบการประเมิน</div>';
+  html+='<div class="db-compare-row">';
+  html+='<select class="db-compare-sel" id="dbCompareASel" onchange="dbCompareA=this.value;renderDash()">';
+  selectableRounds.forEach(function(r){html+='<option value="'+r.id+'"'+(dbCompareA===r.id?' selected':'')+'>ปี '+r.year+' '+r.label+(r.isCurrent?' (ปัจจุบัน)':'')+'</option>';});
+  html+='</select>';
+  html+='<select class="db-compare-sel" id="dbCompareBSel" onchange="dbCompareB=this.value;renderDash()">';
+  selectableRounds.forEach(function(r){html+='<option value="'+r.id+'"'+(dbCompareB===r.id?' selected':'')+'>ปี '+r.year+' '+r.label+(r.isCurrent?' (ปัจจุบัน)':'')+'</option>';});
+  html+='</select>';
+  html+='</div>';
+  html+='</div>';
+
   /* if viewing a past round, swap in its frozen data for every widget below;
      remember the live (current-round) data so we can restore it after render */
   var _liveSelfSc=selfSc,_liveOthSc=othSc,_liveRsnNotes=rsnNotes,_viewingPast=false;
@@ -4515,6 +4758,71 @@ function renderDash(){
 
   /* empty state check */
   var noData=!hasData(dbFilter);
+
+  /* --- 1d. SINGHAWAY SUMMARY CARD (new) ---
+     Left (40%): rank among all employees by Singhaway Overall score in
+     the round picked via dbCompareA, plus a recommendation list of
+     categories not yet at level E (ascending by score).
+     Right (60%): grouped bar chart comparing the 4 Singhaway categories
+     across dbCompareA vs dbCompareB. */
+  if(CU&&CU.empId&&!noData){
+    var cmpRoundA=selectableRounds.filter(function(r){return r.id===dbCompareA;})[0]||selectableRounds[0];
+    var cmpRoundB=selectableRounds.filter(function(r){return r.id===dbCompareB;})[0]||selectableRounds[0];
+    var allScoresA_sw=ALL_EMP.map(function(e){
+      var sc=getRoundScoreFor(dbCompareA,e.empId);
+      var catVals=CATS.map(function(c){return sc.byCat[c];});
+      var overall=catVals.reduce(function(a,b){return a+b;},0)/catVals.length;
+      return{empId:e.empId,value:overall};
+    });
+    var swRank=competitionRank(allScoresA_sw,CU.empId);
+    var myScoreA_sw=getRoundScoreFor(dbCompareA,CU.empId);
+    var myScoreB_sw=getRoundScoreFor(dbCompareB,CU.empId);
+    var swReco=recommendationItems(CATS.map(function(c){return{key:c,value:myScoreA_sw.byCat[c],label:CAT_META[c].lb};}));
+
+    html+='<div class="db-summary-row" style="margin-bottom:14px">';
+    /* left card */
+    html+='<div class="db-summary-left"><div class="card" style="height:100%;padding:16px">';
+    html+='<div class="db-sh-ttl" style="margin-bottom:10px">คะแนน Singhaway</div>';
+    html+='<div class="db-rank-of">คุณอยู่ในลำดับที่</div>';
+    html+='<div class="db-rank-num">'+(swRank.rank||'\u2013')+' <span style="font-size:14px;font-weight:600;color:var(--t2)">จาก '+swRank.total+' คน</span></div>';
+    html+='<div style="font-size:11px;color:var(--t1);margin-top:10px">เพิ่มการแสดงพฤติกรรมเหล่านี้ให้บ่อยขึ้น</div>';
+    if(swReco.length){
+      html+='<div class="db-reco-list">';
+      swReco.forEach(function(it){html+='<div class="db-reco-item">\u2022 '+it.label+'</div>';});
+      html+='</div>';
+    } else {
+      html+='<div class="db-allgood" style="margin-top:8px">&#127881; ยอดเยี่ยม! คุณได้รับคะแนนระดับ E ทุกหัวข้อแล้ว</div>';
+    }
+    html+='</div></div>';
+    /* right card: grouped bar chart */
+    html+='<div class="db-summary-right"><div class="card" style="height:100%;padding:16px">';
+    html+='<div class="db-sh-ttl" style="margin-bottom:6px">กราฟคะแนน Singhaway</div>';
+    html+='<div class="db-gbar-legend">';
+    html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpRoundA.label+'</span>';
+    html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--b1)"></span>'+cmpRoundB.label+'</span>';
+    html+='</div>';
+    html+='<div style="display:flex;align-items:flex-end;gap:18px;height:160px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 8px 0 26px;position:relative">';
+    [5,4,3,2,1,0].forEach(function(v){
+      var top=(1-v/5)*100;
+      html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:9px;font-weight:700;color:var(--t2);width:20px;text-align:right">'+v+'</div>';
+    });
+    CATS.forEach(function(cat){
+      var m=CAT_META[cat];
+      var valA=myScoreA_sw.byCat[cat],valB=myScoreB_sw.byCat[cat];
+      var barHA=Math.max(1,Math.round(valA/5*140)),barHB=Math.max(1,Math.round(valB/5*140));
+      var lblA=s2l(valA),lblB=s2l(valB);
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0">';
+      html+='<div style="display:flex;align-items:flex-end;gap:3px;height:140px;width:100%;justify-content:center">';
+      html+='<div title="'+cmpRoundA.label+': '+valA.toFixed(2)+' ('+lblA.l+')" style="flex:1;max-width:26px;height:'+barHA+'px;background:var(--pb);border-radius:4px 4px 0 0"></div>';
+      html+='<div title="'+cmpRoundB.label+': '+valB.toFixed(2)+' ('+lblB.l+')" style="flex:1;max-width:26px;height:'+barHB+'px;background:var(--b1);border-radius:4px 4px 0 0"></div>';
+      html+='</div>';
+      html+='<div style="font-size:9px;font-weight:700;color:'+m.cl+';text-align:center">'+m.lb+'</div>';
+      html+='</div>';
+    });
+    html+='</div>';
+    html+='</div></div>';
+    html+='</div>';
+  }
 
   /* --- 2. SINGHAWAY TABLE --- */
   html+='<div class="card" data-pdf-sec="singhaway">';
@@ -4616,6 +4924,41 @@ function renderDash(){
     html+='</div>'; /* close sw-card-list */
   }
   html+='</div>';
+
+  /* --- 2b. FOCUS SUMMARY CARD (new) ---
+     Full-width card: rank among all employees by FOCUS Overall score in
+     the round picked via dbCompareA, plus a recommendation list of
+     FOCUS letters not yet at level E (ascending by score), each shown
+     with its E-level definition (the same definitions used to build the
+     FOCUS evaluation itself) as the target to aim for. */
+  if(CU&&CU.empId&&!noData){
+    var fkeysSummary=Object.keys(FDEF);
+    var allScoresA_foc=ALL_EMP.map(function(e){
+      var sc=getRoundScoreFor(dbCompareA,e.empId);
+      var focVals=fkeysSummary.map(function(f){return sc.byFocus[f];});
+      var overall=focVals.reduce(function(a,b){return a+b;},0)/focVals.length;
+      return{empId:e.empId,value:overall};
+    });
+    var focRank=competitionRank(allScoresA_foc,CU.empId);
+    var myScoreA_foc=getRoundScoreFor(dbCompareA,CU.empId);
+    var focReco=recommendationItems(fkeysSummary.map(function(f){return{key:f,value:myScoreA_foc.byFocus[f],label:FDEF[f].nm,def:FDEF[f].df.E};}));
+
+    html+='<div class="card" style="margin-bottom:14px;padding:16px">';
+    html+='<div class="db-sh-ttl" style="margin-bottom:10px">คะแนน FOCUS</div>';
+    html+='<div class="db-rank-of">คุณอยู่ในลำดับที่</div>';
+    html+='<div class="db-rank-num">'+(focRank.rank||'\u2013')+' <span style="font-size:14px;font-weight:600;color:var(--t2)">จาก '+focRank.total+' คน</span></div>';
+    html+='<div style="font-size:11px;color:var(--t1);margin-top:10px">เพิ่มการแสดงพฤติกรรมเหล่านี้เพื่อพัฒนาคะแนน</div>';
+    if(focReco.length){
+      html+='<div class="db-reco-list">';
+      focReco.forEach(function(it){
+        html+='<div class="db-reco-item">\u2022 <b>'+it.label+'</b><div class="db-reco-def">'+it.def+'</div></div>';
+      });
+      html+='</div>';
+    } else {
+      html+='<div class="db-allgood" style="margin-top:8px">&#127881; ยอดเยี่ยม! คุณได้รับคะแนนระดับ E ทุกหัวข้อแล้ว</div>';
+    }
+    html+='</div>';
+  }
 
   /* --- 3. FOCUS CHART --- */
   html+='<div class="card" data-pdf-sec="focus">';
