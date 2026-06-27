@@ -846,12 +846,17 @@ button,input,select{font-family:var(--fb)}
      Mobile browsers zoom in when a focused text field has font-size < 16px.
      Forcing 16px here (mobile only) keeps desktop's tighter, denser sizing
      untouched while eliminating the zoom-jump on every tap-to-type.
-     EXCEPTION: .gcatsel (the FOCUS-category dropdown) is intentionally
-     excluded and kept small to visually match the person-chip text size
-     below it -- per explicit request, even though this means iOS may
-     briefly zoom in when this particular dropdown is tapped open. */
+     EXCEPTION: .gcatsel (the Singhaway-topic dropdown) AND .std-sel (every
+     other standardized dropdown in the system) are intentionally excluded
+     and kept small here -- per explicit request, every dropdown in the
+     app must visually match .gcatsel's ACTUAL rendered size on mobile
+     (12px), not just its desktop size (14px), even though this means iOS
+     may briefly zoom in when any of these dropdowns is tapped open. This
+     was previously an exception for .gcatsel alone; now applied
+     system-wide so no dropdown can ever render larger than the reference
+     dropdown on any screen size. */
   input,textarea,select{font-size:16px!important}
-  .gcatsel{font-size:12px!important;padding:6px 11px}
+  .gcatsel,.std-sel{font-size:12px!important;padding:6px 11px}
 }
 @media(max-width:420px){
   .fg{grid-template-columns:repeat(2,1fr)}
@@ -898,19 +903,19 @@ button,input,select{font-family:var(--fb)}
 <nav class="mob-nav" id="mobNav">
   <div class="mob-nav-inner">
     <button class="mob-nav-btn on" id="mn-self" onclick="showTab('self')">
-      <span class="mn-ico">&#128221;</span>
+      <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
       <span>ตนเอง</span>
     </button>
     <button class="mob-nav-btn" id="mn-person" onclick="showTab('person')">
-      <span class="mn-ico">&#128100;</span>
+      <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
       <span>รายบุคคล</span>
     </button>
     <button class="mob-nav-btn" id="mn-grid" onclick="showTab('grid')">
-      <span class="mn-ico">&#128203;</span>
+      <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>
       <span>รายหัวข้อ</span>
     </button>
     <button class="mob-nav-btn" id="mn-dash" onclick="showTab('dash')">
-      <span class="mn-ico">&#128202;</span>
+      <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>
       <span>ภาพรวม</span>
     </button>
   </div>
@@ -922,15 +927,15 @@ button,input,select{font-family:var(--fb)}
 <nav class="mob-nav" id="mobNavAdmin" style="display:none">
   <div class="mob-nav-inner">
     <button class="mob-nav-btn" id="mna-scores" onclick="showAdminTab('scores')">
-      <span class="mn-ico">&#128202;</span>
+      <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>
       <span>คะแนน</span>
     </button>
     <button class="mob-nav-btn" id="mna-rounds" onclick="showAdminTab('rounds')">
-      <span class="mn-ico">&#9881;&#65039;</span>
+      <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
       <span>ตั้งค่า</span>
     </button>
     <button class="mob-nav-btn" id="mna-status" onclick="showAdminTab('status')">
-      <span class="mn-ico">&#9989;</span>
+      <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
       <span>สถานะ</span>
     </button>
   </div>
@@ -945,7 +950,7 @@ button,input,select{font-family:var(--fb)}
 <div class="sl-wrap">
 <div class="lc">
   <div style="text-align:center;margin-bottom:1.75rem">
-    <div class="li">&#9733;</div>
+    <div class="li"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
     <div class="lt">Singhaway FOCUS</div>
     <div class="ls">Evaluation Platform v6.0</div>
   </div>
@@ -954,7 +959,7 @@ button,input,select{font-family:var(--fb)}
   <label class="lfl">Password</label>
   <div class="pwr">
     <input class="lin" id="lp" type="password" placeholder="กรอก Password">
-    <button class="eyb" id="eyb">&#128065;</button>
+    <button class="eyb" id="eyb"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
   <button class="lbtn" id="lbtn" onclick="doLogin()">เข้าสู่ระบบ</button>
   <div class="lerr" id="lerr">Username หรือ Password ไม่ถูกต้อง</div>
@@ -971,7 +976,7 @@ button,input,select{font-family:var(--fb)}
         <div class="wav"><img id="wavimg" src="" alt="Profile"></div>
         <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0)" id="wname"></div>
         <div style="font-size:12px;color:var(--t1);margin-top:3px" id="wrole"></div>
-        <div style="font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t0);margin-top:14px;margin-bottom:4px">&#128221; วิธีการประเมิน Singhaway FOCUS</div>
+        <div style="font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t0);margin-top:14px;margin-bottom:4px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> วิธีการประเมิน Singhaway FOCUS</div>
         <div style="font-size:11px;color:var(--t1);margin-bottom:12px">กรุณาอ่านและรับทราบก่อนเริ่มประเมิน</div>
       </div>
       <div class="wrules">
@@ -992,23 +997,23 @@ button,input,select{font-family:var(--fb)}
   <!-- SUBMIT -->
   <div class="ovl" id="subovl">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#9888;&#65039; ยืนยันการ Submit?</div>
-      <div class="wb"><span>&#9888;&#65039;</span><span>หลังจาก Submit แล้ว <b>ไม่สามารถกลับมาแก้ไขได้อีก</b></span></div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> ยืนยันการ Submit?</div>
+      <div class="wb"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><span>หลังจาก Submit แล้ว <b>ไม่สามารถกลับมาแก้ไขได้อีก</b></span></div>
       <div style="font-size:13px;color:var(--t1);margin-bottom:1.25rem" id="submsg"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" id="subcancelbtn">ยกเลิก</button>
-        <button class="btn bt" id="subconfirmbtn">&#10003; ยืนยัน Submit</button>
+        <button class="btn bt" id="subconfirmbtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ยืนยัน Submit</button>
       </div>
     </div>
   </div>
   <!-- LOGOUT CONFIRM -->
   <div class="ovl" id="logoutovl">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#9211; ออกจากระบบ?</div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ?</div>
       <div style="font-size:13px;color:var(--t1);margin-bottom:1.25rem">ข้อมูลที่บันทึก (Save) ไว้แล้วจะยังอยู่ครบ \u2014 เข้าสู่ระบบใหม่เพื่อกลับมาทำต่อได้ทุกเมื่อ</div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" id="logoutcancelbtn">ยกเลิก</button>
-        <button class="btn bb" id="logoutconfirmbtn" style="background:var(--I);box-shadow:0 2px 10px rgba(163,45,45,.28)">&#9211; ออกจากระบบ</button>
+        <button class="btn bb" id="logoutconfirmbtn" style="background:var(--I);box-shadow:0 2px 10px rgba(163,45,45,.28)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ</button>
       </div>
     </div>
   </div>
@@ -1017,7 +1022,7 @@ button,input,select{font-family:var(--fb)}
     <div class="mbox spop">
       <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px">เพิ่มผู้รับการประเมิน</div>
       <div style="font-size:11px;color:var(--t1);margin-bottom:12px">ค้นหาได้จาก ชื่อ ชื่อเล่น รหัสพนักงาน ฝ่าย แผนก ตำแหน่ง</div>
-      <div class="sw"><span class="sico">&#128269;</span><input type="text" id="addq" placeholder="พิมพ์เพื่อค้นหา..."></div>
+      <div class="sw"><span class="sico"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span><input type="text" id="addq" placeholder="พิมพ์เพื่อค้นหา..."></div>
       <div class="sres" id="addres"></div>
       <div style="display:flex;justify-content:flex-end;margin-top:12px">
         <button class="btn bo" id="addclosebtn">ปิด</button>
@@ -1027,13 +1032,13 @@ button,input,select{font-family:var(--fb)}
   <!-- CLOSE ROUND (Admin) -->
   <div class="ovl" id="closeRoundOvl">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128197; ปิดรอบประเมินปัจจุบัน?</div>
-      <div class="wb"><span>&#9888;&#65039;</span><span>คะแนนของรอบ "<b id="crCurLabel"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M7 14h2"/><path d="M15 14h2"/></svg> ปิดรอบประเมินปัจจุบัน?</div>
+      <div class="wb"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><span>คะแนนของรอบ "<b id="crCurLabel"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
       <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px">ชื่อรอบถัดไป</div>
       <input type="text" class="lin" id="crNextLabel" style="color:var(--t0);background:var(--s1);border-color:var(--b1);margin-bottom:14px" placeholder="เช่น รอบที่ 2">
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" id="crCancelBtn">ยกเลิก</button>
-        <button class="btn bt" id="crConfirmBtn">&#10003; ยืนยันปิดรอบ</button>
+        <button class="btn bt" id="crConfirmBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ยืนยันปิดรอบ</button>
       </div>
     </div>
   </div>
@@ -1054,12 +1059,12 @@ button,input,select{font-family:var(--fb)}
 
       <!-- ① Header strip -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid var(--b0)">
-        <div style="width:40px;height:40px;border-radius:var(--r);background:var(--pb);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 1px 4px rgba(13,110,231,.2)">&#128172;</div>
+        <div style="width:40px;height:40px;border-radius:var(--r);background:var(--pb);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 1px 4px rgba(13,110,231,.2)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
         <div style="flex:1">
           <div style="font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t0)">บันทึกเหตุผลการให้คะแนน</div>
           <div style="font-size:11px;color:var(--t2);margin-top:2px">ข้อมูลนี้ช่วยให้การประเมินมีความโปร่งใส — ไม่บังคับกรอก</div>
         </div>
-        <button id="rsnCloseXBtn" type="button" title="\u0e1b\u0e34\u0e14 \u0e41\u0e25\u0e30\u0e22\u0e01\u0e40\u0e25\u0e34\u0e01\u0e01\u0e32\u0e23\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e19\u0e35\u0e49" style="flex-shrink:0;width:28px;height:28px;border-radius:50%;border:none;background:var(--s2);color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">&#10005;</button>
+        <button id="rsnCloseXBtn" type="button" title="\u0e1b\u0e34\u0e14 \u0e41\u0e25\u0e30\u0e22\u0e01\u0e40\u0e25\u0e34\u0e01\u0e01\u0e32\u0e23\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e19\u0e35\u0e49" style="flex-shrink:0;width:28px;height:28px;border-radius:50%;border:none;background:var(--s2);color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg></button>
       </div>
 
       <!-- ② Person info card -->
@@ -1083,30 +1088,30 @@ button,input,select{font-family:var(--fb)}
 
       <!-- ④ Existing note indicator (shown if note already exists) -->
       <div id="rsnExistingNote" style="display:none;padding:8px 12px;background:rgba(13,110,231,.06);border:1px solid rgba(13,110,231,.2);border-radius:var(--r);margin-bottom:10px;font-size:11px;color:var(--blue);display:flex;align-items:flex-start;gap:8px">
-        <div style="flex:1;min-width:0"><span style="font-weight:700">&#128204; เหตุผลเดิม:</span> <span id="rsnExistingText"></span></div>
-        <button id="rsnClearBtn" type="button" title="ล้างเหตุผล" style="flex-shrink:0;width:20px;height:20px;border-radius:50%;border:none;background:rgba(163,45,45,.12);color:var(--I);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">&#10005;</button>
+        <div style="flex:1;min-width:0"><span style="font-weight:700"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg> เหตุผลเดิม:</span> <span id="rsnExistingText"></span></div>
+        <button id="rsnClearBtn" type="button" title="ล้างเหตุผล" style="flex-shrink:0;width:20px;height:20px;border-radius:50%;border:none;background:rgba(163,45,45,.12);color:var(--I);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg></button>
       </div>
 
       <!-- ⑤ Textarea -->
       <div style="margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:12px;font-weight:700;color:var(--t0)">&#9997;&#65039; เหตุผล / ข้อสังเกต <span id="rsnReqMark" style="display:none;color:var(--I)">*</span></div>
+        <div style="font-size:12px;font-weight:700;color:var(--t0)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg> เหตุผล / ข้อสังเกต <span id="rsnReqMark" style="display:none;color:var(--I)">*</span></div>
         <div id="rsnCharCount" style="font-size:10px;color:var(--t2)">0 / 300</div>
       </div>
       <textarea class="rsn-textarea" id="rsnText" maxlength="300"
         placeholder="เช่น: ทำงานได้เร็วกว่ากำหนดสม่ำเสมอ, ต้องการพัฒนาด้านการสื่อสาร, ริเริ่มแก้ปัญหาเชิงรุก..."
         style="min-height:90px"></textarea>
       <div id="rsnReqWarn" style="display:none;margin-top:6px;padding:7px 10px;background:rgba(163,45,45,.08);border:1px solid rgba(163,45,45,.25);border-radius:var(--r);font-size:11px;color:var(--I);font-weight:600">
-        &#9888; ระดับ Low / Improve จำเป็นต้องระบุเหตุผลเสมอ
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> ระดับ Low / Improve จำเป็นต้องระบุเหตุผลเสมอ
       </div>
 
       <!-- ⑥ Actions -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:8px">
         <div id="rsnHint" style="font-size:10px;color:var(--t2);display:flex;align-items:center;gap:5px">
-          <span style="font-size:14px">&#128161;</span> ปล่อยว่างแล้วกด "ปิด" เพื่อไม่บันทึกเหตุผล
+          <span style="font-size:14px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3A7 7 0 0 0 12 2Z"/></svg></span> ปล่อยว่างแล้วกด "ปิด" เพื่อไม่บันทึกเหตุผล
         </div>
         <div style="display:flex;gap:8px">
           <button class="btn bo" id="rsnskipbtn" style="min-width:80px">ปิด</button>
-          <button class="btn bt" id="rsnsavebtn" style="min-width:120px">&#10003; บันทึกเหตุผล</button>
+          <button class="btn bt" id="rsnsavebtn" style="min-width:120px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> บันทึกเหตุผล</button>
         </div>
       </div>
     </div>
@@ -1118,7 +1123,7 @@ button,input,select{font-family:var(--fb)}
 
       <!-- Header -->
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:2px solid var(--b0)">
-        <div style="width:40px;height:40px;border-radius:var(--r);background:var(--pb);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 1px 4px rgba(13,110,231,.2)">&#128172;</div>
+        <div style="width:40px;height:40px;border-radius:var(--r);background:var(--pb);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 1px 4px rgba(13,110,231,.2)"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
         <div style="flex:1">
           <div style="font-family:var(--fh);font-size:15px;font-weight:700;color:var(--t0)">บันทึกเหตุผลการให้คะแนน</div>
           <div style="font-size:11px;color:var(--t2);margin-top:2px" id="batchSubtitle">กรอกเหตุผลสำหรับแต่ละคน — ปล่อยว่างได้ทุกช่อง</div>
@@ -1136,7 +1141,7 @@ button,input,select{font-family:var(--fb)}
       <div style="display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;padding-top:12px;border-top:1px solid var(--b0)">
         <div style="display:flex;gap:8px">
           <button class="btn bo" id="batchskipbtn" style="min-width:80px">ข้าม</button>
-          <button class="btn bt" id="batchsavebtn" style="min-width:110px">&#10003; บันทึก</button>
+          <button class="btn bt" id="batchsavebtn" style="min-width:110px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> บันทึก</button>
         </div>
       </div>
     </div>
@@ -1145,7 +1150,7 @@ button,input,select{font-family:var(--fb)}
   <!-- FEEDBACK WALL ALL -->
   <div class="ovl" id="fwAllovl">
     <div class="mbox" style="max-width:500px">
-      <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px">&#128172; ข้อเสนอแนะทั้งหมด</div>
+      <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> ข้อเสนอแนะทั้งหมด</div>
       <div id="fwAllBody" style="display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto;padding-right:4px"></div>
       <div style="display:flex;justify-content:flex-end;margin-top:14px">
         <button class="btn bo" onclick="cov('fwAllovl')">ปิด</button>
@@ -1156,14 +1161,14 @@ button,input,select{font-family:var(--fb)}
   <!-- EXPORT PDF -- choose which Dashboard sections to include -->
   <div class="ovl" id="exportPdfOvl">
     <div class="mbox" style="max-width:420px">
-      <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px">&#128190; Export PDF</div>
+      <div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0);margin-bottom:4px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export PDF</div>
       <div style="font-size:11px;color:var(--t2);margin-bottom:14px">เลือกเฉพาะส่วนที่ต้องการให้อยู่ในไฟล์ PDF</div>
       <div id="exportPdfOpts" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
       <div style="display:flex;justify-content:space-between;align-items:center">
         <button class="btn bo" style="font-size:11px;padding:6px 10px" onclick="setAllExportPdfOpts(true)">เลือกทั้งหมด</button>
         <div style="display:flex;gap:8px">
           <button class="btn bo" onclick="cov('exportPdfOvl')">ยกเลิก</button>
-          <button class="btn bt" id="exportPdfConfirmBtn">&#10003; Export PDF</button>
+          <button class="btn bt" id="exportPdfConfirmBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> Export PDF</button>
         </div>
       </div>
     </div>
@@ -1176,7 +1181,7 @@ button,input,select{font-family:var(--fb)}
   <aside class="sb" id="sb">
     <div class="sb-logo">
       <div class="sb-logo-row">
-        <div class="sb-star">&#9733;</div>
+        <div class="sb-star"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
         <div class="sb-logo-text">
           <div class="sb-brand">Singhaway <span>FOCUS</span></div>
           <div class="sb-ver">Evaluation Platform v6.0</div>
@@ -1195,17 +1200,17 @@ button,input,select{font-family:var(--fb)}
     </div>
     <nav class="sb-nav">
       <div class="sb-sec-lbl">ประเมินตนเอง</div>
-      <button class="nb on" id="t-self" onclick="showTab('self')" title="ประเมินตนเอง"><div class="ni">&#128221;</div><span class="nb-txt">ประเมินตนเอง</span></button>
+      <button class="nb on" id="t-self" onclick="showTab('self')" title="ประเมินตนเอง"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><span class="nb-txt">ประเมินตนเอง</span></button>
       <div class="sb-sep"></div>
       <div class="sb-sec-lbl">ประเมินผู้อื่น</div>
-      <button class="nb" id="t-person" onclick="showTab('person')" title="รายบุคคล"><div class="ni">&#128100;</div><span class="nb-txt">รายบุคคล</span></button>
-      <button class="nb" id="t-grid" onclick="showTab('grid')" title="รายหัวข้อ"><div class="ni">&#128203;</div><span class="nb-txt">รายหัวข้อ</span></button>
+      <button class="nb" id="t-person" onclick="showTab('person')" title="รายบุคคล"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="nb-txt">รายบุคคล</span></button>
+      <button class="nb" id="t-grid" onclick="showTab('grid')" title="รายหัวข้อ"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><span class="nb-txt">รายหัวข้อ</span></button>
       <div class="sb-sep"></div>
       <div class="sb-sec-lbl">ภาพรวม</div>
-      <button class="nb" id="t-dash" onclick="showTab('dash')" title="ภาพรวมผลประเมิน"><div class="ni">&#128202;</div><span class="nb-txt">ภาพรวมผลประเมิน</span></button>
+      <button class="nb" id="t-dash" onclick="showTab('dash')" title="ภาพรวมผลประเมิน"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div><span class="nb-txt">ภาพรวมผลประเมิน</span></button>
     </nav>
     <div class="sb-foot">
-      <button class="sb-logout" id="loutbtn" onclick="doLogout()" title="ออกจากระบบ">&#128682;<span class="nb-txt">ออกจากระบบ</span></button>
+      <button class="sb-logout" id="loutbtn" onclick="doLogout()" title="ออกจากระบบ"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="nb-txt">ออกจากระบบ</span></button>
     </div>
   </aside>
 
@@ -1218,7 +1223,7 @@ button,input,select{font-family:var(--fb)}
           <div class="tb-title" id="tbtitle">ประเมินตนเอง</div>
           <div class="tb-sub" id="tbsub"></div>
         </div>
-        <button class="tb-mob-logout" id="tbMobLogout" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico">&#9211;</span>ออกจากระบบ</button>
+        <button class="tb-mob-logout" id="tbMobLogout" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>ออกจากระบบ</button>
       </div>
       <div class="tb-right" id="tbright"></div>
     </div>
@@ -1283,7 +1288,7 @@ button,input,select{font-family:var(--fb)}
       <div class="view" id="v-dash">
         <div class="vi">
           <div class="phd">
-            <div><div class="ptitle">&#128202; ภาพรวมผลประเมิน</div></div>
+            <div><div class="ptitle"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> ภาพรวมผลประเมิน</div></div>
             <div></div>
           </div>
           <div id="dbody"></div>
@@ -1301,12 +1306,12 @@ button,input,select{font-family:var(--fb)}
   <!-- ADMIN: CLOSE ROUND (reuses the same modal markup/logic as the employee dashboard) -->
   <div class="ovl" id="closeRoundOvlA">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128197; เพิ่มรอบการประเมิน</div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M7 14h2"/><path d="M15 14h2"/></svg> เพิ่มรอบการประเมิน</div>
       <div style="display:flex;gap:6px;margin-bottom:14px">
         <button class="db-ftab on" id="crModeNowBtn" style="flex:1" onclick="setCrMode('now')">ปิดรอบปัจจุบัน &amp; เริ่มรอบใหม่ทันที</button>
         <button class="db-ftab" id="crModeScheduleBtn" style="flex:1" onclick="setCrMode('schedule')">กำหนดรอบล่วงหน้า (ไม่ปิดรอบปัจจุบัน)</button>
       </div>
-      <div class="wb" id="crModeWarnNow"><span>&#9888;&#65039;</span><span>คะแนนของรอบ "<b id="crCurLabelA"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
+      <div class="wb" id="crModeWarnNow"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><span>คะแนนของรอบ "<b id="crCurLabelA"></b>" จะถูก<b>เก็บเป็นประวัติ</b> และล้างหน้าจอเพื่อเริ่มรอบใหม่ \u2014 <b>ไม่สามารถย้อนกลับได้</b></span></div>
       <div class="wb" id="crModeWarnSchedule" style="display:none;background:rgba(13,110,231,.06);border-color:rgba(13,110,231,.25);color:var(--pb)"><span>\u2139\uFE0F</span><span>รอบ "<b id="crCurLabelA2"></b>" จะยังดำเนินการต่อตามปกติ \u2014 รอบที่กำหนดไว้นี้จะมีสถานะ <b>"รอเปิดรอบ"</b> จนกว่าจะกดเริ่มใช้งานจริงด้วยตัวเอง</span></div>
       <div style="font-size:12px;font-weight:700;color:var(--t1);margin-bottom:6px" id="crNextLabelHeading">กำหนดช่วงเวลารอบถัดไป</div>
       <div style="display:flex;gap:8px;margin-bottom:6px">
@@ -1322,19 +1327,19 @@ button,input,select{font-family:var(--fb)}
       <div id="crNextPreviewA" style="font-size:11px;color:var(--pb);font-weight:700;margin-bottom:14px;min-height:16px"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" id="crCancelBtnA">ยกเลิก</button>
-        <button class="btn bt" id="crConfirmBtnA">&#10003; ยืนยันปิดรอบ</button>
+        <button class="btn bt" id="crConfirmBtnA"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ยืนยันปิดรอบ</button>
       </div>
     </div>
   </div>
   <!-- ADMIN: NOTIFY (demo only -- no real email/LINE backend yet) -->
   <div class="ovl" id="notifyOvl">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128276; ส่งแจ้งเตือน</div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg> ส่งแจ้งเตือน</div>
       <div id="notifyBody" style="font-size:13px;color:var(--t1);margin-bottom:1.25rem"></div>
-      <div class="wb" style="background:rgba(186,117,23,.08);border-color:rgba(186,117,23,.25);color:var(--L)"><span>&#9888;&#65039;</span><span>นี่คือ Demo จำลองการแจ้งเตือน \u2014 ยังไม่ได้เชื่อมต่อระบบอีเมล/LINE จริง</span></div>
+      <div class="wb" style="background:rgba(186,117,23,.08);border-color:rgba(186,117,23,.25);color:var(--L)"><span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg></span><span>นี่คือ Demo จำลองการแจ้งเตือน \u2014 ยังไม่ได้เชื่อมต่อระบบอีเมล/LINE จริง</span></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
         <button class="btn bo" onclick="cov('notifyOvl')">ปิด</button>
-        <button class="btn bt" id="notifyConfirmBtn">&#10003; ส่งแจ้งเตือน (Demo)</button>
+        <button class="btn bt" id="notifyConfirmBtn"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ส่งแจ้งเตือน (Demo)</button>
       </div>
     </div>
   </div>
@@ -1352,7 +1357,7 @@ button,input,select{font-family:var(--fb)}
   <!-- ADMIN: EDIT CURRENT ROUND DATES -->
   <div class="ovl" id="editRoundOvlA">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#9999;&#65039; แก้ไขวันที่รอบปัจจุบัน</div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg> แก้ไขวันที่รอบปัจจุบัน</div>
       <div style="display:flex;gap:8px;margin-bottom:14px">
         <div style="flex:1">
           <div style="font-size:10px;color:var(--t2);margin-bottom:3px">วันเริ่มต้น</div>
@@ -1366,7 +1371,7 @@ button,input,select{font-family:var(--fb)}
       <div class="wb" style="margin-bottom:14px"><span>\u2139\uFE0F</span><span>ถ้าเปลี่ยนวันเริ่มต้นข้ามปี พ.ศ. ระบบจะปรับเลขรอบกลับไปเป็น 1 ให้อัตโนมัติ</span></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" id="editRoundCancelBtnA">ยกเลิก</button>
-        <button class="btn bt" id="editRoundConfirmBtnA">&#10003; บันทึก</button>
+        <button class="btn bt" id="editRoundConfirmBtnA"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> บันทึก</button>
       </div>
     </div>
   </div>
@@ -1374,11 +1379,11 @@ button,input,select{font-family:var(--fb)}
   <!-- ADMIN: ADD ROUND PREVIEW (item 2.2) -->
   <div class="ovl" id="addRoundPreviewOvl">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">&#128203; ยืนยันการสร้างรอบการประเมิน</div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> ยืนยันการสร้างรอบการประเมิน</div>
       <div id="addRoundPreviewBody" style="margin-bottom:14px"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" onclick="cov('addRoundPreviewOvl')">&#8592; ย้อนกลับ</button>
-        <button class="btn bt" onclick="confirmAddRoundFromPreview()">&#10003; ยืนยันสร้างรอบ</button>
+        <button class="btn bt" onclick="confirmAddRoundFromPreview()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ยืนยันสร้างรอบ</button>
       </div>
     </div>
   </div>
@@ -1399,7 +1404,7 @@ button,input,select{font-family:var(--fb)}
   <aside class="sb" id="sbAdmin">
     <div class="sb-logo">
       <div class="sb-logo-row">
-        <div class="sb-star" style="background:linear-gradient(135deg,#2A3F5F,#0D1B2A)">&#128274;</div>
+        <div class="sb-star" style="background:linear-gradient(135deg,#2A3F5F,#0D1B2A)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <div class="sb-logo-text">
           <div class="sb-brand">Singhaway <span>FOCUS</span></div>
           <div class="sb-ver">System Admin</div>
@@ -1418,14 +1423,14 @@ button,input,select{font-family:var(--fb)}
     </div>
     <nav class="sb-nav">
       <div class="sb-sec-lbl">ภาพรวมคะแนน</div>
-      <button class="nb on" id="at-scores" onclick="showAdminTab('scores')" title="คะแนนรายบุคคล"><div class="ni">&#128202;</div><span class="nb-txt">คะแนนรายบุคคล</span></button>
+      <button class="nb on" id="at-scores" onclick="showAdminTab('scores')" title="คะแนนรายบุคคล"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div><span class="nb-txt">คะแนนรายบุคคล</span></button>
       <div class="sb-sep"></div>
       <div class="sb-sec-lbl">การจัดการระบบ</div>
-      <button class="nb" id="at-rounds" onclick="showAdminTab('rounds')" title="ตั้งค่า"><div class="ni">&#9881;&#65039;</div><span class="nb-txt">ตั้งค่า</span></button>
-      <button class="nb" id="at-status" onclick="showAdminTab('status')" title="สถานะการประเมิน"><div class="ni">&#9989;</div><span class="nb-txt">สถานะการประเมิน</span></button>
+      <button class="nb" id="at-rounds" onclick="showAdminTab('rounds')" title="ตั้งค่า"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="nb-txt">ตั้งค่า</span></button>
+      <button class="nb" id="at-status" onclick="showAdminTab('status')" title="สถานะการประเมิน"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div><span class="nb-txt">สถานะการประเมิน</span></button>
     </nav>
     <div class="sb-foot">
-      <button class="sb-logout" id="loutbtnA" onclick="doLogout()" title="ออกจากระบบ">&#128682;<span class="nb-txt">ออกจากระบบ</span></button>
+      <button class="sb-logout" id="loutbtnA" onclick="doLogout()" title="ออกจากระบบ"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="nb-txt">ออกจากระบบ</span></button>
     </div>
   </aside>
 
@@ -1437,7 +1442,7 @@ button,input,select{font-family:var(--fb)}
           <div class="tb-title" id="atbtitle">คะแนนรายบุคคล</div>
           <div class="tb-sub" id="atbsub"></div>
         </div>
-        <button class="tb-mob-logout" id="tbMobLogoutA" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico">&#9211;</span>ออกจากระบบ</button>
+        <button class="tb-mob-logout" id="tbMobLogoutA" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>ออกจากระบบ</button>
       </div>
       <div class="tb-right"></div>
     </div>
@@ -1476,6 +1481,61 @@ function avHTML(p,sz){
   return '<div class="av" style="width:'+s+'px;height:'+s+'px;background:'+p.color+';font-size:'+Math.round(s*0.34)+'px">'+ini2(p.name)+'</div>';
 }
 function ini2(n){var p=n.trim().split(' ');return p.length>=2?p[0][0]+p[1][0]:n.slice(0,2);}
+/* ── Icon system (replaces emoji system-wide, per explicit request) ──
+ * Lucide-style inline SVGs (stroke-based, 24x24 viewBox, currentColor)
+ * so exactly ONE icon set is used everywhere instead of mixing icon
+ * libraries or falling back to emoji. icon(name,size,extraStyle) returns
+ * a ready-to-insert <svg> string; size defaults to 18px per the spec's
+ * 18-20px standard. Colors always come from the existing CSS variable
+ * palette via currentColor (inherits whatever color the parent element
+ * sets), never a hardcoded icon-specific color. */
+var ICON_PATHS={
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  barchart:'<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>',
+  chartcolumn:'<path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/>',
+  calendarrange:'<rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M7 14h2"/><path d="M15 14h2"/>',
+  user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  building:'<rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="22" x2="9" y2="18"/><line x1="15" y1="22" x2="15" y2="18"/><line x1="8" y1="6" x2="8" y2="6.01"/><line x1="16" y1="6" x2="16" y2="6.01"/><line x1="8" y1="10" x2="8" y2="10.01"/><line x1="16" y1="10" x2="16" y2="10.01"/><line x1="8" y1="14" x2="8" y2="14.01"/><line x1="16" y1="14" x2="16" y2="14.01"/>',
+  shield:'<path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5z"/>',
+  eye:'<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+  badgecheck:'<path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z"/><path d="m9 12 2 2 4-4"/>',
+  info:'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  alerttriangle:'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  circlecheck:'<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  circlex:'<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>',
+  trash:'<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>',
+  plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  pencil:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>',
+  search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>',
+  filetext:'<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
+  lock:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  play:'<polygon points="5 3 19 12 5 21 5 3"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  refresh:'<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+  copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  chevronleft:'<polyline points="15 18 9 12 15 6"/>',
+  chevronright:'<polyline points="9 18 15 12 9 6"/>',
+  trendingup:'<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>',
+  trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+  target:'<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>',
+  award:'<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  heart:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>',
+  lockopen:'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>',
+  shieldoff:'<path d="M19.69 14a6.9 6.9 0 0 0 .31-2V5l-8-3-3.16 1.18"/><path d="M4.73 4.73 4 5v7c0 6 8 10 8 10a13.5 13.5 0 0 0 4.3-2.7"/><line x1="2" y1="2" x2="22" y2="22"/>',
+  message:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  filearchive:'<path d="M4 22V4c0-.5.2-1 .6-1.4S5.5 2 6 2h8.5L20 7.5V20c0 .5-.2 1-.6 1.4-.4.4-.9.6-1.4.6Z"/><path d="M10 8h.01"/><path d="M10 11h.01"/><path d="M10 14a1 1 0 0 0-1 1v.51l.5.49h1l.5-.5V15a1 1 0 0 0-1-1z"/>',
+  logout:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'
+};
+function icon(name,size,extraStyle){
+  size=size||18;
+  var p=ICON_PATHS[name]||'';
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0'+(extraStyle?';'+extraStyle:'')+'">'+p+'</svg>';
+}
+var ICONSZ={sidebar:20,pagetitle:22,cardheader:18,button:16,dropdown:16,tableaction:16,status:16,tooltip:14};
 var RCOL={E:'#1D9E75',G:'#185FA5',S:'#5F6B7A',L:'#BA7517',I:'#A32D2D'};
 var RVAL={E:5,G:4,S:3,L:2,I:1};
 var RATINGS=['E','G','S','L','I'];
@@ -1733,8 +1793,6 @@ var SCHEDULED_ROUNDS=[]; /* rounds planned in advance but not yet activated -- t
    per explicit request -- NOT meant to represent real evaluation history.
    Each entry: {id,year,roundNo,startDate,endDate,label,
                 byEmp:{empId:{overall,byCat:{},byFocus:{}}}} */
-var MOCK_ROUNDS=[];
-var mockRound1=null; /* kept for backward compatibility with the existing FOCUS-chart overlay -- now just points at MOCK_ROUNDS[0] */
 function _mockScoreForRound(empId,roundKey){
   var seed=_seedFor(empId+'_'+roundKey+'_overall');
   var overall=1.5+((seed%351)/100); /* 1.50-5.00 spread, same style as mockScoreFor() */
@@ -1758,38 +1816,46 @@ function _mockScoreForRound(empId,roundKey){
   });
   return{overall:overall,byCat:byCat,byFocus:byFocus,byCriterion:byCriterion};
 }
+/* ── Single Source of Truth mock seeding (replaces the old separate
+ * MOCK_ROUNDS array) ──
+ * Previously, ensureMockRound1() built a SEPARATE array (MOCK_ROUNDS)
+ * that only the Dashboard's dropdowns ever read from -- the Admin
+ * history table never saw those rounds at all, exactly the "two
+ * different mock datasets" problem this request calls out. Now this
+ * seeds ROUNDS (closed history), currentRound (the active round), and
+ * SCHEDULED_ROUNDS directly -- the SAME three variables every part of
+ * the app (Admin table, Dashboard dropdowns, comparison, ranking) was
+ * already reading from. There is no second array anymore; one seed,
+ * one source, used everywhere identically. */
 function ensureMockRound1(){
-  if(MOCK_ROUNDS.length||ROUNDS.length)return;
-  /* a handful of past rounds spanning a couple of years, purely for
-     exercising the comparison dropdowns -- years/dates are illustrative */
-  var defs=[
-    {year:2567,roundNo:1,startDate:'2024-01-15',endDate:'2024-06-30'},
-    {year:2567,roundNo:2,startDate:'2024-07-01',endDate:'2024-12-31'},
-    {year:2568,roundNo:1,startDate:'2025-01-15',endDate:'2025-06-30'},
-    {year:2568,roundNo:2,startDate:'2025-07-01',endDate:'2025-12-31'}
-  ];
-  defs.forEach(function(d){
-    var roundKey='mock_'+d.year+'_'+d.roundNo;
-    var byEmp={};
-    ALL_EMP.forEach(function(e){byEmp[e.empId]=_mockScoreForRound(e.empId,roundKey);});
-    MOCK_ROUNDS.push({
-      id:roundKey,year:d.year,roundNo:d.roundNo,startDate:d.startDate,endDate:d.endDate,
-      label:roundLabel(d.year,d.roundNo),byEmp:byEmp
-    });
-  });
-  mockRound1=MOCK_ROUNDS[MOCK_ROUNDS.length-1]; /* most recent mock round = closest stand-in for the old single mockRound1 */
-  mockRound1.avgByEmp={};
-  Object.keys(mockRound1.byEmp).forEach(function(eid){mockRound1.avgByEmp[eid]=mockRound1.byEmp[eid].overall;});
-  mockRound1.focByLetter=mockRound1.byEmp[Object.keys(mockRound1.byEmp)[0]]?(function(){
-    /* org-wide average per FOCUS letter across all employees, for the
-       existing FOCUS-chart overlay that reads mockRound1.focByLetter */
-    var avg={};
-    Object.keys(FDEF).forEach(function(f){
-      var vals=ALL_EMP.map(function(e){return mockRound1.byEmp[e.empId].byFocus[f];});
-      avg[f]=vals.reduce(function(a,b){return a+b;},0)/vals.length;
-    });
-    return avg;
-  })():{};
+  if(ROUNDS.length||SCHEDULED_ROUNDS.length||currentRound.id!=='r1')return; /* never re-seed over real data */
+  function seedRound(year,roundNo,startDate,endDate,isAnon,empCount,completedCount){
+    var id='mock_'+year+'_'+roundNo;
+    return{id:id,year:year,roundNo:roundNo,startDate:startDate,endDate:endDate,
+      label:roundLabel(year,roundNo),isAnonymous:isAnon,empCount:empCount,completedCount:completedCount,
+      closedAt:new Date(endDate+'T23:59:59').getTime()};
+  }
+  /* 1/2568 -- Closed, Anonymous, 150 employees, 148 completed */
+  ROUNDS.push(seedRound(2568,1,'2025-01-15','2025-06-30',true,150,148));
+  /* 2/2568 -- Closed, Anonymous, 152 employees, 151 completed, slightly
+     different scores from 1/2568 (the per-round deterministic seed in
+     _mockScoreForRound already varies by round id, so 1/2568 vs 2/2568
+     naturally produce different mock numbers without any extra code) */
+  ROUNDS.push(seedRound(2568,2,'2025-07-01','2025-12-31',true,152,151));
+  /* 1/2569 -- Active (becomes the live currentRound), Identified, 155
+     employees, only 102 completed so far -- a realistic in-progress
+     round for testing the comparison/ranking views against a round
+     that isn't finished yet. */
+  currentRound={id:'r_mock_2569_1_cur',year:2569,roundNo:1,startDate:'2026-01-01',endDate:'2026-06-30',
+    label:roundLabel(2569,1),closed:false,isAnonymous:false,empCount:155,completedCount:102};
+  /* 2/2569, 3/2569 -- Scheduled, no evaluation data yet (genuinely
+     correct per spec -- a Scheduled round can't have submitted data),
+     used for testing the open-round workflow. */
+  SCHEDULED_ROUNDS.push({id:'mock_sched_2569_2',year:2569,roundNo:2,startDate:'2026-07-01',endDate:'2026-12-31',
+    label:roundLabel(2569,2),isAnonymous:true});
+  SCHEDULED_ROUNDS.push({id:'mock_sched_2569_3',year:2569,roundNo:3,startDate:'2027-01-01',endDate:'2027-06-30',
+    label:roundLabel(2569,3),isAnonymous:true});
+  saveRoundsData();
 }
 /* Returns every round selectable in the comparison dropdowns: the live
    current round first, then real closed ROUNDS, then the mock history
@@ -1797,7 +1863,6 @@ function ensureMockRound1(){
 function allSelectableRounds(){
   var list=[{id:'current',year:currentRound.year,roundNo:currentRound.roundNo,label:roundLabel(currentRound.year,currentRound.roundNo),isCurrent:true}];
   ROUNDS.slice().reverse().forEach(function(r){list.push({id:r.id,year:r.year,roundNo:r.roundNo,label:r.label});});
-  MOCK_ROUNDS.slice().reverse().forEach(function(r){list.push({id:r.id,year:r.year,roundNo:r.roundNo,label:r.label,isMock:true});});
   return list;
 }
 /* Returns {older, newer} round-info objects (from allSelectableRounds)
@@ -1837,8 +1902,6 @@ function getRoundScoreFor(roundId,empId,filter){
     }
     return _mockScoreForRound(empId,'current_'+currentRound.id);
   }
-  var mr=MOCK_ROUNDS.filter(function(r){return r.id===roundId;})[0];
-  if(mr)return mr.byEmp[empId];
   var rr=ROUNDS.filter(function(r){return r.id===roundId;})[0];
   if(rr)return _mockScoreForRound(empId,'closed_'+roundId); /* real closed rounds still lack a full per-employee mock breakdown -- approximate consistently */
   return _mockScoreForRound(empId,roundId);
@@ -1903,7 +1966,7 @@ function h(id){return document.getElementById(id);}
 function cov(id){h(id).classList.remove('on');}
 var ttimer=null;
 function toast(ico,msg,sub,col){
-  h('tico').textContent=ico;h('tmsg').textContent=msg;h('tsub').textContent=sub||'';
+  h('tico').innerHTML=ico;h('tmsg').textContent=msg;h('tsub').textContent=sub||'';
   var el=h('toast');el.style.borderLeft='4px solid '+(col||'var(--teal)');
   el.classList.add('on');if(ttimer)clearTimeout(ttimer);ttimer=setTimeout(function(){el.classList.remove('on');},3600);
 }
@@ -2034,8 +2097,8 @@ function mockScoreFor(empId){
 
 /* --- TAB 1: สถานะการประเมิน (completion tracker + demo notify) --- */
 function renderAdminStatus(){
-  var html='<div class="phd"><div><div class="ptitle">&#9989; สถานะการประเมิน</div></div></div>';
-  html+='<div class="wb" style="margin-bottom:14px"><span>&#8505;&#65039;</span><span>สถานะ Save/Submit และเวลาด้านล่างจะอัปเดตทันทีเมื่อพนักงานบันทึกข้อมูลในระบบ</span></div>';
+  var html='<div class="phd"><div><div class="ptitle">'+icon('circlecheck',16)+' สถานะการประเมิน</div></div></div>';
+  html+='<div class="wb" style="margin-bottom:14px"><span>'+icon('info',16)+'&#65039;</span><span>สถานะ Save/Submit และเวลาด้านล่างจะอัปเดตทันทีเมื่อพนักงานบันทึกข้อมูลในระบบ</span></div>';
   var allRows=ALL_EMP.map(function(e){
     var c=mockCompletionFor(e.empId);
     return{e:e,c:c};
@@ -2047,7 +2110,7 @@ function renderAdminStatus(){
   html+='<div><div style="font-size:11px;color:var(--t2)">ประเมินตนเองแล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+selfDoneCnt+' / '+allRows.length+'</div></div>';
   html+='<div><div style="font-size:11px;color:var(--t2)">Submit แล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--G)">'+submittedCnt+' / '+allRows.length+'</div></div>';
   html+='<div><div style="font-size:11px;color:var(--t2)">ยังไม่ Submit</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--I)">'+pendingSubmit.length+' คน</div></div>';
-  html+='<button class="btn bt" style="margin-left:auto;font-size:12px" onclick="notifyAllPending()">&#128276; ส่งแจ้งเตือนทุกคนที่ยังไม่ Submit</button>';
+  html+='<button class="btn bt" style="margin-left:auto;font-size:12px" onclick="notifyAllPending()">'+icon('bell',16)+' ส่งแจ้งเตือนทุกคนที่ยังไม่ Submit</button>';
   html+='</div>';
 
   /* ── daily 9am auto-reminder schedule info ──
@@ -2062,7 +2125,7 @@ function renderAdminStatus(){
   try{sentToday=localStorage.getItem(todayKey)==='1';}catch(e){}
   var rdStatus=daysRemaining(currentRound.endDate);
   var scheduleActive=rdStatus===null||rdStatus>=0;
-  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#8987;</div><div class="db-sh-ttl">แจ้งเตือนอัตโนมัติรายวัน</div></div>';
+  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">'+icon('clock',16)+'</div><div class="db-sh-ttl">แจ้งเตือนอัตโนมัติรายวัน</div></div>';
   html+='<div style="padding:14px 16px">';
   html+='<div style="font-size:12px;color:var(--t1);line-height:1.7;margin-bottom:10px">ระบบจะส่งแจ้งเตือนให้คนที่ยังไม่กด <b>Submit</b> ทุกวัน เวลา <b>9:00 น.</b> โดยอัตโนมัติ จนกว่าจะกด Submit หรือหมดระยะเวลาประเมินของรอบนี้'
     +(currentRound.endDate?' (สิ้นสุด '+fmtThaiDate(currentRound.endDate)+')':'')+'</div>';
@@ -2070,14 +2133,14 @@ function renderAdminStatus(){
   html+='<span class="rb-inl" style="background:'+(scheduleActive?'var(--E)':'var(--t2)')+'">'+(scheduleActive?'\u25CF กำลังทำงาน':'\u25CF หยุดทำงาน (รอบหมดเวลาแล้ว)')+'</span>';
   html+='<span style="font-size:11px;color:var(--t2)">'+(sentToday?'\u2713 ส่งแจ้งเตือนของวันนี้ไปแล้ว':'ยังไม่ส่งแจ้งเตือนของวันนี้')+'</span>';
   html+='</div>';
-  html+='<div class="wb" style="margin-top:10px;background:rgba(186,117,23,.08);border-color:rgba(186,117,23,.25);color:var(--L)"><span>&#9888;&#65039;</span><span>การส่งจริงทุกวัน 9:00 น. ต้องมี backend/cron ฝั่งเซิร์ฟเวอร์ทำงานอยู่เสมอ (เบราว์เซอร์ที่ไม่ได้เปิดหน้านี้ไว้จะส่งเองไม่ได้) \u2014 ปุ่มด้านล่างคือการสาธิต/ทดสอบส่งด้วยมือ</span></div>';
-  html+='<button class="btn bo" style="margin-top:10px;font-size:12px" onclick="sendDailyReminderNow()">&#128276; ทดสอบส่งแจ้งเตือนตอนนี้ ('+pendingSubmit.length+' คน)</button>';
+  html+='<div class="wb" style="margin-top:10px;background:rgba(186,117,23,.08);border-color:rgba(186,117,23,.25);color:var(--L)"><span>'+icon('alerttriangle',16)+'</span><span>การส่งจริงทุกวัน 9:00 น. ต้องมี backend/cron ฝั่งเซิร์ฟเวอร์ทำงานอยู่เสมอ (เบราว์เซอร์ที่ไม่ได้เปิดหน้านี้ไว้จะส่งเองไม่ได้) \u2014 ปุ่มด้านล่างคือการสาธิต/ทดสอบส่งด้วยมือ</span></div>';
+  html+='<button class="btn bo" style="margin-top:10px;font-size:12px" onclick="sendDailyReminderNow()">'+icon('bell',16)+' ทดสอบส่งแจ้งเตือนตอนนี้ ('+pendingSubmit.length+' คน)</button>';
   html+='</div></div>';
 
   /* ── filter bar: search + department dropdown ── */
   var depts=Array.from(new Set(ALL_EMP.map(function(e){return e.dept;}).filter(function(d){return d;}))).sort();
   html+='<div class="card" style="padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">';
-  html+='<input type="text" id="adminStatusSearch" value="'+adminStatusQ+'" placeholder="\uD83D\uDD0D ค้นหาชื่อ ชื่อเล่น หรือรหัสพนักงาน..." style="flex:1;min-width:200px;padding:8px 12px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;outline:none" oninput="adminStatusQ=this.value;renderAdminStatus()">';
+  html+='<div style="position:relative;flex:1;min-width:200px"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t2);pointer-events:none">'+icon('search',14)+'</span><input type="text" id="adminStatusSearch" value="'+adminStatusQ+'" placeholder="ค้นหาชื่อ ชื่อเล่น หรือรหัสพนักงาน..." style="width:100%;padding:8px 12px 8px 32px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;outline:none" oninput="adminStatusQ=this.value;renderAdminStatus()"></div>';
   html+='<select id="adminStatusDept" class="std-sel" onchange="adminStatusDept=this.value;renderAdminStatus()">';
   html+='<option value=""'+(adminStatusDept===''?' selected':'')+'>ทุกหน่วยงาน</option>';
   depts.forEach(function(d){html+='<option value="'+d+'"'+(adminStatusDept===d?' selected':'')+'>'+d+'</option>';});
@@ -2106,7 +2169,7 @@ function renderAdminStatus(){
     html+='<td style="font-size:11px;color:var(--t2)">'+(c.savedAt?fmtThaiDateTime(c.savedAt):'<span style="color:var(--I)">\u2013</span>')+'</td>';
     html+='<td style="font-size:11px;color:var(--t2)">'+(c.submittedAt?fmtThaiDateTime(c.submittedAt):'<span style="color:var(--I)">ยังไม่ Submit</span>')+'</td>';
     html+='<td><div style="display:flex;align-items:center;gap:6px;justify-content:center"><div style="flex:1;max-width:90px;height:6px;background:var(--s2);border-radius:3px;overflow:hidden"><div style="width:'+c.receivedPct+'%;height:100%;background:'+(c.receivedPct>=70?'var(--E)':c.receivedPct>=30?'var(--L)':'var(--I)')+'"></div></div><span style="font-size:10px;color:var(--t2);white-space:nowrap">'+c.receivedPct+'%</span></div></td>';
-    html+='<td><button class="btn bo" style="font-size:10px;padding:4px 10px" onclick="openNotifyDialog(\''+e.empId+'\')">&#128276; แจ้งเตือน</button></td>';
+    html+='<td><button class="btn bo" style="font-size:10px;padding:4px 10px" onclick="openNotifyDialog(\''+e.empId+'\')">'+icon('bell',16)+' แจ้งเตือน</button></td>';
     html+='</tr>';
   });
   html+='</tbody></table></div></div>';
@@ -2121,8 +2184,8 @@ function sendDailyReminderNow(){
   var pending=ALL_EMP.filter(function(e){return !mockCompletionFor(e.empId).submitted;});
   var todayKey='sf_auto_remind_'+new Date().toISOString().slice(0,10);
   try{localStorage.setItem(todayKey,'1');}catch(e){}
-  if(!pending.length){toast('&#9989;','ทุกคน Submit ครบแล้ว','ไม่มีใครต้องแจ้งเตือนวันนี้','var(--E)');renderAdminTab();return;}
-  toast('&#128276;','ส่งแจ้งเตือนรายวันแล้ว (Demo)','ถึง '+pending.length+' คนที่ยังไม่ Submit','var(--E)');
+  if(!pending.length){toast(''+icon('circlecheck',16)+'','ทุกคน Submit ครบแล้ว','ไม่มีใครต้องแจ้งเตือนวันนี้','var(--E)');renderAdminTab();return;}
+  toast(''+icon('bell',16)+'','ส่งแจ้งเตือนรายวันแล้ว (Demo)','ถึง '+pending.length+' คนที่ยังไม่ Submit','var(--E)');
   renderAdminTab();
 }
 function openNotifyDialog(empId){
@@ -2131,17 +2194,17 @@ function openNotifyDialog(empId){
   h('notifyBody').innerHTML='ส่งการแจ้งเตือนไปยัง <b>'+e.name+'</b> ('+e.nick+') ให้กด Submit การประเมินให้ครบถ้วนในรอบ <b>'+currentRound.label+'</b>?';
   h('notifyConfirmBtn').onclick=function(){
     cov('notifyOvl');
-    toast('&#128276;','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+e.name,'var(--E)');
+    toast(''+icon('bell',16)+'','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+e.name,'var(--E)');
   };
   h('notifyOvl').classList.add('on');
 }
 function notifyAllPending(){
   var pending=ALL_EMP.filter(function(e){return !mockCompletionFor(e.empId).submitted;});
-  if(!pending.length){toast('&#9989;','ทุกคน Submit ครบแล้ว','','var(--E)');return;}
+  if(!pending.length){toast(''+icon('circlecheck',16)+'','ทุกคน Submit ครบแล้ว','','var(--E)');return;}
   h('notifyBody').innerHTML='ส่งการแจ้งเตือนไปยังพนักงานที่ยังไม่ Submit <b>'+pending.length+' คน</b> ให้ดำเนินการในรอบ <b>'+currentRound.label+'</b>?';
   h('notifyConfirmBtn').onclick=function(){
     cov('notifyOvl');
-    toast('&#128276;','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+pending.length+' คนที่ยังไม่ Submit','var(--E)');
+    toast(''+icon('bell',16)+'','ส่งแจ้งเตือนแล้ว (Demo)','ถึง '+pending.length+' คนที่ยังไม่ Submit','var(--E)');
   };
   h('notifyOvl').classList.add('on');
 }
@@ -2230,15 +2293,15 @@ var focusFilterGroup='ALL'; /* 'ALL' = เลือกทั้งหมด (who
 var focusFilterDiv='';      /* '' = ทุกฝ่าย within the selected กลุ่ม */
 var focusFilterDept='';     /* '' = ทุกแผนก within the selected ฝ่าย */
 function renderAdminScores(){
-  var html='<div class="phd"><div><div class="ptitle">&#128202; คะแนนรายบุคคล</div></div><div><button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">&#128190; Export PDF</button></div></div>';
-  html+='<div class="wb" style="margin-bottom:14px"><span>&#8505;&#65039;</span><span>คะแนนด้านล่างคำนวณจากข้อมูลการประเมินล่าสุดในระบบ</span></div>';
+  var html='<div class="phd"><div><div class="ptitle">'+icon('chartcolumn',18)+' คะแนนรายบุคคล</div></div><div><button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">'+icon('download',16)+' Export PDF</button></div></div>';
+  html+='<div class="wb" style="margin-bottom:14px"><span>'+icon('info',16)+'&#65039;</span><span>คะแนนด้านล่างคำนวณจากข้อมูลการประเมินล่าสุดในระบบ</span></div>';
 
   /* ── round comparison selector ──
      รอบ A drives every figure on this page (whole-page filter, per the
      request); รอบ B is optional and only feeds the small comparison
      figures next to each Round-A number -- it never replaces the page. */
   html+='<div class="card" style="padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
-  html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">&#128197; รอบหลัก:</span>';
+  html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">'+icon('calendarrange',18)+' รอบหลัก:</span>';
   html+=roundOptionsHTML(adminRoundA,'adminRoundA');
   html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap;margin-left:6px">เปรียบเทียบกับ:</span>';
   html+=roundOptionsHTML(adminRoundB,'adminRoundB');
@@ -2258,7 +2321,7 @@ function renderAdminScoresBody(html){
      focus + cursor position right after the re-render (see
      adminScoreSearchInput()). font-size is 16px to also avoid iOS/Android
      auto-zoom on focus, which was compounding the same bug visually. */
-  html+='<div style="margin-bottom:14px"><input type="text" id="adminScoreSearch" value="'+adminScoreQ+'" placeholder="\uD83D\uDD0D ค้นหาชื่อ ชื่อเล่น รหัสพนักงาน หรือแผนก..." style="width:100%;max-width:420px;padding:9px 13px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:16px;outline:none" oninput="onAdminScoreSearchInput(this)"></div>';
+  html+='<div style="margin-bottom:14px;position:relative;width:100%;max-width:420px"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t2);pointer-events:none">'+icon('search',14)+'</span><input type="text" id="adminScoreSearch" value="'+adminScoreQ+'" placeholder="ค้นหาชื่อ ชื่อเล่น รหัสพนักงาน หรือแผนก..." style="width:100%;padding:9px 13px 9px 32px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:16px;outline:none" oninput="onAdminScoreSearchInput(this)"></div>';
 
   var allRows=ALL_EMP.map(function(e){var sc=mockScoreFor(e.empId);return{e:e,sc:sc,lbl:s2l(sc.avg)};});
   var q=adminScoreQ.trim().toLowerCase();
@@ -2326,12 +2389,12 @@ function renderAdminScoresBody(html){
   var DIV_CODE_TO_NAME={'WRM':'บริหารทรัพยากร'};
   var DEPT_CODE_TO_NAME={'WC':'อนุรักษ์ทรัพยากรน้ำ','WT':'บำบัดน้ำดี','WWT':'บำบัดน้ำทิ้ง','EV':'สิ่งแวดล้อม'};
 
-  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128202;</div><div class="db-sh-ttl">สรุปคะแนน FOCUS</div></div>';
+  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">'+icon('chartcolumn',18)+'</div><div class="db-sh-ttl">สรุปคะแนน FOCUS</div></div>';
   html+='<div style="padding:14px 16px">';
   html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">';
   html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">กลุ่ม:</span>';
   html+='<select id="focusFilterGroup" class="std-sel" onchange="focusFilterGroup=this.value;focusFilterDiv=\'\';focusFilterDept=\'\';renderAdminScores()">';
-  html+='<option value="ALL"'+(focusFilterGroup==='ALL'?' selected':'')+'>&#127970; เลือกทั้งหมด (ภาพรวมองค์กร)</option>';
+  html+='<option value="ALL"'+(focusFilterGroup==='ALL'?' selected':'')+'>'+icon('building',18)+' เลือกทั้งหมด (ภาพรวมองค์กร)</option>';
   Object.keys(ORG_STRUCTURE).forEach(function(g){html+='<option value="'+g+'"'+(focusFilterGroup===g?' selected':'')+'>'+g+'</option>';});
   html+='</select>';
 
@@ -2526,7 +2589,7 @@ function renderAdminScoresBody(html){
       catAvgScoped[cat]=vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0;
     });
     var catChartH=200;
-    html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#11088;</div><div class="db-sh-ttl">สรุปคะแนน Singhaway Values</div></div>';
+    html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('star',16)+'</div><div class="db-sh-ttl">สรุปคะแนน Singhaway Values</div></div>';
     html+='<div style="padding:14px 16px">';
     html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">แกนตั้ง = <b>คะแนนเฉลี่ย</b> (0-5) \u2014 '+scopeLabel+' ('+scopeRowsForAgg.length+' คน)</div>';
     html+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
@@ -2569,9 +2632,9 @@ function renderAdminScoresBody(html){
     var fd2=FDEF[df];
     var matches=allRows.filter(function(r){return s2l(r.sc.byFocus[df]).l===dl;});
     html+='<div class="card" style="margin-bottom:14px;border-left:4px solid '+RCOL[dl]+'">';
-    html+='<div class="chd"><div class="db-sh-ico" style="background:'+RCOL[dl]+'18">&#128269;</div>';
+    html+='<div class="chd"><div class="db-sh-ico" style="background:'+RCOL[dl]+'18">'+icon('search',16)+'</div>';
     html+='<div class="db-sh-ttl">คนที่ได้ระดับ '+dl+' ในหัวข้อ '+df+' ('+fd2.nm+') \u2014 '+matches.length+' คน</div>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 10px" onclick="adminScoreFocusDrill=null;renderAdminScores()">&#10005; ปิด</button></div>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 10px" onclick="adminScoreFocusDrill=null;renderAdminScores()">'+icon('circlex',14)+' ปิด</button></div>';
     if(!matches.length){
       html+='<div style="padding:1.25rem;text-align:center;color:var(--t2);font-size:12px">ไม่มีใครได้ระดับนี้</div>';
     } else {
@@ -2664,7 +2727,7 @@ function renderAdminScoresBody(html){
     html+='<td style="color:var(--t2)">'+r.sc.min.toFixed(2)+'</td>';
     html+='<td style="color:var(--t2)">'+r.sc.max.toFixed(2)+'</td>';
     html+='<td><span class="rb-inl" style="background:'+RCOL[r.lbl.l]+'">'+r.lbl.l+'</span></td>';
-    html+='<td><button class="btn bo" style="font-size:10px;padding:3px 9px" onclick="openAdminScoreHistory(\''+r.e.empId+'\')">&#128201; ดู</button></td>';
+    html+='<td><button class="btn bo" style="font-size:10px;padding:3px 9px" onclick="openAdminScoreHistory(\''+r.e.empId+'\')">'+icon('trendingup',18)+' ดู</button></td>';
     html+='</tr>';
   });
   html+='</tbody></table></div></div>';
@@ -2711,7 +2774,7 @@ function openAdminScoreHistory(empId){
 /* --- TAB 3: จัดการรอบประเมิน (round lifecycle -- moved here from the
    employee Dashboard since it's purely an Admin/system concern) --- */
 function renderAdminRounds(){
-  var html='<div class="phd"><div><div class="ptitle">&#9881;&#65039; ตั้งค่า</div></div></div>';
+  var html='<div class="phd"><div><div class="ptitle">'+icon('settings',22)+' การจัดการรอบการประเมิน</div></div></div>';
 
   /* ── การจัดการรอบการประเมิน (item 2): single consolidated card ──
      Combines what used to be 3 separate cards (current-round status,
@@ -2722,14 +2785,14 @@ function renderAdminRounds(){
      covering every round (scheduled / active / closed) with the action
      buttons appropriate to each status. */
   html+='<div class="card" style="margin-bottom:14px">';
-  html+='<div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#128197;</div><div class="db-sh-ttl">การจัดการรอบการประเมิน</div>';
+  html+='<div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('calendarrange',18)+'</div><div class="db-sh-ttl">ประวัติรอบการประเมิน</div>';
   html+='<button class="ach" id="adminAddRoundToggleBtn" style="margin-left:auto" onclick="toggleAddRoundForm()">+ เพิ่มรอบการประเมิน</button></div>';
 
   /* current round summary strip, always visible at the top */
   html+='<div style="padding:14px 16px;border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">';
   html+='<div>';
   html+='<div style="font-family:var(--fh);font-size:18px;font-weight:800;color:var(--t0)">'+roundLabel(currentRound.year,currentRound.roundNo)+' <span style="font-size:11px;font-weight:600;color:'+(currentRound.closed?'var(--I)':'var(--E)')+'">'+(currentRound.closed?'(ปิดรอบแล้ว)':'(กำลังดำเนินการ)')+'</span></div>';
-  if(currentRound.startDate&&currentRound.endDate)html+='<div style="font-size:11px;color:var(--t1);margin-top:2px">'+fmtThaiDate(currentRound.startDate)+' \u2013 '+fmtThaiDate(currentRound.endDate)+' \u00B7 '+(currentRound.isAnonymous?'\uD83D\uDD12 ไม่ระบุตัวตน':'\uD83D\uDC64 ระบุตัวตน')+'</div>';
+  if(currentRound.startDate&&currentRound.endDate)html+='<div style="font-size:11px;color:var(--t1);margin-top:2px">'+fmtThaiDate(currentRound.startDate)+' \u2013 '+fmtThaiDate(currentRound.endDate)+' \u00B7 '+(currentRound.isAnonymous?icon('lock',14)+' ไม่ระบุตัวตน':icon('eye',14)+' ระบุตัวตน')+'</div>';
   html+='</div>';
   if(!currentRound.closed){
     var rdA=daysRemaining(currentRound.endDate);
@@ -2830,9 +2893,9 @@ function updateAddRoundAutoFields(){
 function buildAddRoundFormHTML(){
   var html='<div style="display:flex;flex-direction:column;gap:14px;max-width:680px">';
   html+='<div style="display:flex;gap:12px;flex-wrap:wrap">';
-  html+='<div style="flex:1;min-width:160px"><div style="font-size:11px;color:var(--t2);margin-bottom:4px">&#128197; วันที่เริ่มต้น</div>';
+  html+='<div style="flex:1;min-width:160px"><div style="font-size:11px;color:var(--t2);margin-bottom:4px">'+icon('calendarrange',18)+' วันที่เริ่มต้น</div>';
   html+='<input type="date" id="addRoundStart" class="lin" style="margin-bottom:0;color:var(--t0);background:var(--s0)" onchange="updateAddRoundAutoFields()"></div>';
-  html+='<div style="flex:1;min-width:160px"><div style="font-size:11px;color:var(--t2);margin-bottom:4px">&#128197; วันที่สิ้นสุด</div>';
+  html+='<div style="flex:1;min-width:160px"><div style="font-size:11px;color:var(--t2);margin-bottom:4px">'+icon('calendarrange',18)+' วันที่สิ้นสุด</div>';
   html+='<input type="date" id="addRoundEnd" class="lin" style="margin-bottom:0;color:var(--t0);background:var(--s0)" onchange="updateAddRoundAutoFields()"></div>';
   html+='</div>';
   html+='<div style="display:flex;gap:24px;flex-wrap:wrap">';
@@ -2843,8 +2906,8 @@ function buildAddRoundFormHTML(){
   html+='<div>';
   html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin-bottom:8px">การแสดงตัวตนของผู้ประเมิน</div>';
   html+='<div style="display:flex;gap:18px;flex-wrap:wrap">';
-  html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="addRoundAnon" id="addRoundAnonYes" value="anon" checked style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer">&#128274; ไม่ระบุตัวตน (Anonymous)</label>';
-  html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="addRoundAnon" id="addRoundAnonNo" value="identified" style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer">&#128100; ระบุตัวตน (Identified)</label>';
+  html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="addRoundAnon" id="addRoundAnonYes" value="anon" checked style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer">'+icon('lock',16)+' ไม่ระบุตัวตน (Anonymous)</label>';
+  html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="addRoundAnon" id="addRoundAnonNo" value="identified" style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer">'+icon('eye',18)+' ระบุตัวตน (Identified)</label>';
   html+='</div></div>';
   /* สิทธิ์การประเมิน (item 2.1) -- pre-filled from the org-wide default
      rules (EVAL_RULES) set in the card below, but editable per-round
@@ -2856,7 +2919,7 @@ function buildAddRoundFormHTML(){
   html+='</div>';
   html+='<div style="display:flex;gap:8px;justify-content:flex-end">';
   html+='<button class="btn bo" onclick="toggleAddRoundForm()">ยกเลิก</button>';
-  html+='<button class="btn bt" onclick="openAddRoundPreview()">&#10003; บันทึกรอบการประเมิน</button>';
+  html+='<button class="btn bt" onclick="openAddRoundPreview()">'+icon('circlecheck',16)+' บันทึกรอบการประเมิน</button>';
   html+='</div>';
   html+='</div>';
   return html;
@@ -2864,8 +2927,8 @@ function buildAddRoundFormHTML(){
 /* ── Preview/confirm modal (item 2.2) ── */
 function openAddRoundPreview(){
   var s=h('addRoundStart').value,e=h('addRoundEnd').value;
-  if(!s||!e){toast('\u26A0\uFE0F','กรุณาเลือกวันที่ให้ครบ','','var(--I)');return;}
-  if(e<s){toast('\u26A0\uFE0F','วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
+  if(!s||!e){toast(icon('alerttriangle',18),'กรุณาเลือกวันที่ให้ครบ','','var(--I)');return;}
+  if(e<s){toast(icon('alerttriangle',18),'วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
   /* collect + validate the per-round permissions the same way the
      org-wide settings card does -- scope is mandatory for every checked
      target role here too. */
@@ -2880,7 +2943,7 @@ function openAddRoundPreview(){
     summaryLines.push({role:role,target:target,scope:scopeRadio.value});
   });
   if(missingScope.length){
-    toast('\u26A0\uFE0F','กรุณาเลือกขอบเขต (Scope) ให้ครบ','ยังไม่ได้เลือกขอบเขตสำหรับ: '+missingScope.join(', '),'var(--I)');
+    toast(icon('alerttriangle',18),'กรุณาเลือกขอบเขต (Scope) ให้ครบ','ยังไม่ได้เลือกขอบเขตสำหรับ: '+missingScope.join(', '),'var(--I)');
     return;
   }
   var lastKnown=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1]:currentRound;
@@ -2900,7 +2963,7 @@ function openAddRoundPreview(){
   if(summaryLines.length){
     html+='<div style="display:flex;flex-direction:column;gap:3px;padding-left:10px">';
     summaryLines.forEach(function(l){
-      html+='<div>&#10003; '+l.role+' \u27A1\uFE0F '+l.target+' ('+(l.scope==='dept'?'เฉพาะหน่วยงาน':'ทั้ง TPKs')+')</div>';
+      html+='<div>'+icon('circlecheck',16)+' '+l.role+' \u27A1\uFE0F '+l.target+' ('+(l.scope==='dept'?'เฉพาะหน่วยงาน':'ทั้ง TPKs')+')</div>';
     });
     html+='</div>';
   } else {
@@ -2922,7 +2985,7 @@ function confirmAddRoundFromPreview(){
   h('addRoundPreviewOvl').classList.remove('on');
   window._pendingNewRound=null;
   toggleAddRoundForm(); /* collapses the form back, per item 2.1's "สไลด์ปิดฟอร์มกลับไป" */
-  toast('&#128197;','สร้างรอบการประเมินเรียบร้อย',nr.label+' \u2014 สถานะ: รอเปิดรอบ','var(--E)');
+  toast(''+icon('calendarrange',18)+'','สร้างรอบการประเมินเรียบร้อย',nr.label+' \u2014 สถานะ: รอเปิดรอบ','var(--E)');
   renderAdminTab();
 }
 /* ── Unified 3-status table (item 2.3) ── */
@@ -2932,63 +2995,71 @@ function roundDurationDays(startDate,endDate){
 }
 function anonymityBadge(isAnon){
   return isAnon!==false
-    ?'<span style="font-size:10px;color:var(--t1)">&#128274; Anonymous</span>'
-    :'<span style="font-size:10px;color:var(--t1)">&#128100; Identified</span>';
+    ?'<span title="Anonymous Evaluation" style="color:var(--t1);cursor:default">'+icon('shield',18)+'</span>'
+    :'<span title="Identified Evaluation" style="color:var(--t1);cursor:default">'+icon('eye',18)+'</span>';
 }
 function buildRoundStatusRowsHTML(){
-  var html='<div style="overflow-x:auto"><table class="sw-table" style="width:100%;min-width:760px"><thead><tr>'
-    +'<th class="lft">รอบ</th><th class="lft">วันที่เริ่มต้น</th><th class="lft">วันที่สิ้นสุด</th><th>ระยะเวลา</th><th class="lft">การเปิดเผยตัวตน</th><th>สถานะ</th><th class="lft">การดำเนินการ</th>'
+  var html='<table class="sw-table" style="width:100%"><thead><tr>'
+    +'<th class="lft">รอบการประเมิน</th><th>ระยะเวลา</th><th>การเปิดเผยตัวตน</th><th>ผู้ประเมิน</th><th>สถานะ</th><th class="lft">การดำเนินการ</th>'
     +'</tr></thead><tbody>';
   function statusBadge(color,bg,text){return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:12px;font-size:10px;font-weight:700;color:'+color+';background:'+bg+'">'+text+'</span>';}
-  /* 🟢 กำลังดำเนินการ -- the live current round, always exactly one */
+  function roundCell(label,startDate,endDate){
+    var html='<div style="font-weight:700;font-size:13px;color:var(--t0)">'+label+'</div>';
+    if(startDate&&endDate)html+='<div style="font-size:10px;color:var(--t2);margin-top:2px">'+fmtThaiDate(startDate)+' \u2014 '+fmtThaiDate(endDate)+'</div>';
+    return html;
+  }
+  function evaluatorCountCell(empCount,completedCount){
+    if(empCount===undefined||empCount===null)return '<span style="color:var(--t2)">\u2013</span>';
+    var pct=empCount?Math.round((completedCount||0)/empCount*100):0;
+    return '<div style="font-size:11px;color:var(--t1)">'+(completedCount!==undefined?completedCount+' / ':'')+empCount+' คน'
+      +(completedCount!==undefined?'<div style="font-size:9px;color:var(--t2)">('+pct+'% ตอบแบบประเมิน)</div>':'')+'</div>';
+  }
+  /* [Active/green] กำลังดำเนินการ -- the live current round, always exactly one */
   html+='<tr>';
-  html+='<td class="lft" style="font-weight:700">'+roundLabel(currentRound.year,currentRound.roundNo)+'</td>';
-  html+='<td class="lft" style="font-size:11px;color:var(--t1)">'+(currentRound.startDate?fmtThaiDate(currentRound.startDate):'\u2013')+'</td>';
-  html+='<td class="lft" style="font-size:11px;color:var(--t1)">'+(currentRound.endDate?fmtThaiDate(currentRound.endDate):'\u2013')+'</td>';
+  html+='<td class="lft">'+roundCell(roundLabel(currentRound.year,currentRound.roundNo),currentRound.startDate,currentRound.endDate)+'</td>';
   html+='<td style="font-size:11px;color:var(--t1)">'+(roundDurationDays(currentRound.startDate,currentRound.endDate)||'\u2013')+' วัน</td>';
-  html+='<td class="lft">'+anonymityBadge(currentRound.isAnonymous)+'</td>';
-  html+='<td>'+(currentRound.closed?statusBadge('var(--I)','rgba(163,45,45,.1)','&#128308; ปิดรอบแล้ว'):statusBadge('var(--E)','rgba(29,158,117,.1)','&#128994; กำลังดำเนินการ'))+'</td>';
+  html+='<td>'+anonymityBadge(currentRound.isAnonymous)+'</td>';
+  html+='<td>'+evaluatorCountCell(currentRound.empCount,currentRound.completedCount)+'</td>';
+  html+='<td>'+(currentRound.closed?statusBadge('var(--I)','rgba(163,45,45,.1)',icon('circlex',12)+' ปิดรอบแล้ว'):statusBadge('var(--E)','rgba(29,158,117,.1)',icon('play',12)+' กำลังดำเนินการ'))+'</td>';
   html+='<td class="lft"><div style="display:flex;gap:6px;flex-wrap:wrap">';
   if(currentRound.closed){
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="toast(\'\u2139\uFE0F\',\'รอบนี้ปิดแล้ว\',\'ดูข้อมูลได้ปกติจากหน้า Dashboard\',\'var(--t2)\')">&#128065; ดูรายละเอียด</button>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="toast(\''+icon('info',16)+'\',\'รอบนี้ปิดแล้ว\',\'ดูข้อมูลได้ปกติจากหน้า Dashboard\',\'var(--t2)\')">'+icon('eye',14)+' ดูรายละเอียด</button>';
   } else {
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditRoundDatesDialog()">&#9999;&#65039; แก้ไขวันที่</button>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openCloseCurrentRoundConfirm()">&#128274; ปิดรอบ</button>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditRoundDatesDialog()">'+icon('pencil',14)+' แก้ไขวันที่</button>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openCloseCurrentRoundConfirm()">'+icon('lock',14)+' ปิดรอบ</button>';
   }
   html+='</div></td>';
   html+='</tr>';
-  /* 🟡 กำหนดล่วงหน้า -- scheduled, not yet opened */
+  /* [Scheduled/yellow] กำหนดล่วงหน้า -- scheduled, not yet opened */
   SCHEDULED_ROUNDS.forEach(function(r){
     html+='<tr style="background:rgba(186,117,23,.04)">';
-    html+='<td class="lft" style="font-weight:700">'+r.label+'</td>';
-    html+='<td class="lft" style="font-size:11px;color:var(--t1)">'+(r.startDate?fmtThaiDate(r.startDate):'\u2013')+'</td>';
-    html+='<td class="lft" style="font-size:11px;color:var(--t1)">'+(r.endDate?fmtThaiDate(r.endDate):'\u2013')+'</td>';
+    html+='<td class="lft">'+roundCell(r.label,r.startDate,r.endDate)+'</td>';
     html+='<td style="font-size:11px;color:var(--t1)">'+(roundDurationDays(r.startDate,r.endDate)||'\u2013')+' วัน</td>';
-    html+='<td class="lft">'+anonymityBadge(r.isAnonymous)+'</td>';
-    html+='<td>'+statusBadge('var(--L)','rgba(186,117,23,.1)','&#128993; กำหนดล่วงหน้า')+'</td>';
+    html+='<td>'+anonymityBadge(r.isAnonymous)+'</td>';
+    html+='<td><span style="color:var(--t2);font-size:11px">ยังไม่เริ่ม</span></td>';
+    html+='<td>'+statusBadge('var(--L)','rgba(186,117,23,.1)',icon('clock',12)+' กำหนดล่วงหน้า')+'</td>';
     html+='<td class="lft"><div style="display:flex;gap:6px;flex-wrap:wrap">';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditScheduledRoundDialog(\''+r.id+'\')">&#9999;&#65039; แก้ไข</button>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--E);border-color:rgba(29,158,117,.3)" onclick="openActivateRoundConfirm(\''+r.id+'\')">&#9654; เปิดรอบ</button>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openRemoveScheduledRoundConfirm(\''+r.id+'\')">&#128465;&#65039; ลบ</button>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditScheduledRoundDialog(\''+r.id+'\')">'+icon('pencil',14)+' แก้ไข</button>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--E);border-color:rgba(29,158,117,.3)" onclick="openActivateRoundConfirm(\''+r.id+'\')">'+icon('play',14)+' เปิดรอบ</button>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openRemoveScheduledRoundConfirm(\''+r.id+'\')">'+icon('trash',14)+' ลบ</button>';
     html+='</div></td>';
     html+='</tr>';
   });
-  /* 🔴 ปิดรอบแล้ว -- fully closed/archived rounds */
+  /* [Closed/red] ปิดรอบแล้ว -- fully closed/archived rounds */
   ROUNDS.slice().reverse().forEach(function(r){
     html+='<tr>';
-    html+='<td class="lft" style="font-weight:700">'+r.label+'</td>';
-    html+='<td class="lft" style="font-size:11px;color:var(--t1)">'+(r.startDate?fmtThaiDate(r.startDate):'\u2013')+'</td>';
-    html+='<td class="lft" style="font-size:11px;color:var(--t1)">'+(r.endDate?fmtThaiDate(r.endDate):'\u2013')+'</td>';
+    html+='<td class="lft">'+roundCell(r.label,r.startDate,r.endDate)+'</td>';
     html+='<td style="font-size:11px;color:var(--t1)">'+(roundDurationDays(r.startDate,r.endDate)||'\u2013')+' วัน</td>';
-    html+='<td class="lft">'+anonymityBadge(r.isAnonymous)+'</td>';
-    html+='<td>'+statusBadge('var(--I)','rgba(163,45,45,.1)','&#128308; ปิดรอบแล้ว')+'</td>';
+    html+='<td>'+anonymityBadge(r.isAnonymous)+'</td>';
+    html+='<td>'+evaluatorCountCell(r.empCount,r.completedCount)+'</td>';
+    html+='<td>'+statusBadge('var(--I)','rgba(163,45,45,.1)',icon('circlex',12)+' ปิดรอบแล้ว')+'</td>';
     html+='<td class="lft"><div style="display:flex;gap:6px;flex-wrap:wrap">';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openClosedRoundDetail(\''+r.id+'\')">&#128065; ดูรายละเอียด</button>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="duplicateRound(\''+r.id+'\')">&#128203; คัดลอกรอบ</button>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openClosedRoundDetail(\''+r.id+'\')">'+icon('eye',14)+' ดูรายละเอียด</button>';
+    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="duplicateRound(\''+r.id+'\')">'+icon('copy',14)+' คัดลอกรอบ</button>';
     html+='</div></td>';
     html+='</tr>';
   });
-  html+='</tbody></table></div>';
+  html+='</tbody></table>';
   return html;
 }
 function openEditScheduledRoundDialog(roundId){
@@ -3006,7 +3077,7 @@ function openEditScheduledRoundDialog(roundId){
 function openClosedRoundDetail(roundId){
   var r=ROUNDS.filter(function(x){return x.id===roundId;})[0];
   if(!r)return;
-  toast('&#128065;',r.label,(r.startDate?fmtThaiDate(r.startDate)+' \u2013 '+fmtThaiDate(r.endDate):'')+' \u2014 ดูผลย้อนหลังเต็มรูปแบบได้จากหน้า Dashboard (เลือกรอบนี้ในตัวเปรียบเทียบ)','var(--t2)');
+  toast(''+icon('eye',16)+'',r.label,(r.startDate?fmtThaiDate(r.startDate)+' \u2013 '+fmtThaiDate(r.endDate):'')+' \u2014 ดูผลย้อนหลังเต็มรูปแบบได้จากหน้า Dashboard (เลือกรอบนี้ในตัวเปรียบเทียบ)','var(--t2)');
 }
 function duplicateRound(roundId){
   var r=ROUNDS.filter(function(x){return x.id===roundId;})[0];
@@ -3021,14 +3092,14 @@ function duplicateRound(roundId){
     label:roundLabel(meta.year,meta.roundNo),isAnonymous:r.isAnonymous!==false,rules:r.rules||null
   });
   saveRoundsData();
-  toast('&#128203;','คัดลอกรอบเรียบร้อย',roundLabel(meta.year,meta.roundNo)+' \u2014 สถานะ: รอเปิดรอบ','var(--E)');
+  toast(''+icon('filetext',16)+'','คัดลอกรอบเรียบร้อย',roundLabel(meta.year,meta.roundNo)+' \u2014 สถานะ: รอเปิดรอบ','var(--E)');
   renderAdminTab();
 }
 function refreshSimDBAndRender(){
   var btn=h('simdbRefreshBtn');
   if(btn){btn.disabled=true;btn.textContent='\u23F3 กำลังโหลด...';}
   SimDB.refresh(function(ok){
-    if(!ok)toast('\u26A0\uFE0F','โหลดข้อมูลไม่สำเร็จ','ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต','var(--I)');
+    if(!ok)toast(icon('alerttriangle',18),'โหลดข้อมูลไม่สำเร็จ','ตรวจสอบการเชื่อมต่ออินเทอร์เน็ต','var(--I)');
     renderAdminTab();
   });
 }
@@ -3049,14 +3120,14 @@ function testGASConnection(){
       try{parsed=JSON.parse(r.text);}catch(e){}
       if(box){
         if(parsed&&parsed.ok!==undefined){
-          box.innerHTML='<span style="color:var(--E);font-weight:700">&#9989; เชื่อมต่อสำเร็จ</span> \u2014 HTTP '+r.status+', ok:'+parsed.ok+(parsed.error?(', error: '+parsed.error):'')+', แถวที่อ่านได้: '+(parsed.rows?parsed.rows.length:0);
+          box.innerHTML='<span style="color:var(--E);font-weight:700">'+icon('circlecheck',16)+' เชื่อมต่อสำเร็จ</span> \u2014 HTTP '+r.status+', ok:'+parsed.ok+(parsed.error?(', error: '+parsed.error):'')+', แถวที่อ่านได้: '+(parsed.rows?parsed.rows.length:0);
         } else {
-          box.innerHTML='<span style="color:var(--I);font-weight:700">&#10060; ผลลัพธ์ไม่ใช่รูปแบบที่คาดไว้</span> \u2014 HTTP '+r.status+'<br><span style="color:var(--t2);font-size:10px">เนื้อหาที่ได้รับ (120 ตัวแรก): '+(r.text||'').slice(0,120).replace(/</g,'&lt;')+'</span><br><span style="color:var(--t2);font-size:10px">มักเกิดจาก: Deploy ยังไม่ใช่ Web App ล่าสุด, "Who has access" ไม่ใช่ Anyone, หรือ URL เป็นหน้า Editor ไม่ใช่ /exec</span>';
+          box.innerHTML='<span style="color:var(--I);font-weight:700">'+icon('circlex',16)+' ผลลัพธ์ไม่ใช่รูปแบบที่คาดไว้</span> \u2014 HTTP '+r.status+'<br><span style="color:var(--t2);font-size:10px">เนื้อหาที่ได้รับ (120 ตัวแรก): '+(r.text||'').slice(0,120).replace(/</g,'&lt;')+'</span><br><span style="color:var(--t2);font-size:10px">มักเกิดจาก: Deploy ยังไม่ใช่ Web App ล่าสุด, "Who has access" ไม่ใช่ Anyone, หรือ URL เป็นหน้า Editor ไม่ใช่ /exec</span>';
         }
       }
     })
     .catch(function(err){
-      if(box)box.innerHTML='<span style="color:var(--I);font-weight:700">&#10060; ยิงคำขอไม่สำเร็จเลย</span> \u2014 '+String(err&&err.message||err)+'<br><span style="color:var(--t2);font-size:10px">มักเกิดจาก: ไม่มีอินเทอร์เน็ต, URL พิมพ์ผิด, หรือ Apps Script ถูกบล็อกโดยเครือข่าย/Firewall</span>';
+      if(box)box.innerHTML='<span style="color:var(--I);font-weight:700">'+icon('circlex',16)+' ยิงคำขอไม่สำเร็จเลย</span> \u2014 '+String(err&&err.message||err)+'<br><span style="color:var(--t2);font-size:10px">มักเกิดจาก: ไม่มีอินเทอร์เน็ต, URL พิมพ์ผิด, หรือ Apps Script ถูกบล็อกโดยเครือข่าย/Firewall</span>';
     });
 }
 function saveEvalRulesFromForm(){
@@ -3078,18 +3149,18 @@ function saveEvalRulesFromForm(){
      picked before saving is allowed at all -- partial/ambiguous rules
      would silently misconfigure who evaluates whom. */
   if(missingScope.length){
-    toast('\u26A0\uFE0F','กรุณาเลือกขอบเขต (Scope) ให้ครบ','ยังไม่ได้เลือกขอบเขตสำหรับ: '+missingScope.join(', '),'var(--I)');
+    toast(icon('alerttriangle',18),'กรุณาเลือกขอบเขต (Scope) ให้ครบ','ยังไม่ได้เลือกขอบเขตสำหรับ: '+missingScope.join(', '),'var(--I)');
     return;
   }
   EVAL_RULES=rules;
   saveEvalRules();
-  toast('&#128274;','บันทึกสิทธิ์การประเมินแล้ว','การประเมินรอบถัดไปจะใช้กฎนี้','var(--E)');
+  toast(''+icon('lock',16)+'','บันทึกสิทธิ์การประเมินแล้ว','การประเมินรอบถัดไปจะใช้กฎนี้','var(--E)');
   renderAdminRounds();
 }
 function resetEvalRules(){
   EVAL_RULES=null;
   saveEvalRules();
-  toast('&#8634;','กลับไปใช้กฎเริ่มต้นของระบบ','','var(--L)');
+  toast(''+icon('refresh',16)+'','กลับไปใช้กฎเริ่มต้นของระบบ','','var(--L)');
   renderAdminRounds();
 }
 function openEditRoundDatesDialog(){
@@ -3101,7 +3172,7 @@ if(h('editRoundCancelBtnA'))h('editRoundCancelBtnA').addEventListener('click',fu
 if(h('editRoundConfirmBtnA'))h('editRoundConfirmBtnA').addEventListener('click',function(){
   var s=h('editRoundStartA').value,e=h('editRoundEndA').value;
   if(!s||!e){return;}
-  if(e<s){toast('\u26A0\uFE0F','วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
+  if(e<s){toast(icon('alerttriangle',18),'วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
   /* editing dates can change which Buddhist year the round falls in --
      recompute year/roundNo consistently with how a brand-new round would */
   var newYear=buddhistYear(s);
@@ -3112,7 +3183,7 @@ if(h('editRoundConfirmBtnA'))h('editRoundConfirmBtnA').addEventListener('click',
   currentRound.label=roundLabel(currentRound.year,currentRound.roundNo);
   saveRoundsData();
   h('editRoundOvlA').classList.remove('on');
-  toast('&#9999;\uFE0F','แก้ไขวันที่รอบเรียบร้อย',roundLabel(currentRound.year,currentRound.roundNo),'var(--E)');
+  toast(''+icon('pencil',16)+'','แก้ไขวันที่รอบเรียบร้อย',roundLabel(currentRound.year,currentRound.roundNo),'var(--E)');
   renderAdminTab();
 });
 var crMode='now'; /* 'now' (close current, start immediately) or 'schedule' (plan a future round, current keeps running) */
@@ -3150,7 +3221,7 @@ function confirmCloseCurrentRound(){
   currentRound.closed=true;
   saveRoundsData();
   h('roundConfirmOvl').classList.remove('on');
-  toast('\u2705','ปิดรอบการประเมินเรียบร้อยแล้ว',roundLabel(currentRound.year,currentRound.roundNo),'var(--E)');
+  toast(icon('circlecheck',18),'ปิดรอบการประเมินเรียบร้อยแล้ว',roundLabel(currentRound.year,currentRound.roundNo),'var(--E)');
   renderAdminTab();
 }
 function openActivateRoundConfirm(roundId){
@@ -3160,7 +3231,7 @@ function openActivateRoundConfirm(roundId){
      entirely with the exact specified message if a round is already
      running, rather than silently closing it for the admin. */
   if(!currentRound.closed){
-    toast('\u26A0\uFE0F','ไม่สามารถเปิดรอบการประเมินได้','เนื่องจากมีรอบการประเมินที่กำลังดำเนินการอยู่ กรุณาปิดรอบปัจจุบันก่อน จึงจะสามารถเปิดรอบใหม่ได้','var(--I)');
+    toast(icon('alerttriangle',18),'ไม่สามารถเปิดรอบการประเมินได้','เนื่องจากมีรอบการประเมินที่กำลังดำเนินการอยู่ กรุณาปิดรอบปัจจุบันก่อน จึงจะสามารถเปิดรอบใหม่ได้','var(--I)');
     return;
   }
   window._pendingActivateRoundId=roundId;
@@ -3178,7 +3249,7 @@ function activateScheduledRound(roundId){
     /* defensive re-check in case state changed between opening the
        confirm dialog and actually clicking confirm */
     h('roundConfirmOvl').classList.remove('on');
-    toast('\u26A0\uFE0F','ไม่สามารถเปิดรอบการประเมินได้','เนื่องจากมีรอบการประเมินที่กำลังดำเนินการอยู่ กรุณาปิดรอบปัจจุบันก่อน จึงจะสามารถเปิดรอบใหม่ได้','var(--I)');
+    toast(icon('alerttriangle',18),'ไม่สามารถเปิดรอบการประเมินได้','เนื่องจากมีรอบการประเมินที่กำลังดำเนินการอยู่ กรุณาปิดรอบปัจจุบันก่อน จึงจะสามารถเปิดรอบใหม่ได้','var(--I)');
     return;
   }
   /* the now-closed current round is already safely archived in ROUNDS
@@ -3190,7 +3261,7 @@ function activateScheduledRound(roundId){
     isAnonymous:sched.isAnonymous!==false,rules:sched.rules||null};
   saveRoundsData();
   h('roundConfirmOvl').classList.remove('on');
-  toast('\u2705','เปิดรอบการประเมินเรียบร้อยแล้ว',currentRound.label,'var(--E)');
+  toast(icon('circlecheck',18),'เปิดรอบการประเมินเรียบร้อยแล้ว',currentRound.label,'var(--E)');
   renderAdminTab();
 }
 function openRemoveScheduledRoundConfirm(roundId){
@@ -3202,7 +3273,7 @@ function openRemoveScheduledRoundConfirm(roundId){
      can never actually trigger false for a Scheduled round. */
   var hasData=SimDB.allRows().some(function(row){return row['\u0e23\u0e2d\u0e1a\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19']===sched.label;});
   if(hasData){
-    toast('\u26A0\uFE0F','ไม่สามารถลบรอบนี้ได้','มีข้อมูลการประเมินอยู่แล้วในรอบนี้','var(--I)');
+    toast(icon('alerttriangle',18),'ไม่สามารถลบรอบนี้ได้','มีข้อมูลการประเมินอยู่แล้วในรอบนี้','var(--I)');
     return;
   }
   h('roundConfirmTitle').textContent='ยืนยันการลบรอบการประเมิน';
@@ -3217,7 +3288,7 @@ function removeScheduledRound(roundId){
   SCHEDULED_ROUNDS=SCHEDULED_ROUNDS.filter(function(r){return r.id!==roundId;});
   saveRoundsData();
   h('roundConfirmOvl').classList.remove('on');
-  toast('\u2705','ลบรอบการประเมินเรียบร้อยแล้ว','','var(--E)');
+  toast(icon('circlecheck',18),'ลบรอบการประเมินเรียบร้อยแล้ว','','var(--E)');
   renderAdminTab();
 }
 function setCrMode(mode){
@@ -3227,7 +3298,7 @@ function setCrMode(mode){
   h('crModeWarnNow').style.display=mode==='now'?'flex':'none';
   h('crModeWarnSchedule').style.display=mode==='schedule'?'flex':'none';
   h('crNextLabelHeading').textContent=mode==='now'?'กำหนดช่วงเวลารอบถัดไป':'กำหนดช่วงเวลารอบที่จะวางแผนไว้';
-  h('crConfirmBtnA').innerHTML=mode==='now'?'&#10003; ยืนยันปิดรอบ':'&#10003; บันทึกรอบที่กำหนดไว้';
+  h('crConfirmBtnA').innerHTML=mode==='now'?''+icon('circlecheck',16)+' ยืนยันปิดรอบ':''+icon('circlecheck',16)+' บันทึกรอบที่กำหนดไว้';
   /* schedule mode should default to starting after the LATEST already-
      scheduled round (if any), not necessarily right after the current
      round -- lets several future rounds be queued up in sequence */
@@ -3274,7 +3345,7 @@ if(h('crCancelBtnA'))h('crCancelBtnA').addEventListener('click',function(){h('cl
 if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
   var nextStart=h('crNextStartA').value,nextEnd=h('crNextEndA').value;
   if(!nextStart||!nextEnd){if(!nextStart)h('crNextStartA').focus();else h('crNextEndA').focus();return;}
-  if(nextEnd<nextStart){toast('\u26A0\uFE0F','วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
+  if(nextEnd<nextStart){toast(icon('alerttriangle',18),'วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
 
   if(crMode==='schedule'){
     /* schedule a future round WITHOUT touching the current one --
@@ -3291,7 +3362,7 @@ if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
     });
     saveRoundsData();
     h('closeRoundOvlA').classList.remove('on');
-    toast('&#128197;','กำหนดรอบล่วงหน้าเรียบร้อย',roundLabel(meta2.year,meta2.roundNo)+' \u2014 รอบปัจจุบันยังดำเนินการต่อตามปกติ','var(--pb)');
+    toast(''+icon('calendarrange',18)+'','กำหนดรอบล่วงหน้าเรียบร้อย',roundLabel(meta2.year,meta2.roundNo)+' \u2014 รอบปัจจุบันยังดำเนินการต่อตามปกติ','var(--pb)');
     renderAdminTab();
     return;
   }
@@ -3326,7 +3397,7 @@ if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
   }
   saveRoundsData();
   h('closeRoundOvlA').classList.remove('on');
-  toast('&#128197;','ปิดรอบเรียบร้อย','เริ่ม '+currentRound.label,'var(--L)');
+  toast(''+icon('calendarrange',18)+'','ปิดรอบเรียบร้อย','เริ่ม '+currentRound.label,'var(--L)');
   renderAdminTab();
 });
 
@@ -3411,7 +3482,7 @@ function doLogout(){
   sSaved=false;sSub=false;oSaved=false;oSub=false;
   curTab='self';expd={};catOp={};orgExp={};
   gmCat=CATS[0];gmSM=false;gmSel={};gmDP=null;gmRI=null;gmArmed=null;subTgt=null;cdIdx=null;orgMode='dept';orgQ='';
-  h('lu').value='';h('lp').value='';h('lp').type='password';h('eyb').textContent='\uD83D\uDC41';h('lerr').style.display='none';
+  h('lu').value='';h('lp').value='';h('lp').type='password';h('eyb').innerHTML=icon('eye',16);h('lerr').style.display='none';
   /* close all overlays */
   ['wovl','subovl','addovl','drillovl','rsnovl','batchrsnovl','closeRoundOvl','logoutovl'].forEach(function(id){h(id).classList.remove('on');});
   /* switch screens: hide app (employee or admin), show login */
@@ -3653,15 +3724,15 @@ function noteCell(pid,cid,locked){
     /* Body click opens the popup to edit; the small x clears the note directly
        (only offered when the rating isn't L/I, since a reason is mandatory there). */
     var clearBtn=required?''
-      :'<span class="note-clear-ico" onclick="event.stopPropagation();clearNoteDirect(\''+pid+'\',\''+cid+'\')" title="\u0e25\u0e49\u0e32\u0e07\u0e40\u0e2b\u0e15\u0e38\u0e1c\u0e25">&#10005;</span>';
+      :'<span class="note-clear-ico" onclick="event.stopPropagation();clearNoteDirect(\''+pid+'\',\''+cid+'\')" title="\u0e25\u0e49\u0e32\u0e07\u0e40\u0e2b\u0e15\u0e38\u0e1c\u0e25">'+icon('circlex',14)+'</span>';
     return '<div class="note-cell note-has" onclick="openReasonFromNote(\''+pid+'\',\''+cid+'\')" title="\u0e41\u0e01\u0e49\u0e44\u0e02: '+noteText+'">'
       +'<span class="note-txt">'+noteText+'</span>'
-      +(required?'<span class="note-edit-ico">&#9998;</span>':clearBtn)
+      +(required?'<span class="note-edit-ico">'+icon('pencil',16)+'</span>':clearBtn)
       +'</div>';
   }
   if(required){
     return '<div class="note-cell note-required" onclick="openReasonFromNote(\''+pid+'\',\''+cid+'\')" title="\u0e23\u0e30\u0e14\u0e31\u0e1a Low/Improve \u0e08\u0e33\u0e40\u0e1b\u0e47\u0e19\u0e15\u0e49\u0e2d\u0e07\u0e23\u0e30\u0e1a\u0e38\u0e40\u0e2b\u0e15\u0e38\u0e1c\u0e25">'
-      +'<span class="note-add-lbl">&#9888; ต้องระบุเหตุผล</span>'
+      +'<span class="note-add-lbl">'+icon('alerttriangle',16)+' ต้องระบุเหตุผล</span>'
       +'</div>';
   }
   return '<div class="note-cell note-add" onclick="openReasonFromNote(\''+pid+'\',\''+cid+'\')">'
@@ -4217,7 +4288,7 @@ function downloadDatabaseCSV(){
        with the backend team even before anyone has submitted anything */
     rows=buildDatabaseRows();
   }
-  if(!rows.length){toast('\u26A0\uFE0F','ไม่มีข้อมูลให้ Export','','var(--L)');return;}
+  if(!rows.length){toast(icon('alerttriangle',18),'ไม่มีข้อมูลให้ Export','','var(--L)');return;}
   var cols=dbColumnOrder();
   function csvEscape(v){
     v=(v===undefined||v===null)?'':String(v);
@@ -4279,7 +4350,7 @@ if(h('crConfirmBtn'))h('crConfirmBtn').addEventListener('click',function(){
   saveRoundsData();
   autoSave();
   h('closeRoundOvl').classList.remove('on');
-  toast('&#128197;','ปิดรอบเรียบร้อย','เริ่มรอบใหม่: '+nextLabel,'var(--E)');
+  toast(''+icon('calendarrange',18)+'','ปิดรอบเรียบร้อย','เริ่มรอบใหม่: '+nextLabel,'var(--E)');
   renderTab();
 });
 
@@ -4294,7 +4365,7 @@ function scoreSummaryCard(){
   }).sort(function(a,b){return b.avg-a.avg;});
 
   var html='<div class="sc-sum"><div class="sc-sum-hd">';
-  html+='<span class="sc-sum-title">&#128202; สรุปคะแนน \u2014 จัดลำดับจากมากไปน้อย</span>';
+  html+='<span class="sc-sum-title">'+icon('chartcolumn',18)+' สรุปคะแนน \u2014 จัดลำดับจากมากไปน้อย</span>';
   html+='<span class="sc-sum-sub">'+ranked.length+' คน</span>';
   html+='</div><div class="sc-rank-row">';
 
@@ -4336,43 +4407,43 @@ function actBtns(isSelf){
   var html=prgChip(pct);
 
   if(subbed){
-    html+='<div class="tsub">&#10003; Submitted</div>';
+    html+='<div class="tsub">'+icon('circlecheck',16)+' Submitted</div>';
   } else if(saved){
     var editFn=isSelf?'doEditSelf()':'doEditOther()';
     html+='<div style="display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--t2);padding:4px 8px">'+
       '<span style="width:6px;height:6px;border-radius:50%;background:var(--G);animation:pulse 2s infinite;flex-shrink:0"></span>Auto-saved</div>';
-    html+='<div class="tsav">&#128190; Saved</div>';
-    html+='<button class="btn bo" onclick="'+editFn+'">&#9999; Edit</button>';
+    html+='<div class="tsav">'+icon('download',16)+' Saved</div>';
+    html+='<button class="btn bo" onclick="'+editFn+'">'+icon('pencil',16)+' Edit</button>';
     if(canSubmit){
       html+='<button class="btn bb" onclick="openSub(\'all\')" style="background:linear-gradient(135deg,#0F6E52,#1D9E75)">&#9654; Submit \u0e17\u0e31\u0e49\u0e07\u0e2b\u0e21\u0e14</button>';
     } else if(currentRound.closed&&!sSub&&!oSub){
-      html+='<span class="save-gate-tip">&#128274; \u0e23\u0e2d\u0e1a\u0e1b\u0e34\u0e14\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e41\u0e25\u0e49\u0e27 \u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16 Submit \u0e44\u0e14\u0e49</span>';
+      html+='<span class="save-gate-tip">'+icon('lock',16)+' \u0e23\u0e2d\u0e1a\u0e1b\u0e34\u0e14\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e41\u0e25\u0e49\u0e27 \u0e44\u0e21\u0e48\u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16 Submit \u0e44\u0e14\u0e49</span>';
     } else if(!sSub&&!oSub){
       var missTxt='';
       if(!sSaved&&!oSaved)missTxt='\u0e15\u0e49\u0e2d\u0e07 Save \u0e17\u0e31\u0e49\u0e07\u0e2a\u0e2d\u0e07\u0e2d\u0e22\u0e48\u0e32\u0e07';
       else if(!sSaved)missTxt='\u0e15\u0e49\u0e2d\u0e07 Save \u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e15\u0e19\u0e40\u0e2d\u0e07\u0e14\u0e49\u0e27\u0e22';
       else missTxt='\u0e15\u0e49\u0e2d\u0e07 Save \u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19\u0e14\u0e49\u0e27\u0e22';
-      html+='<span class="save-gate-tip">&#9888; '+missTxt+'</span>';
+      html+='<span class="save-gate-tip">'+icon('alerttriangle',16)+' '+missTxt+'</span>';
     }
   } else if(complete){
     var saveFn=isSelf?'doSaveSelf()':'doSaveOther()';
-    html+='<button class="btn bt" onclick="'+saveFn+'">&#128190; Save</button>';
+    html+='<button class="btn bt" onclick="'+saveFn+'">'+icon('download',16)+' Save</button>';
   } else {
-    html+='<span class="save-gate-tip">&#9888; \u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e43\u0e2b\u0e49\u0e04\u0e23\u0e1a '+total+' \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e01\u0e48\u0e2d\u0e19\u0e01\u0e14 Save</span>';
+    html+='<span class="save-gate-tip">'+icon('alerttriangle',16)+' \u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e43\u0e2b\u0e49\u0e04\u0e23\u0e1a '+total+' \u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e01\u0e48\u0e2d\u0e19\u0e01\u0e14 Save</span>';
   }
   return html;
 }
 
 function doSaveSelf(){
-  if(!isSelfComplete()){toast('\u26A0\uFE0F','ยังประเมินไม่ครบ','กรุณากรอกคะแนนทุกหัวข้อก่อน','var(--L)');return;}
+  if(!isSelfComplete()){toast(icon('alerttriangle',18),'ยังประเมินไม่ครบ','กรุณากรอกคะแนนทุกหัวข้อก่อน','var(--L)');return;}
   sSaved=true;autoSave();renderTab();
-  toast('\uD83D\uDCBE','กำลังบันทึกข้อมูล...','','var(--G)');
+  toast(icon('download',18),'กำลังบันทึกข้อมูล...','','var(--G)');
   syncToGoogleSheets();
 }
 function doSaveOther(){
-  if(!isOtherComplete()){toast('\u26A0\uFE0F','ยังประเมินไม่ครบ','กรุณาประเมินครบทุกคนและทุกหัวข้อก่อน','var(--L)');return;}
+  if(!isOtherComplete()){toast(icon('alerttriangle',18),'ยังประเมินไม่ครบ','กรุณาประเมินครบทุกคนและทุกหัวข้อก่อน','var(--L)');return;}
   oSaved=true;autoSave();renderTab();
-  toast('\uD83D\uDCBE','กำลังบันทึกข้อมูล...','','var(--G)');
+  toast(icon('download',18),'กำลังบันทึกข้อมูล...','','var(--G)');
   syncToGoogleSheets();
 }
 /* shared by both Save handlers above (and still called again on Submit,
@@ -4386,13 +4457,13 @@ function syncToGoogleSheets(){
   try{
     SimDB.upsertRows(buildDatabaseRows(),function(ok,errMsg){
       if(ok){
-        toast('\u2705','บันทึกข้อมูลเรียบร้อย','','var(--E)');
+        toast(icon('circlecheck',18),'บันทึกข้อมูลเรียบร้อย','','var(--E)');
       } else {
-        toast('\u26A0\uFE0F','บันทึกข้อมูลไม่สำเร็จ',errMsg||'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่อีกครั้ง','var(--I)');
+        toast(icon('alerttriangle',18),'บันทึกข้อมูลไม่สำเร็จ',errMsg||'กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่อีกครั้ง','var(--I)');
       }
     });
   }catch(e){
-    toast('\u26A0\uFE0F','เกิดข้อผิดพลาด',String(e&&e.message||e),'var(--I)');
+    toast(icon('alerttriangle',18),'เกิดข้อผิดพลาด',String(e&&e.message||e),'var(--I)');
   }
 }
 function doEditSelf(){sSaved=false;renderTab();}
@@ -4403,7 +4474,7 @@ function isOtherComplete(){
 }
 
 function openSub(t){
-  if(currentRound.closed){toast('\uD83D\uDD12','รอบนี้ปิดรับการประเมินแล้ว','กรุณารอรอบใหม่จากผู้ดูแลระบบ','var(--L)');return;}
+  if(currentRound.closed){toast(icon('lock',18),'รอบนี้ปิดรับการประเมินแล้ว','กรุณารอรอบใหม่จากผู้ดูแลระบบ','var(--L)');return;}
   /* Unified submit: one click submits BOTH self and other at same time */
   subTgt='all';
   var selfDone=isSelfComplete()?pStr('self',true):'ยังไม่ครบ';
@@ -4432,7 +4503,7 @@ h('subconfirmbtn').addEventListener('click',function(){
   sSub=true;sSaved=true;oSub=true;oSaved=true;
   autoSave();
   cov('subovl');renderTab();
-  toast('\u2705','Submit \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08!','\u0e23\u0e30\u0e1a\u0e1a\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22\u0e41\u0e25\u0e49\u0e27','var(--E)');
+  toast(icon('circlecheck',18),'Submit \u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08!','\u0e23\u0e30\u0e1a\u0e1a\u0e1a\u0e31\u0e19\u0e17\u0e36\u0e01\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e40\u0e23\u0e35\u0e22\u0e1a\u0e23\u0e49\u0e2d\u0e22\u0e41\u0e25\u0e49\u0e27','var(--E)');
   /* re-syncs the final, locked state to the shared database -- data already
      started flowing there on every Save before this point (per request),
      this just ensures the Submit-locked version is the last thing written. */
@@ -4445,7 +4516,7 @@ function renderSelf(){
   /* update topbar subtitle + actions */
   if(h('tbsub'))h('tbsub').textContent='กรอกแล้ว '+pStr('self',true)+' ข้อ';
   if(h('tbright'))h('tbright').innerHTML=actBtns(true);
-  if(h('selfstatus'))h('selfstatus').innerHTML=sSub?'<div class="tsub">\u2713 Submitted</div>':sSaved?'<div class="tsav">&#128190; Saved</div>':'';
+  if(h('selfstatus'))h('selfstatus').innerHTML=sSub?'<div class="tsub">\u2713 Submitted</div>':sSaved?'<div class="tsav">'+icon('download',16)+' Saved</div>':'';
   var html='';
   if(sSub){
     html+='<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--teal);font-size:13px;font-weight:600;background:var(--tlt);border-bottom:1px solid var(--b0)">\u2705 ส่งข้อมูลเรียบร้อยแล้ว ไม่สามารถแก้ไขได้ \u2014 รายการที่ประเมินไปแล้วแสดงอยู่ด้านล่าง (อ่านอย่างเดียว)</div>';
@@ -4500,7 +4571,7 @@ function renderPerson(){
     html+='<span class="ppo">'+(p.dept||p.div)+' \u00B7 '+p.pos+'</span>';
     html+='<span class="ppg" style="color:'+pc2+'">'+pct2+'% \u00B7 '+pStr(p.empId,false)+'</span>';
     html+='</div></div>';
-    if(canRemove)html+='<button onclick="event.stopPropagation();removePerson(\''+p.empId+'\')" title="\u0e25\u0e1a\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19" style="flex-shrink:0;width:26px;height:26px;border-radius:50%;border:none;background:rgba(163,45,45,.1);color:var(--I);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-right:4px">&#10005;</button>';
+    if(canRemove)html+='<button onclick="event.stopPropagation();removePerson(\''+p.empId+'\')" title="\u0e25\u0e1a\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19" style="flex-shrink:0;width:26px;height:26px;border-radius:50%;border:none;background:rgba(163,45,45,.1);color:var(--I);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-right:4px">'+icon('circlex',14)+'</button>';
     html+='<div class="pchv'+(open?' op':'')+'">&#9662;</div>';
     html+='</div>';
     html+='<div class="pb'+(open?' op':'')+'">';
@@ -4539,7 +4610,7 @@ function renderChipBar(cid){
     var avH=ph?'<div class="chav"><img src="'+ph+'" alt="'+p.name+'"></div>':'<div class="chav" style="background:'+p.color+'">'+ini(p.name)+'</div>';
     var c=document.createElement('div');c.className='chip';
     if(!locked){c.draggable=true;c.dataset.i=i;}
-    var rm=(!locked&&!defs[p.empId])?'<button class="chrm" onclick="removePerson(\''+p.empId+'\')">&#10005;</button>':'';
+    var rm=(!locked&&!defs[p.empId])?'<button class="chrm" onclick="removePerson(\''+p.empId+'\')">'+icon('circlex',14)+'</button>':'';
     c.innerHTML=avH+'<span>'+p.name.split(' ')[0]+'<span class="gchip-nick" style="font-size:9px;color:var(--t2);margin-left:3px">('+p.nick+')</span></span>'+rm;
     if(!locked){
       (function(idx){
@@ -4556,7 +4627,7 @@ function renderChipBar(cid){
 }
 function removePerson(eid){
   var defs={};getDefaults(CU).forEach(function(e){defs[e.empId]=true;});
-  if(defs[eid]){toast('\u26A0\uFE0F','ไม่สามารถลบได้','บุคคลนี้อยู่ใน Default list','var(--L)');return;}
+  if(defs[eid]){toast(icon('alerttriangle',18),'ไม่สามารถลบได้','บุคคลนี้อยู่ใน Default list','var(--L)');return;}
   persons=persons.filter(function(p){return p.empId!==eid;});renderTab();
 }
 
@@ -4597,15 +4668,15 @@ function filterAdd(q){
     var statusBadge='';
     if(isAdded){
       if(pct>=100){
-        statusBadge='<span style="font-size:9px;padding:2px 7px;border-radius:5px;background:rgba(29,158,117,.12);color:var(--E);font-weight:700">&#10003; ประเมินครบแล้ว</span>';
+        statusBadge='<span style="font-size:9px;padding:2px 7px;border-radius:5px;background:rgba(29,158,117,.12);color:var(--E);font-weight:700">'+icon('circlecheck',16)+' ประเมินครบแล้ว</span>';
       } else {
         var barW=pct;
-        statusBadge='<span style="font-size:9px;padding:2px 7px;border-radius:5px;background:rgba(186,117,23,.1);color:var(--L);font-weight:700">&#9203; ประเมิน '+pct+'%</span>';
+        statusBadge='<span style="font-size:9px;padding:2px 7px;border-radius:5px;background:rgba(186,117,23,.1);color:var(--L);font-weight:700">'+icon('clock',16)+' ประเมิน '+pct+'%</span>';
       }
     }
     var addbtn=isAdded
       ?'<button class="sradd done" style="font-size:9px;width:auto;border-radius:8px;padding:0 8px">\u2713 \u0e2d\u0e22\u0e39\u0e48\u0e43\u0e19\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23</button>'
-      :'<button class="sradd" onclick="addPerson(\''+e.empId+'\')">&#65291;</button>';
+      :'<button class="sradd" onclick="addPerson(\''+e.empId+'\')">'+icon('plus',16)+'</button>';
     html+='<div class="sri">'+avH
       +'<div class="srin"><div class="srin1" style="display:flex;align-items:center;gap:6px">'+e.name+' <span style="font-size:10px;color:var(--t2)">('+e.nick+')</span>'+(statusBadge?statusBadge:'')+'</div>'
       +'<div class="srin2">'+e.empId+' &middot; '+e.role+' &middot; '+(e.dept||e.div)+'</div></div>'
@@ -4623,7 +4694,7 @@ function addPerson(eid){
   CATS.forEach(function(c){catOp[emp.empId+c]=true;});
   filterAdd(h('addq').value);
   renderTab();
-  toast('\u2705','\u0e40\u0e1e\u0e34\u0e48\u0e21 '+emp.name+' \u0e41\u0e25\u0e49\u0e27','\u0e15\u0e49\u0e2d\u0e07\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e43\u0e2b\u0e49\u0e04\u0e23\u0e1a\u0e17\u0e38\u0e01\u0e2b\u0e31\u0e27\u0e02\u0e49\u0e2d\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e01\u0e14 Save \u0e44\u0e14\u0e49','var(--G)');
+  toast(icon('circlecheck',18),'\u0e40\u0e1e\u0e34\u0e48\u0e21 '+emp.name+' \u0e41\u0e25\u0e49\u0e27','\u0e15\u0e49\u0e2d\u0e07\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e43\u0e2b\u0e49\u0e04\u0e23\u0e1a\u0e17\u0e38\u0e01\u0e2b\u0e31\u0e27\u0e02\u0e49\u0e2d\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e01\u0e14 Save \u0e44\u0e14\u0e49','var(--G)');
 }
 
 /* GRID */
@@ -4674,7 +4745,7 @@ function renderGrid(){
     html+=avH+'<span>'+p.name.split(' ')[0]+'<span class="gchip-nick" style="font-size:9px;color:var(--t2);margin-left:2px">('+p.nick+')</span></span>';
     if(allDone)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2713</span>';
     if(isSel)html+='<span style="font-size:9px;color:var(--teal);margin-left:2px">\u2714</span>';
-    if(canRemoveG)html+='<button class="chrm" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();removePerson(\''+p.empId+'\')" title="\u0e25\u0e1a\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19" style="margin-left:3px">&#10005;</button>';
+    if(canRemoveG)html+='<button class="chrm" onmousedown="event.stopPropagation()" onclick="event.stopPropagation();removePerson(\''+p.empId+'\')" title="\u0e25\u0e1a\u0e2d\u0e2d\u0e01\u0e08\u0e32\u0e01\u0e23\u0e32\u0e22\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19" style="margin-left:3px">'+icon('circlex',14)+'</button>';
     html+='</div>';
   });
   html+='</div></div>';
@@ -4706,7 +4777,7 @@ function renderGrid(){
     /* pending (not-yet-evaluated) indicator */
     html+='<div class="ggcc-done">';
     if(pendingList.length===0){
-      html+='<span class="ggcc-done-cnt" style="color:var(--E)">&#10003; ครบทุกคน</span>';
+      html+='<span class="ggcc-done-cnt" style="color:var(--E)">'+icon('circlecheck',16)+' ครบทุกคน</span>';
     } else {
       pendingList.slice(0,5).forEach(function(p){
         var ph3=getPhoto(p.empId);
@@ -5133,8 +5204,8 @@ function renderDash(){
 
   /* --- 1. FILTER --- */
   html+='<div class="card" data-pdf-sec="controls"><div class="db-filter">';
-  html+='<span class="db-filter-lbl">&#128269; แสดงผล:</span>';
-  [['overall','\uD83C\uDF10 Overall'],['self','\uD83E\uDDD1 ตนเอง'],['other','\uD83D\uDC65 ผู้อื่น'],['p','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e1b'],['k','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e01'],['s','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e2a']].forEach(function(f){
+  html+='<span class="db-filter-lbl">'+icon('search',16)+' แสดงผล:</span>';
+  [['overall',icon('barchart',16)+' Overall'],['self',icon('user',16)+' ตนเอง'],['other',icon('users',16)+' ผู้อื่น'],['p','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e1b'],['k','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e01'],['s','\u0e23\u0e30\u0e14\u0e31\u0e1a \u0e2a']].forEach(function(f){
     html+='<button class="db-ftab'+(dbFilter===f[0]?' on':'')+'" onclick="dbFilter=\''+f[0]+'\';renderDash()">'+f[1]+'</button>';
   });
   html+='<div style="margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
@@ -5145,7 +5216,7 @@ function renderDash(){
     html+='<option value="7.5"'+(dbScale===7.5?' selected':'')+'>7.50</option>';
     html+='</select>';
   }
-  html+='<button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">&#128190; Export PDF</button>';
+  html+='<button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">'+icon('download',16)+' Export PDF</button>';
   html+='</div>';
   html+='</div></div>';
 
@@ -5161,7 +5232,7 @@ function renderDash(){
   html+='<div class="card" data-pdf-sec="controls" style="padding:14px 16px">';
   html+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">';
   html+='<div>';
-  html+='<div style="font-size:11px;color:var(--t2);margin-bottom:3px">&#128197; รอบการประเมิน</div>';
+  html+='<div style="font-size:11px;color:var(--t2);margin-bottom:3px">'+icon('calendarrange',18)+' รอบการประเมิน</div>';
   html+='<div style="font-family:var(--fh);font-size:16px;font-weight:800;color:var(--t0)">ปี '+viewingRound.year+' '+roundLabel(viewingRound.year,viewingRound.roundNo)+'</div>';
   if(viewingRound.startDate&&viewingRound.endDate){
     html+='<div style="font-size:12px;color:var(--t1);margin-top:3px">ระหว่างวันที่ '+fmtThaiDate(viewingRound.startDate)+' \u2013 '+fmtThaiDate(viewingRound.endDate)+'</div>';
@@ -5173,7 +5244,7 @@ function renderDash(){
     html+='<div id="countdownBox_dash" data-end="'+(currentRound.endDate||'')+'"></div>';
     html+='</div>';
   } else if(dbRoundView!=='current'){
-    html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:5px">&#128065; กำลังดูข้อมูลย้อนหลัง \u2014 อ่านอย่างเดียว</span>';
+    html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:5px">'+icon('eye',16)+' กำลังดูข้อมูลย้อนหลัง \u2014 อ่านอย่างเดียว</span>';
   }
   html+='</div>';
   html+='</div>';
@@ -5214,7 +5285,7 @@ function renderDash(){
     cmpNewer=selectableRounds.filter(function(r){return r.id===dbCompareA;})[0]||selectableRounds[0];
   }
   html+='<div class="card" data-pdf-sec="controls" style="padding:14px 16px">';
-  html+='<div style="font-size:11px;color:var(--t2);margin-bottom:8px">&#128202; รอบที่คุณต้องการ</div>';
+  html+='<div style="font-size:11px;color:var(--t2);margin-bottom:8px">'+icon('chartcolumn',18)+' รอบที่คุณต้องการ</div>';
   html+='<div class="db-compare-row">';
   html+='<div style="flex:1;min-width:160px">';
   html+='<select class="db-compare-sel std-sel" id="dbCompareASel" onchange="dbCompareA=this.value;renderDash()">';
@@ -5272,7 +5343,7 @@ function renderDash(){
     html+='<div class="db-summary-left"><div class="card" style="height:100%;padding:16px">';
     html+='<div class="db-sh-ttl" style="margin-bottom:10px">คะแนน Singhaway</div>';
     if(swAllE){
-      html+='<div class="db-allgood">&#127881; ยอดเยี่ยม! คุณได้รับคะแนนระดับ E ทุกหัวข้อแล้ว</div>';
+      html+='<div class="db-allgood">'+icon('badgecheck',18)+' ยอดเยี่ยม! คุณได้รับคะแนนระดับ E ทุกหัวข้อแล้ว</div>';
     } else {
       html+='<div class="db-rank-of">คุณอยู่ในลำดับที่</div>';
       html+='<div class="db-rank-num db-anim-number">'+(swRank.rank||'\u2013')+' <span style="font-size:14px;font-weight:600;color:var(--t2)">จาก '+swRank.total+' คน</span></div>';
@@ -5305,24 +5376,34 @@ function renderDash(){
       var valNewer=myScoreNewer_sw.byCat[cat];
       var barHNewer=Math.max(1,Math.round(valNewer/5*swChartH)); /* beginAtZero, min=0, max=5 semantics: 0 score -> 0px (clamped to 1px floor only so a real score is never literally invisible), 5 -> the FULL plot height -- nothing here can ever "float" above the axis or leave a gap below it, since height is the only thing positioning the bar and there is no margin/padding/transform pushing it away from the flex-end baseline */
       var lblNewer=s2l(valNewer);
-      html+='<div style="flex:1;display:flex;align-items:flex-end;height:100%;justify-content:center;min-width:0">';
+      /* ── Dynamic bar width, matching the FOCUS chart's exact pattern ──
+         Same approach as the FOCUS chart immediately below: each bar
+         lives in its own flex:1 sub-slot (not a fixed percentage or
+         max-width cap), with the bar itself at width:100% of that
+         sub-slot. Flexbox alone decides the actual pixel width from
+         the category column's available space and how many sibling
+         sub-slots it's sharing with (one in single-dataset mode, two
+         side-by-side with a small gap in comparison mode) -- identical
+         mechanism to fkeys.forEach()'s bars in the FOCUS chart, so the
+         two charts behave the same way as the container resizes. */
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;min-width:0">';
       if(dbCompareMode){
         var valOlder=myScoreOlder_sw.byCat[cat];
         var barHOlder=Math.max(1,Math.round(valOlder/5*swChartH));
         var lblOlder=s2l(valOlder);
         var diffPct_sw=valOlder?Math.round((valNewer-valOlder)/valOlder*100):0;
         var oldFits=barHOlder>=22,newFits=barHNewer>=22;
-        html+='<div style="flex:1;max-width:24px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpOlder.label+': '+valOlder.toFixed(2)+' ('+lblOlder.l+')">';
+        html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpOlder.label+': '+valOlder.toFixed(2)+' ('+lblOlder.l+')">';
         if(!oldFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHOlder+2)+'px;font-size:9px;font-weight:700;color:#111827">'+valOlder.toFixed(2)+'</span>';
         html+='<div class="db-anim-bar" style="width:100%;height:'+barHOlder+'px;background:'+lightVariantOf(m.cl)+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
           +(oldFits?'<span class="db-bar-label" style="font-size:9px;color:#111827">'+valOlder.toFixed(2)+'</span>':'')+'</div></div>';
-        html+='<div style="flex:1;max-width:24px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
+        html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
         if(!newFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:9px;font-weight:700;color:#111827">'+valNewer.toFixed(2)+'</span>';
         html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:'+m.cl+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
           +(newFits?'<span class="db-bar-label" style="font-size:9px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
       } else {
         var fits=barHNewer>=22;
-        html+='<div style="flex:1;max-width:36px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
+        html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
         if(!fits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:10px;font-weight:700;color:#111827">'+valNewer.toFixed(2)+'</span>';
         html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:'+m.cl+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
           +(fits?'<span class="db-bar-label" style="font-size:10px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
@@ -5351,12 +5432,12 @@ function renderDash(){
 
   /* --- 2. SINGHAWAY TABLE --- */
   html+='<div class="card" data-pdf-sec="singhaway">';
-  html+='<div class="chd"><div class="db-sh-ico" style="background:var(--s2)">&#11088;</div>';
+  html+='<div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('star',16)+'</div>';
   html+='<div class="db-sh-ttl">\u0e1c\u0e25\u0e01\u0e32\u0e23\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19 Singhaway Values</div>';
   if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
   html+='</div>';
   if(noData){
-    html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน<br><span style="font-size:11px">กรอกคะแนนในหน้าประเมินก่อน แล้วกลับมาดูที่นี่</span></div>';
+    html+='<div style="padding:2rem;text-align:center;color:var(--t2)">'+icon('chartcolumn',18)+' ยังไม่มีข้อมูลการประเมิน<br><span style="font-size:11px">กรอกคะแนนในหน้าประเมินก่อน แล้วกลับมาดูที่นี่</span></div>';
   } else {
     /* table now reads from the SAME comparison data source as every
        other widget (getRoundScoreFor against cmpNewer/cmpOlder), instead
@@ -5532,18 +5613,18 @@ function renderDash(){
       });
       html+='</div>';
     } else {
-      html+='<div class="db-allgood" style="margin-top:8px">&#127881; ยอดเยี่ยม! คุณได้รับคะแนนระดับ E ทุกหัวข้อแล้ว</div>';
+      html+='<div class="db-allgood" style="margin-top:8px">'+icon('badgecheck',18)+' ยอดเยี่ยม! คุณได้รับคะแนนระดับ E ทุกหัวข้อแล้ว</div>';
     }
     html+='</div>';
   }
 
   /* --- 3. FOCUS CHART --- */
   html+='<div class="card" data-pdf-sec="focus">';
-  html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">&#128202;</div>';
+  html+='<div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">'+icon('chartcolumn',18)+'</div>';
   html+='<div class="db-sh-ttl">ผลการประเมินคะแนน FOCUS</div>';
   html+='</div>';
   if(noData){
-    html+='<div style="padding:2rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน</div>';
+    html+='<div style="padding:2rem;text-align:center;color:var(--t2)">'+icon('chartcolumn',18)+' ยังไม่มีข้อมูลการประเมิน</div>';
   } else {
     var chartAreaH=260; /* total px height of the scaled 0-5 axis area -- bars below scale against this EXACT value, not a separate smaller constant, or the bar will visually land on the wrong gridline */
     /* FOCUS scores now come from the SAME round-comparison data source as
@@ -5692,7 +5773,7 @@ function renderDash(){
 
   /* --- 4. FEEDBACK WALL --- */
   html+='<div class="card" data-pdf-sec="feedback">';
-  html+='<div class="chd"><div class="db-sh-ico" style="background:rgba(83,74,183,.1)">&#128172;</div>';
+  html+='<div class="chd"><div class="db-sh-ico" style="background:rgba(83,74,183,.1)">'+icon('message',18)+'</div>';
   html+='<div class="db-sh-ttl">ข้อเสนอแนะจากการประเมิน</div>';
   var feedbacks=collectFeedbacks();
   var anyIdentified=feedbacks.some(function(f){return f.isAnonymous===false;});
@@ -5700,7 +5781,7 @@ function renderDash(){
     /* item 4-5: the (i) button only ever appears for an Identified round
        -- an Anonymous round's card is byte-for-byte the same as before
        this feature existed (no new button, no identity anywhere). */
-    html+='<button class="btn boteal" style="font-size:10px;padding:4px 10px;margin-left:auto" onclick="openEvaluatorDetailModal()">&#9432; ดูรายละเอียดผู้ประเมิน</button>';
+    html+='<button class="btn boteal" style="font-size:10px;padding:4px 10px;margin-left:auto" onclick="openEvaluatorDetailModal()">'+icon('info',14)+' ดูรายละเอียดผู้ประเมิน</button>';
   } else {
     html+='<span style="font-size:10px;color:var(--t2)">\u0e44\u0e21\u0e48\u0e40\u0e1b\u0e34\u0e14\u0e40\u0e1c\u0e22\u0e15\u0e31\u0e27\u0e15\u0e19</span>';
   }
@@ -5726,9 +5807,9 @@ function renderDash(){
       html+='</div>';
     });
     html+='</div>';
-    html+='<div style="text-align:center"><button class="btn boteal" onclick="openFeedbackAll()">&#128172; ดูทั้งหมด ('+feedbacks.length+' ข้อความ)</button></div>';
+    html+='<div style="text-align:center"><button class="btn boteal" onclick="openFeedbackAll()">'+icon('message',18)+' ดูทั้งหมด ('+feedbacks.length+' ข้อความ)</button></div>';
   } else {
-    html+='<div style="padding:1.5rem;text-align:center;color:var(--t2);font-size:13px">&#128172; ยังไม่มีข้อเสนอแนะ<br><span style="font-size:11px">เมื่อมีการให้เหตุผลในการประเมิน จะแสดงที่นี่</span></div>';
+    html+='<div style="padding:1.5rem;text-align:center;color:var(--t2);font-size:13px">'+icon('message',18)+' ยังไม่มีข้อเสนอแนะ<br><span style="font-size:11px">เมื่อมีการให้เหตุผลในการประเมิน จะแสดงที่นี่</span></div>';
   }
   html+='</div></div>';
 
@@ -5736,14 +5817,14 @@ function renderDash(){
   var showOverview=['ผู้บริหารระดับกลาง','ผู้บริหารระดับสูง','ผู้ช่วยผู้อำนวยการกลุ่ม','ผู้อำนวยการกลุ่ม'].indexOf(CU.role)>=0;
   if(showOverview){
     html+='<div class="card" data-pdf-sec="overview">';
-    html+='<div class="chd"><div class="db-sh-ico" style="background:var(--blt)">&#128200;</div>';
+    html+='<div class="chd"><div class="db-sh-ico" style="background:var(--blt)">'+icon('trendingup',18)+'</div>';
     html+='<div class="db-sh-ttl">ภาพรวมคะแนนรายบุคคล</div>';
     if(dbScale!==5)html+='<span style="font-size:10px;font-weight:700;color:var(--pb);background:var(--blt);padding:2px 8px;border-radius:5px;margin-right:6px">\u0e40\u0e15\u0e47\u0e21 '+dbScale.toFixed(2)+'</span>';
     html+='<button class="db-ftab on" style="font-size:10px;padding:3px 10px" onclick="sovSortDir=sovSortDir===\'desc\'?\'asc\':\'desc\';renderDash()">คะแนน'+(sovSortDir==='asc'?'น้อย\u2192มาก &#9650;':'มาก\u2192น้อย &#9660;')+'</button>';
     html+='</div>';
     html+='<div style="padding:14px 16px">';
     if(noData){
-      html+='<div style="padding:1.5rem;text-align:center;color:var(--t2)">&#128202; ยังไม่มีข้อมูลการประเมิน</div>';
+      html+='<div style="padding:1.5rem;text-align:center;color:var(--t2)">'+icon('chartcolumn',18)+' ยังไม่มีข้อมูลการประเมิน</div>';
     } else {
       html+=scoreOverviewSection();
     }
@@ -5919,9 +6000,9 @@ function scoreOverviewSection(){
       ||p.empId.toLowerCase().indexOf(q)>=0||(p.dept||'').toLowerCase().indexOf(q)>=0||p.role.toLowerCase().indexOf(q)>=0;
   });
   var fkeys=Object.keys(FDEF);
-  var html='<div style="margin-bottom:10px"><input type="text" id="sovSearch" value="'+sovQ
-    +'" placeholder="\uD83D\uDD0D \u0e04\u0e49\u0e19\u0e2b\u0e32\u0e0a\u0e37\u0e48\u0e2d \u0e23\u0e2b\u0e31\u0e2a \u0e41\u0e1c\u0e19\u0e01..."'
-    +' style="width:100%;max-width:360px;padding:8px 12px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;outline:none" '
+  var html='<div style="margin-bottom:10px;position:relative;width:100%;max-width:360px"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t2);pointer-events:none">'+icon('search',14)+'</span><input type="text" id="sovSearch" value="'+sovQ
+    +'" placeholder="\u0e04\u0e49\u0e19\u0e2b\u0e32\u0e0a\u0e37\u0e48\u0e2d \u0e23\u0e2b\u0e31\u0e2a \u0e41\u0e1c\u0e19\u0e01..."'
+    +' style="width:100%;padding:8px 12px 8px 32px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;outline:none" '
     +' oninput="window._sovQ=this.value;renderDash()"></div>';
 
   html+='<div style="overflow-x:auto"><table class="sov-tbl"><thead><tr>';
@@ -5979,7 +6060,7 @@ function openDrill(eid,name,hlCat){
   h('drtitle').textContent=name+' \u2014 รายละเอียดคะแนน';
   h('drsub').textContent=p.pos+' \u00B7 '+p.role+' \u00B7 '+p.empId;
   var levels=[{lb:'ระดับปฏิบัติการ',cl:'#1D9E75',rng:[0.45,0.95]},{lb:'ผู้บริหารระดับกลาง',cl:'#185FA5',rng:[0.5,1.0]},{lb:'ผู้บริหารระดับสูง',cl:'#534AB7',rng:[0.55,1.0]}];
-  var html='<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">&#11088; คะแนน Singhaway Values</div>';
+  var html='<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">'+icon('star',16)+' คะแนน Singhaway Values</div>';
   CATS.forEach(function(cat){
     var m=CAT_META[cat];var isHL=cat===hlCat;
     html+='<div style="margin-bottom:10px'+(isHL?';background:var(--tlt);border-radius:var(--r);padding:8px':'')+'">';
