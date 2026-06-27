@@ -667,6 +667,8 @@ button,input,select{font-family:var(--fb)}
 .db-gbar-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:2px;font-size:10px;color:var(--t2);row-gap:6px}
 .db-gbar-legend-sw{display:inline-flex;align-items:center;gap:5px}
 .db-gbar-legend-dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+.db-gbar-legend-filled{background:var(--t0)}
+.db-gbar-legend-hollow{background:transparent;border:1.5px solid var(--t1)}
 /* ── Animations (spec item 9): bar grow, number count-in, bubble slide ──
    300-500ms, eased -- fires whenever a bar/number/bubble's height, content,
    or position changes (i.e. every time renderDash() runs after a dropdown
@@ -1444,6 +1446,19 @@ var RCOL={E:'#1D9E75',G:'#185FA5',S:'#5F6B7A',L:'#BA7517',I:'#A32D2D'};
 var RVAL={E:5,G:4,S:3,L:2,I:1};
 var RATINGS=['E','G','S','L','I'];
 var RNAME={E:'Excellence',G:'Good',S:'Standard',L:'Low',I:'Improve'};
+/* ── Comparison-mode light-variant palette (spec item 3) ──
+ * Exact hue-preserving lighter shades for the "comparison round" (older)
+ * bars, paired one-to-one with each main color used across FOCUS and
+ * Singhaway charts. Looked up directly rather than computed, since the
+ * spec gives fixed hex pairs rather than an algorithm. */
+var LIGHT_VARIANT={
+  '#2563EB':'#93C5FD', /* Fast / Family -- main blue -> light blue */
+  '#06B6D4':'#67E8F9', /* Ownership / Courage -- main cyan -> light cyan */
+  '#60A5FA':'#BFDBFE', /* Commitment / Premium Quality -- main light-blue -> lighter blue */
+  '#A855F7':'#D8B4FE', /* United / Happiness -- main purple -> light purple */
+  '#EC4899':'#F9A8D4'  /* Strong -- main pink -> light pink */
+};
+function lightVariantOf(hex){return LIGHT_VARIANT[hex]||hex;}
 var FDEF={
   F:{nm:'Fast',cl:'#2563EB',bg:'rgba(37,99,235,.1)',df:{
     E:'\u0e40\u0e02\u0e49\u0e32\u0e43\u0e08\u0e41\u0e25\u0e30\u0e15\u0e2d\u0e1a\u0e2a\u0e19\u0e2d\u0e07\u0e04\u0e27\u0e32\u0e21\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e25\u0e39\u0e01\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e17\u0e31\u0e19\u0e17\u0e35 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27\u0e01\u0e27\u0e48\u0e32\u0e41\u0e1c\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e21\u0e35\u0e1b\u0e23\u0e30\u0e2a\u0e34\u0e17\u0e18\u0e34\u0e20\u0e32\u0e1e\u0e41\u0e25\u0e30\u0e15\u0e23\u0e07\u0e08\u0e38\u0e14 \u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e23\u0e31\u0e1a\u0e21\u0e37\u0e2d\u0e07\u0e32\u0e19\u0e40\u0e23\u0e48\u0e07\u0e14\u0e48\u0e27\u0e19 \u0e41\u0e25\u0e30\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e27\u0e34\u0e18\u0e35\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e43\u0e2b\u0e49\u0e40\u0e23\u0e47\u0e27\u0e02\u0e36\u0e49\u0e19',
@@ -1451,25 +1466,25 @@ var FDEF={
     S:'\u0e41\u0e08\u0e49\u0e07\u0e1c\u0e39\u0e49\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e17\u0e31\u0e19\u0e17\u0e35\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e04\u0e32\u0e14\u0e27\u0e48\u0e32\u0e07\u0e32\u0e19\u0e08\u0e30\u0e25\u0e48\u0e32\u0e0a\u0e49\u0e32 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27 \u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e43\u0e19\u0e02\u0e2d\u0e1a\u0e40\u0e02\u0e15\u0e07\u0e32\u0e19 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e2b\u0e25\u0e32\u0e01\u0e2b\u0e25\u0e32\u0e22\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27\u0e15\u0e23\u0e07\u0e15\u0e32\u0e21\u0e41\u0e1c\u0e19 \u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49\u0e07\u0e32\u0e19\u0e43\u0e2b\u0e21\u0e48\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27',
     L:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e15\u0e32\u0e21\u0e41\u0e1c\u0e19 \u0e41\u0e15\u0e48\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e21\u0e35\u0e07\u0e32\u0e19\u0e41\u0e17\u0e23\u0e01\u0e08\u0e30\u0e40\u0e2a\u0e35\u0e22\u0e08\u0e31\u0e07\u0e2b\u0e27\u0e30 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e0a\u0e49\u0e32\u0e41\u0e21\u0e49\u0e08\u0e30\u0e40\u0e04\u0e22\u0e40\u0e1b\u0e47\u0e19\u0e07\u0e32\u0e19\u0e17\u0e35\u0e48\u0e17\u0e33\u0e21\u0e32\u0e41\u0e25\u0e49\u0e27 \u0e41\u0e25\u0e30\u0e15\u0e49\u0e2d\u0e07\u0e04\u0e2d\u0e22\u0e15\u0e34\u0e14\u0e15\u0e32\u0e21\u0e07\u0e32\u0e19\u0e40\u0e2a\u0e21\u0e2d',
     I:'\u0e44\u0e21\u0e48\u0e08\u0e31\u0e14\u0e25\u0e33\u0e14\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e33\u0e04\u0e31\u0e0d\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e25\u0e48\u0e32\u0e0a\u0e49\u0e32 \u0e23\u0e39\u0e49\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e41\u0e15\u0e48\u0e44\u0e21\u0e48\u0e25\u0e07\u0e21\u0e37\u0e2d\u0e41\u0e01\u0e49 \u0e23\u0e2d\u0e04\u0e33\u0e2a\u0e31\u0e48\u0e07 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e0a\u0e49\u0e32 \u0e41\u0e08\u0e49\u0e07\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e01\u0e23\u0e30\u0e0a\u0e31\u0e49\u0e19\u0e0a\u0e34\u0e14\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48\u0e41\u0e08\u0e49\u0e07'}},
-  O:{nm:'Ownership',cl:'#0EA5A8',bg:'rgba(14,165,168,.1)',df:{
+  O:{nm:'Ownership',cl:'#06B6D4',bg:'rgba(6,182,212,.1)',df:{
     E:'\u0e21\u0e35\u0e04\u0e27\u0e32\u0e21\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e08\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e15\u0e48\u0e2d\u0e1c\u0e25\u0e25\u0e31\u0e1e\u0e18\u0e4c \u0e44\u0e21\u0e48\u0e1b\u0e25\u0e48\u0e2d\u0e22\u0e1c\u0e48\u0e32\u0e19\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e41\u0e08\u0e49\u0e07\u0e41\u0e25\u0e30\u0e41\u0e01\u0e49\u0e44\u0e02\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e19\u0e33\u0e44\u0e1b\u0e1b\u0e23\u0e31\u0e1a\u0e1b\u0e23\u0e38\u0e07\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1b\u0e49\u0e2d\u0e07\u0e01\u0e31\u0e19\u0e01\u0e32\u0e23\u0e40\u0e01\u0e34\u0e14\u0e0b\u0e49\u0e33',
     G:'\u0e21\u0e35\u0e04\u0e27\u0e32\u0e21\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e08\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e15\u0e48\u0e2d\u0e1c\u0e25\u0e25\u0e31\u0e1e\u0e18\u0e4c \u0e41\u0e08\u0e49\u0e07\u0e41\u0e25\u0e30\u0e41\u0e01\u0e49\u0e44\u0e02\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34',
     S:'\u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e2b\u0e19\u0e49\u0e32\u0e17\u0e35\u0e48 \u0e41\u0e01\u0e49\u0e44\u0e02\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e0a\u0e35\u0e49\u0e41\u0e19\u0e30 \u0e41\u0e08\u0e49\u0e07\u0e1c\u0e39\u0e49\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34',
     L:'\u0e1b\u0e0f\u0e34\u0e1a\u0e31\u0e15\u0e34\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e17\u0e35\u0e48\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e21\u0e2d\u0e1a\u0e2b\u0e21\u0e32\u0e22 \u0e15\u0e49\u0e2d\u0e07\u0e15\u0e34\u0e14\u0e15\u0e32\u0e21 \u0e40\u0e1e\u0e34\u0e01\u0e40\u0e09\u0e22\u0e15\u0e48\u0e2d\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e41\u0e25\u0e30\u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e04\u0e27\u0e32\u0e21\u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e40\u0e01\u0e34\u0e14\u0e1b\u0e31\u0e0d\u0e2b\u0e32',
     I:'\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e44\u0e21\u0e48\u0e41\u0e08\u0e49\u0e07\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e2b\u0e23\u0e37\u0e2d\u0e41\u0e01\u0e49\u0e44\u0e02 \u0e2a\u0e48\u0e07\u0e1c\u0e25\u0e01\u0e23\u0e30\u0e17\u0e1a\u0e15\u0e48\u0e2d\u0e07\u0e32\u0e19\u0e41\u0e25\u0e30\u0e17\u0e35\u0e21 \u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e01\u0e32\u0e23\u0e22\u0e2d\u0e21\u0e23\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e41\u0e25\u0e30\u0e1c\u0e25\u0e31\u0e01\u0e20\u0e32\u0e23\u0e30\u0e43\u0e2b\u0e49\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19'}},
-  C:{nm:'Commitment',cl:'#7C3AED',bg:'rgba(124,58,237,.1)',df:{
+  C:{nm:'Commitment',cl:'#60A5FA',bg:'rgba(96,165,250,.1)',df:{
     E:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32 \u0e04\u0e32\u0e14\u0e01\u0e32\u0e23\u0e13\u0e4c \u0e41\u0e25\u0e30\u0e27\u0e32\u0e07\u0e41\u0e1c\u0e19\u0e1b\u0e49\u0e2d\u0e07\u0e01\u0e31\u0e19\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e44\u0e14\u0e49\u0e17\u0e38\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e41\u0e25\u0e30\u0e1e\u0e31\u0e12\u0e19\u0e32\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e15\u0e48\u0e2d\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07',
     G:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14\u0e43\u0e19\u0e2a\u0e34\u0e48\u0e07\u0e17\u0e35\u0e48\u0e17\u0e33\u0e44\u0e14\u0e49 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d \u0e1e\u0e31\u0e12\u0e19\u0e32\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e43\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19',
     S:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14\u0e43\u0e19\u0e2a\u0e34\u0e48\u0e07\u0e17\u0e35\u0e48\u0e17\u0e33\u0e44\u0e14\u0e49 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49 \u0e2a\u0e48\u0e07\u0e21\u0e2d\u0e1a\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19',
     L:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49\u0e1a\u0e32\u0e07\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e21\u0e48\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d',
     I:'\u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e1b\u0e32\u0e01/\u0e44\u0e21\u0e48\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e44\u0e21\u0e48\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32 \u0e44\u0e21\u0e48\u0e21\u0e35\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e43\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19'}},
-  U:{nm:'United',cl:'#16A34A',bg:'rgba(22,163,74,.1)',df:{
+  U:{nm:'United',cl:'#A855F7',bg:'rgba(168,85,247,.1)',df:{
     E:'\u0e40\u0e1b\u0e47\u0e19\u0e41\u0e1a\u0e1a\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e02\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e40\u0e1b\u0e47\u0e19\u0e17\u0e35\u0e21 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e43\u0e2b\u0e49\u0e04\u0e19\u0e23\u0e2d\u0e1a\u0e15\u0e31\u0e27\u0e2d\u0e22\u0e32\u0e01\u0e23\u0e48\u0e27\u0e21\u0e21\u0e37\u0e2d\u0e14\u0e49\u0e27\u0e22',
     G:'\u0e0a\u0e48\u0e27\u0e22\u0e40\u0e2b\u0e25\u0e37\u0e2d\u0e17\u0e35\u0e21\u0e40\u0e0a\u0e34\u0e07\u0e23\u0e38\u0e01 \u0e41\u0e25\u0e30\u0e2a\u0e48\u0e07\u0e40\u0e2a\u0e23\u0e34\u0e21\u0e1a\u0e23\u0e23\u0e22\u0e32\u0e01\u0e32\u0e28\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d',
     S:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e1a\u0e17\u0e35\u0e21\u0e15\u0e32\u0e21\u0e1a\u0e17\u0e1a\u0e32\u0e17\u0e2b\u0e19\u0e49\u0e32\u0e17\u0e35\u0e48 \u0e41\u0e25\u0e30\u0e40\u0e04\u0e32\u0e23\u0e1e\u0e02\u0e49\u0e2d\u0e15\u0e01\u0e25\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21',
     L:'\u0e43\u0e2b\u0e49\u0e04\u0e27\u0e32\u0e21\u0e23\u0e48\u0e27\u0e21\u0e21\u0e37\u0e2d\u0e40\u0e09\u0e1e\u0e32\u0e30\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e16\u0e39\u0e01\u0e02\u0e2d \u0e41\u0e15\u0e48\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e43\u0e2a\u0e48\u0e43\u0e08\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e43\u0e19\u0e20\u0e32\u0e1e\u0e23\u0e27\u0e21',
     I:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e41\u0e1a\u0e1a\u0e15\u0e48\u0e32\u0e07\u0e04\u0e19\u0e15\u0e48\u0e32\u0e07\u0e17\u0e33 \u0e44\u0e21\u0e48\u0e40\u0e1b\u0e34\u0e14\u0e23\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e04\u0e34\u0e14\u0e40\u0e2b\u0e47\u0e19 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e43\u0e2b\u0e49\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e19\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e15\u0e34\u0e14\u0e02\u0e31\u0e14'}},
-  S:{nm:'Strong',cl:'#DC2626',bg:'rgba(220,38,38,.1)',df:{
+  S:{nm:'Strong',cl:'#EC4899',bg:'rgba(236,72,153,.1)',df:{
     E:'\u0e40\u0e1b\u0e47\u0e19\u0e1e\u0e25\u0e31\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e43\u0e19\u0e17\u0e38\u0e01\u0e2a\u0e16\u0e32\u0e19\u0e01\u0e32\u0e23\u0e13\u0e4c \u0e2a\u0e23\u0e49\u0e32\u0e07\u0e41\u0e23\u0e07\u0e1a\u0e31\u0e19\u0e14\u0e32\u0e25\u0e43\u0e08\u0e43\u0e2b\u0e49\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19\u0e01\u0e25\u0e49\u0e32\u0e01\u0e49\u0e32\u0e27\u0e02\u0e49\u0e32\u0e21\u0e02\u0e35\u0e14\u0e08\u0e33\u0e01\u0e31\u0e14 \u0e41\u0e25\u0e30\u0e1c\u0e25\u0e31\u0e01\u0e14\u0e31\u0e19\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07\u0e44\u0e1b\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e01\u0e31\u0e19',
     G:'\u0e22\u0e37\u0e19\u0e2b\u0e22\u0e31\u0e14\u0e17\u0e48\u0e32\u0e21\u0e01\u0e25\u0e32\u0e07\u0e04\u0e27\u0e32\u0e21\u0e01\u0e14\u0e14\u0e31\u0e19 \u0e01\u0e25\u0e49\u0e32\u0e40\u0e2a\u0e19\u0e2d\u0e41\u0e19\u0e27\u0e04\u0e34\u0e14\u0e43\u0e2b\u0e21\u0e48 \u0e41\u0e25\u0e30\u0e23\u0e48\u0e27\u0e21\u0e02\u0e31\u0e1a\u0e40\u0e04\u0e25\u0e37\u0e48\u0e2d\u0e19\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21',
     S:'\u0e01\u0e25\u0e49\u0e32\u0e40\u0e1c\u0e0a\u0e34\u0e0d\u0e1b\u0e31\u0e0d\u0e2b\u0e32 \u0e41\u0e2a\u0e14\u0e07\u0e04\u0e27\u0e32\u0e21\u0e04\u0e34\u0e14\u0e40\u0e2b\u0e47\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e40\u0e2b\u0e21\u0e32\u0e30\u0e2a\u0e21 \u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49\u0e41\u0e25\u0e30\u0e40\u0e1b\u0e34\u0e14\u0e23\u0e31\u0e1a\u0e41\u0e19\u0e27\u0e04\u0e34\u0e14\u0e43\u0e2b\u0e21\u0e48\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1e\u0e31\u0e12\u0e19\u0e32\u0e15\u0e19\u0e40\u0e2d\u0e07',
@@ -1569,6 +1584,14 @@ function buddhistYear(dateStr){
   return y+543;
 }
 function roundLabel(year,roundNo){return 'รอบที่ '+roundNo+'/'+year;}
+/* Compact "N/YYYY" format for chart legends specifically (spec item 5
+   wants "1/2569" style, not the fuller "รอบที่ 1/2569" used elsewhere in
+   the app) -- kept separate from roundLabel() itself so nothing else
+   that already depends on the fuller text is affected. */
+function compactRoundLabel(roundOrYear,roundNo){
+  if(typeof roundOrYear==='object'&&roundOrYear)return roundOrYear.roundNo+'/'+roundOrYear.year;
+  return roundNo+'/'+roundOrYear;
+}
 /* figure out the next round's year+number given the previous round and a
    newly-picked start date: same Buddhist year -> increment; new year -> 1 */
 function nextRoundMeta(prevYear,prevRoundNo,newStartDate){
@@ -1744,7 +1767,8 @@ function chronologicalOrder(roundIdX,roundIdY){
    lookups for a given employee -- handles all 3 sources (live current
    round via getDefaults-style avgScore2, real closed ROUNDS, or
    MOCK_ROUNDS) behind one consistent interface. */
-function getRoundScoreFor(roundId,empId){
+function getRoundScoreFor(roundId,empId,filter){
+  filter=filter||'overall'; /* default preserved for any caller that doesn't pass one, so nothing else breaks */
   if(roundId==='current'){
     /* live, in-progress round: this only has real data for whoever is
        actually logged in right now (selfSc/othSc are per-session) -- use
@@ -1752,12 +1776,14 @@ function getRoundScoreFor(roundId,empId){
        employees so the comparison/ranking views still have something to
        show for everyone, exactly like the Admin shell already does via
        mockScoreFor(). The logged-in user's own row prefers their real
-       entered scores when available. */
+       entered scores when available, computed under the SAME filter the
+       person picked from the existing dbFilter control (item 1-6 of this
+       request) -- never hardcoded to 'overall' regardless of selection. */
     if(CU&&empId===CU.empId){
-      var byCat={};CATS.forEach(function(cat){byCat[cat]=avgScore2([empId],CRITERIA.filter(function(c){return c.cat===cat;}),'overall');});
-      var byFocus={};Object.keys(FDEF).forEach(function(f){byFocus[f]=avgScore2([empId],CRITERIA.filter(function(c){return c.foc===f;}),'overall');});
-      var byCriterion={};CRITERIA.forEach(function(c){byCriterion[c.id]=avgScore2([empId],[c],'overall');});
-      var overall=avgScore2([empId],CRITERIA,'overall');
+      var byCat={};CATS.forEach(function(cat){byCat[cat]=avgScore2([empId],CRITERIA.filter(function(c){return c.cat===cat;}),filter);});
+      var byFocus={};Object.keys(FDEF).forEach(function(f){byFocus[f]=avgScore2([empId],CRITERIA.filter(function(c){return c.foc===f;}),filter);});
+      var byCriterion={};CRITERIA.forEach(function(c){byCriterion[c.id]=avgScore2([empId],[c],filter);});
+      var overall=avgScore2([empId],CRITERIA,filter);
       if(overall)return{overall:overall,byCat:byCat,byFocus:byFocus,byCriterion:byCriterion};
     }
     return _mockScoreForRound(empId,'current_'+currentRound.id);
@@ -4877,15 +4903,19 @@ function renderDash(){
      used to scale against 140px while the axis was drawn against the
      160px container, so 4.80 and 4.50 looked almost the same height). */
   if(CU&&CU.empId&&!noData){
+    var myScoreNewer_sw=getRoundScoreFor(cmpNewer.id,CU.empId,dbFilter);
+    var myScoreOlder_sw=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId,dbFilter):null;
     var allScoresNewer_sw=ALL_EMP.map(function(e){
+      if(e.empId===CU.empId){
+        var catValsMe=CATS.map(function(c){return myScoreNewer_sw.byCat[c];});
+        return{empId:e.empId,value:catValsMe.reduce(function(a,b){return a+b;},0)/catValsMe.length};
+      }
       var sc=getRoundScoreFor(cmpNewer.id,e.empId);
       var catVals=CATS.map(function(c){return sc.byCat[c];});
       var overall=catVals.reduce(function(a,b){return a+b;},0)/catVals.length;
       return{empId:e.empId,value:overall};
     });
     var swRank=competitionRank(allScoresNewer_sw,CU.empId);
-    var myScoreNewer_sw=getRoundScoreFor(cmpNewer.id,CU.empId);
-    var myScoreOlder_sw=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId):null;
     var swReco=recommendationItems(CATS.map(function(c){return{key:c,value:myScoreNewer_sw.byCat[c],label:CAT_META[c].lb};}));
     var swAllE=swReco.length===0;
 
@@ -4909,18 +4939,17 @@ function renderDash(){
     html+='<div class="db-sh-ttl" style="margin-bottom:6px">กราฟคะแนน Singhaway</div>';
     if(dbCompareMode){
       html+='<div class="db-gbar-legend">';
-      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--b1)"></span>'+cmpOlder.label+'</span>';
-      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpNewer.label+'</span>';
+      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-hollow"></span>'+compactRoundLabel(cmpOlder)+'</span>';
+      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-filled"></span>'+compactRoundLabel(cmpNewer)+'</span>';
       html+='</div>';
     } else {
-      html+='<div class="db-gbar-legend"><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpNewer.label+'</span></div>';
+      html+='<div class="db-gbar-legend"><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-filled"></span>'+compactRoundLabel(cmpNewer)+'</span></div>';
     }
     var swChartH=170; /* bars scale against this EXACT height -- must match the y-axis below, or bars land on the wrong gridline (this was the reported bug) */
     html+='<div style="display:flex;align-items:flex-end;gap:14px;height:'+swChartH+'px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 6px 0 24px;position:relative">';
     [5,4,3,2,1,0].forEach(function(v){
       var top=(1-v/5)*100;
       html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:8px;font-weight:700;color:var(--t2);width:18px;text-align:right">'+v+'</div>';
-      html+='<div style="position:absolute;left:24px;right:6px;top:'+top+'%;border-top:1px dashed #E5E7EB"></div>';
     });
     CATS.forEach(function(cat){
       var m=CAT_META[cat];
@@ -4937,11 +4966,11 @@ function renderDash(){
         var oldFits=barHOlder>=22,newFits=barHNewer>=22;
         html+='<div style="flex:1;max-width:24px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpOlder.label+': '+valOlder.toFixed(2)+' ('+lblOlder.l+')">';
         if(!oldFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHOlder+2)+'px;font-size:9px;font-weight:700;color:#111827">'+valOlder.toFixed(2)+'</span>';
-        html+='<div class="db-anim-bar" style="width:100%;height:'+barHOlder+'px;background:var(--b1);border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
-          +(oldFits?'<span class="db-bar-label" style="font-size:9px;color:var(--t1)">'+valOlder.toFixed(2)+'</span>':'')+'</div></div>';
+        html+='<div class="db-anim-bar" style="width:100%;height:'+barHOlder+'px;background:'+lightVariantOf(m.cl)+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
+          +(oldFits?'<span class="db-bar-label" style="font-size:9px;color:#111827">'+valOlder.toFixed(2)+'</span>':'')+'</div></div>';
         html+='<div style="flex:1;max-width:24px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
         if(!newFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:9px;font-weight:700;color:#111827">'+valNewer.toFixed(2)+'</span>';
-        html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:var(--pb);border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
+        html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:'+m.cl+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
           +(newFits?'<span class="db-bar-label" style="font-size:9px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
       } else {
         var fits=barHNewer>=22;
@@ -4979,8 +5008,8 @@ function renderDash(){
        what lets the table grow a 2nd round column + Variance column the
        instant dbCompareMode turns on, sourced from data nothing else
        independently recomputes. */
-    var tableNewer=getRoundScoreFor(cmpNewer.id,CU.empId);
-    var tableOlder=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId):null;
+    var tableNewer=getRoundScoreFor(cmpNewer.id,CU.empId,dbFilter);
+    var tableOlder=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId,dbFilter):null;
     function varianceCellHtml(oldVal,newVal){
       var diff=newVal-oldVal;
       var pct=oldVal?Math.round(diff/oldVal*100):0;
@@ -5121,14 +5150,18 @@ function renderDash(){
      FOCUS evaluation itself) as the target to aim for. */
   if(CU&&CU.empId&&!noData){
     var fkeysSummary=Object.keys(FDEF);
+    var myScoreA_foc=getRoundScoreFor(dbCompareA,CU.empId,dbFilter);
     var allScoresA_foc=ALL_EMP.map(function(e){
+      if(e.empId===CU.empId){
+        var focValsMe=fkeysSummary.map(function(f){return myScoreA_foc.byFocus[f];});
+        return{empId:e.empId,value:focValsMe.reduce(function(a,b){return a+b;},0)/focValsMe.length};
+      }
       var sc=getRoundScoreFor(dbCompareA,e.empId);
       var focVals=fkeysSummary.map(function(f){return sc.byFocus[f];});
       var overall=focVals.reduce(function(a,b){return a+b;},0)/focVals.length;
       return{empId:e.empId,value:overall};
     });
     var focRank=competitionRank(allScoresA_foc,CU.empId);
-    var myScoreA_foc=getRoundScoreFor(dbCompareA,CU.empId);
     var focReco=recommendationItems(fkeysSummary.map(function(f){return{key:f,value:myScoreA_foc.byFocus[f],label:FDEF[f].nm,def:FDEF[f].df.E};}));
 
     html+='<div class="card" style="margin-bottom:14px;padding:16px">';
@@ -5162,20 +5195,20 @@ function renderDash(){
        not the old dbFilter/avgScore2/mockRound1 path -- this is what
        keeps this chart in sync with the dropdowns, the summary card, and
        the table (spec item 8: one shared data source everywhere). */
-    var myScoreNewer_foc=getRoundScoreFor(cmpNewer.id,CU.empId);
+    var myScoreNewer_foc=getRoundScoreFor(cmpNewer.id,CU.empId,dbFilter);
     var focScores={};fkeys.forEach(function(f){focScores[f]=myScoreNewer_foc.byFocus[f];});
-    var myScoreOlder_foc=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId):null;
+    var myScoreOlder_foc=dbCompareMode?getRoundScoreFor(cmpOlder.id,CU.empId,dbFilter):null;
     var focValsHas=fkeys.map(function(f){return focScores[f];}).filter(function(a){return a>0;});
     var focAvgAll=focValsHas.length?focValsHas.reduce(function(a,b){return a+b;},0)/focValsHas.length:0;
     var avgLinePct=focAvgAll?(1-focAvgAll/5)*100:null; /* position of the dashed average line, top-down, within the 0-5 scaled area only */
     html+='<div style="padding:0 16px 16px">';
     if(dbCompareMode){
       html+='<div class="db-gbar-legend">';
-      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--b1)"></span>'+cmpOlder.label+'</span>';
-      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpNewer.label+'</span>';
+      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-hollow"></span>'+compactRoundLabel(cmpOlder)+'</span>';
+      html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-filled"></span>'+compactRoundLabel(cmpNewer)+'</span>';
       html+='</div>';
     } else {
-      html+='<div class="db-gbar-legend"><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot" style="background:var(--pb)"></span>'+cmpNewer.label+'</span></div>';
+      html+='<div class="db-gbar-legend"><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-filled"></span>'+compactRoundLabel(cmpNewer)+'</span></div>';
     }
     html+='<div class="focus-chart-wrap" style="align-items:end">';
     html+='<div>';
@@ -5231,18 +5264,20 @@ function renderDash(){
       var oldVal=dbCompareMode&&myScoreOlder_foc?myScoreOlder_foc.byFocus[f]:null;
       var oldBarH=oldVal?Math.max(1,Math.round(oldVal/5*chartAreaH)):0;
       var oldNumFits=oldBarH>=26;
+      var lblNewFoc=cur?s2l(cur):null;
       html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;min-width:0">';
       /* older round bar (muted) -- LEFT, per spec's chronological ordering rule */
       if(dbCompareMode){
-        html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0">';
-        if(oldVal&&!oldNumFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(oldBarH+2)+'px;font-size:clamp(8px,2vw,10px);font-weight:700;color:var(--t1)">'+oldVal.toFixed(2)+'</span>';
-        html+='<div class="db-anim-bar" style="width:100%;height:'+oldBarH+'px;background:var(--b1);border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
-        if(oldVal&&oldNumFits)html+='<span class="db-bar-label" style="font-size:clamp(8px,2vw,10px);font-weight:700;color:var(--t1)">'+oldVal.toFixed(2)+'</span>';
+        var lblOldFoc=oldVal?s2l(oldVal):null;
+        html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+fd.nm+' \u2013 \u0e23\u0e2d\u0e1a '+compactRoundLabel(cmpOlder)+(oldVal?': '+oldVal.toFixed(2)+' ('+lblOldFoc.l+')':'')+'">';
+        if(oldVal&&!oldNumFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(oldBarH+2)+'px;font-size:clamp(8px,2vw,10px);font-weight:700;color:#111827">'+oldVal.toFixed(2)+'</span>';
+        html+='<div class="db-anim-bar" style="width:100%;height:'+oldBarH+'px;background:'+lightVariantOf(fd.cl)+';border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
+        if(oldVal&&oldNumFits)html+='<span class="db-bar-label" style="font-size:clamp(8px,2vw,10px);font-weight:700;color:#111827">'+oldVal.toFixed(2)+'</span>';
         if(!oldVal)html+='<span style="position:absolute;bottom:2px;font-size:clamp(9px,2vw,11px);color:var(--t2)">\u2013</span>';
         html+='</div></div>';
       }
       /* newer round bar -- RIGHT (or the only bar, in single-round mode) */
-      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0">';
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+fd.nm+' \u2013 \u0e23\u0e2d\u0e1a '+compactRoundLabel(cmpNewer)+(cur?': '+cur.toFixed(2)+' ('+lblNewFoc.l+')':'')+'">';
       if(cur&&!numFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barH+2)+'px;font-size:clamp(8px,2vw,10px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
       html+='<div class="db-anim-bar" style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
       if(cur&&numFits)html+='<span class="db-bar-label" style="font-size:clamp(8px,2vw,10px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
