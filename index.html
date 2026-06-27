@@ -1477,10 +1477,10 @@ var FDEF={
     I:'\u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e04\u0e27\u0e32\u0e21\u0e17\u0e49\u0e32\u0e17\u0e32\u0e22 \u0e44\u0e21\u0e48\u0e01\u0e25\u0e49\u0e32\u0e41\u0e2a\u0e14\u0e07\u0e04\u0e27\u0e32\u0e21\u0e04\u0e34\u0e14\u0e40\u0e2b\u0e47\u0e19 \u0e41\u0e25\u0e30\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e40\u0e1b\u0e34\u0e14\u0e43\u0e08\u0e15\u0e48\u0e2d\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07'}}
 };
 var CAT_META={
-  'Family':{lb:'We are Family',cl:'#1D9E75',bg:'rgba(29,158,117,.08)'},
-  'Courage':{lb:'We act with Courage',cl:'#185FA5',bg:'rgba(24,95,165,.08)'},
-  'Premium Quality':{lb:'We deliver Premium Quality',cl:'#534AB7',bg:'rgba(83,74,183,.08)'},
-  'Happiness':{lb:'We believe in Happiness',cl:'#BA7517',bg:'rgba(186,117,23,.08)'}
+  'Family':{lb:'We are Family',cl:'#2563EB',bg:'rgba(37,99,235,.08)'},
+  'Courage':{lb:'We act with Courage',cl:'#06B6D4',bg:'rgba(6,182,212,.08)'},
+  'Premium Quality':{lb:'We deliver Premium Quality',cl:'#60A5FA',bg:'rgba(96,165,250,.08)'},
+  'Happiness':{lb:'We believe in Happiness',cl:'#A855F7',bg:'rgba(168,85,247,.08)'}
 };
 var CATS=['Family','Courage','Premium Quality','Happiness'];
 var CRITERIA=[
@@ -3010,11 +3010,6 @@ function doLogin(){
   persons=getDefaults(CU).slice().sort(function(a,b){return a.name.localeCompare(b.name,'th');});
   persons.forEach(function(p2){expd[p2.empId]=false;CATS.forEach(function(c){catOp[p2.empId+c]=true;});});
   /* All person cards start collapsed so the user sees the full list (and count) before opening any */
-  /* setup welcome popup */
-  h('wavimg').src=getPhoto(CU.empId)||'';
-  h('wname').textContent=CU.name;
-  h('wrole').textContent=CU.role+' \u00b7 '+CU.dept+' \u00b7 '+CU.pos;
-  h('wchk').checked=false;h('wsbtn').disabled=true;
   /* swap the mobile bottom nav back to the employee's 4 tabs, in case the
      previous session in this browser was an Admin login */
   if(h('mobNavAdmin'))h('mobNavAdmin').style.display='none';
@@ -3022,7 +3017,40 @@ function doLogin(){
   /* switch screens: hide login, show app */
   h('sl').classList.remove('on');
   h('sa').classList.add('on');
-  h('wovl').classList.add('on');
+
+  /* ── New-vs-returning routing (item 3) ──
+     New user (never seen the welcome popup before, on this browser) ->
+     always show the welcome/how-it-works popup before anything else.
+     Returning user -> restore their autosaved progress silently (no
+     popup), then route based on submission status: still in-progress ->
+     land on the evaluation tab with their data already filled back in;
+     already Submit'd -> land straight on the Dashboard instead, since
+     there's nothing left to fill in. */
+  var isNewUser=!hasSeenWelcomeBefore(CU.username);
+  if(isNewUser){
+    /* setup welcome popup */
+    h('wavimg').src=getPhoto(CU.empId)||'';
+    h('wname').textContent=CU.name;
+    h('wrole').textContent=CU.role+' \u00b7 '+CU.dept+' \u00b7 '+CU.pos;
+    h('wchk').checked=false;h('wsbtn').disabled=true;
+    h('wovl').classList.add('on');
+    markWelcomeSeen(CU.username);
+    curTab='self';
+    showTab('self');
+  } else {
+    autoLoad(); /* restores selfSc/othSc/rsnNotes + sSaved/sSub/oSaved/oSub from THIS user's own saved progress, if any */
+    if(oSub){
+      /* already submitted this round -- nothing left to fill in, so the
+         evaluation tabs would just show a frozen read-only summary;
+         land on the Dashboard instead, which is what they'd actually
+         want to see at this point. */
+      curTab='dash';
+      showTab('dash');
+    } else {
+      curTab='self';
+      showTab('self');
+    }
+  }
 }
 /* lbtn uses onclick="doLogin()" in HTML */
 h('lu').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
@@ -3569,12 +3597,28 @@ h('batchsavebtn').addEventListener('click',function(){
 
 /* -- AUTO SAVE (localStorage backup) -- */
 function autoSave(){
-  try{localStorage.setItem('sf_autosave',JSON.stringify({selfSc:selfSc,othSc:othSc,rsnNotes:rsnNotes,ts:Date.now()}));}catch(e){}
+  if(!CU||!CU.username)return;
+  try{localStorage.setItem('sf_autosave_'+CU.username,JSON.stringify({selfSc:selfSc,othSc:othSc,rsnNotes:rsnNotes,sSaved:sSaved,sSub:sSub,oSaved:oSaved,oSub:oSub,ts:Date.now()}));}catch(e){}
 }
 function autoLoad(){
-  try{var d=JSON.parse(localStorage.getItem('sf_autosave')||'null');
-    if(d&&d.selfSc){selfSc=d.selfSc;othSc=d.othSc||{};rsnNotes=d.rsnNotes||{};return true;}}catch(e){}
+  if(!CU||!CU.username)return false;
+  try{var d=JSON.parse(localStorage.getItem('sf_autosave_'+CU.username)||'null');
+    if(d&&d.selfSc){
+      selfSc=d.selfSc;othSc=d.othSc||{};rsnNotes=d.rsnNotes||{};
+      sSaved=!!d.sSaved;sSub=!!d.sSub;oSaved=!!d.oSaved;oSub=!!d.oSub;
+      return true;
+    }}catch(e){}
   return false;
+}
+/* ── New-vs-returning user tracking (per item 3) ──
+ * Stored separately from autosave (which only tracks evaluation
+ * progress) so "has this person ever opened the app before" survives
+ * even before they've entered a single score. */
+function hasSeenWelcomeBefore(username){
+  try{return localStorage.getItem('sf_seen_welcome_'+username)==='1';}catch(e){return false;}
+}
+function markWelcomeSeen(username){
+  try{localStorage.setItem('sf_seen_welcome_'+username,'1');}catch(e){}
 }
 /* Round/history persistence -- separate key so it isn't wiped by per-person
  * autosave/load cycles above. Saved on every round open/close action. */
@@ -4596,23 +4640,23 @@ function getScore(empId,cid,filter){
  * so neither group dominates when counts differ */
 function avgScore2(empIds,crits,filter){
   if(filter==='overall'){
-    /* Self group: CU's own self-assessment averaged */
-    var sT=0,sN=0;
-    crits.forEach(function(c){var s=selfSc[c.id];if(s){sT+=RVAL[s];sN++;}});
-    var selfAvg=sN?sT/sN:null;
-    /* Others group: scores empIds received */
-    var oT=0,oN=0;
+    /* ── Weighted average by headcount (item 4) ──
+       Every individual score counts once -- self-assessment AND each
+       peer/manager evaluation -- rather than first averaging "self" and
+       "others" into two separate numbers and then averaging THOSE
+       (which silently gives self-assessment a fixed 50% weight no
+       matter how many peers actually evaluated). Matches the spec's
+       worked example exactly: self=E(5), peers=S(3),S(3),E(5) ->
+       (5+5+3+3)/4 = 4.00, not (5 + (3+3+5)/3)/2 = 4.33 (the old result). */
+    var total=0,count=0;
+    crits.forEach(function(c){var s=selfSc[c.id];if(s){total+=RVAL[s];count++;}});
     empIds.forEach(function(id){
       crits.forEach(function(c){
         var s=othSc[id+'|'+c.id];
-        if(s){oT+=RVAL[s];oN++;}
+        if(s){total+=RVAL[s];count++;}
       });
     });
-    var othAvg=oN?oT/oN:null;
-    if(selfAvg!==null&&othAvg!==null)return(selfAvg+othAvg)/2;
-    if(selfAvg!==null)return selfAvg;
-    if(othAvg!==null)return othAvg;
-    return 0;
+    return count?total/count:0;
   }
   /* Other filters: straightforward average */
   var t=0,n=0;
@@ -4708,6 +4752,17 @@ function renderDash(){
   var fkeys=Object.keys(FDEF);
   var allIds=persons.map(function(p){return p.empId;});
   var selfId=CU?[CU.empId]:[];
+  /* Pull the latest submitted data from the shared store (Google Sheets)
+     once per session -- this is what lets feedback OTHER people wrote
+     about CU (via collectFeedbacks(), see the FEEDBACK WALL section
+     below) actually show up here, instead of only ever reflecting
+     whatever happened to already be cached from a previous Admin-page
+     visit. Re-renders once fresh data arrives, same guarded pattern as
+     the Admin shell's round-management page uses. */
+  if(!SimDB._autoRefreshDone){
+    SimDB._autoRefreshDone=true;
+    SimDB.refresh(function(){if(curTab==='dash')renderDash();});
+  }
   var html='<div style="display:flex;flex-direction:column;gap:14px">';
 
   /* --- 1. FILTER --- */
@@ -4865,7 +4920,7 @@ function renderDash(){
     [5,4,3,2,1,0].forEach(function(v){
       var top=(1-v/5)*100;
       html+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:8px;font-weight:700;color:var(--t2);width:18px;text-align:right">'+v+'</div>';
-      html+='<div style="position:absolute;left:24px;right:6px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
+      html+='<div style="position:absolute;left:24px;right:6px;top:'+top+'%;border-top:1px dashed #E5E7EB"></div>';
     });
     CATS.forEach(function(cat){
       var m=CAT_META[cat];
@@ -4881,17 +4936,17 @@ function renderDash(){
         var diffPct_sw=valOlder?Math.round((valNewer-valOlder)/valOlder*100):0;
         var oldFits=barHOlder>=22,newFits=barHNewer>=22;
         html+='<div style="flex:1;max-width:24px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpOlder.label+': '+valOlder.toFixed(2)+' ('+lblOlder.l+')">';
-        if(!oldFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHOlder+2)+'px;font-size:9px;font-weight:700;color:var(--t1)">'+valOlder.toFixed(2)+'</span>';
+        if(!oldFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHOlder+2)+'px;font-size:9px;font-weight:700;color:#111827">'+valOlder.toFixed(2)+'</span>';
         html+='<div class="db-anim-bar" style="width:100%;height:'+barHOlder+'px;background:var(--b1);border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
           +(oldFits?'<span class="db-bar-label" style="font-size:9px;color:var(--t1)">'+valOlder.toFixed(2)+'</span>':'')+'</div></div>';
         html+='<div style="flex:1;max-width:24px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
-        if(!newFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:9px;font-weight:700;color:'+m.cl+'">'+valNewer.toFixed(2)+'</span>';
+        if(!newFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:9px;font-weight:700;color:#111827">'+valNewer.toFixed(2)+'</span>';
         html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:var(--pb);border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
           +(newFits?'<span class="db-bar-label" style="font-size:9px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
       } else {
         var fits=barHNewer>=22;
         html+='<div style="flex:1;max-width:36px;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
-        if(!fits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:10px;font-weight:700;color:'+m.cl+'">'+valNewer.toFixed(2)+'</span>';
+        if(!fits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:10px;font-weight:700;color:#111827">'+valNewer.toFixed(2)+'</span>';
         html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:'+m.cl+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
           +(fits?'<span class="db-bar-label" style="font-size:10px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
       }
@@ -5015,7 +5070,12 @@ function renderDash(){
         +'</span>';
       html+='</div>';
       if(dbCompareMode){
-        html+='<div style="padding:4px 14px;font-size:10px;color:var(--t2)">'+cmpOlder.label+' \u2192 '+cmpNewer.label+': '+varianceCellHtml(tableOlder.byCat[cat],catAvgNewer)+'</div>';
+        var catAvgOlder=tableOlder.byCat[cat];
+        html+='<div style="display:flex;align-items:center;gap:8px;padding:4px 14px;font-size:11px;color:var(--t2)">';
+        html+='<span><span style="font-size:9px;font-weight:600">เดิม</span> <b style="color:'+s2l(catAvgOlder).c+'">'+scaleScore(catAvgOlder).toFixed(2)+'</b></span>';
+        html+='<span><span style="font-size:9px;font-weight:600">ล่าสุด</span> <b style="color:'+catL.c+'">'+scaleScore(catAvgNewer).toFixed(2)+'</b></span>';
+        html+='<span style="margin-left:auto">'+varianceCellHtml(catAvgOlder,catAvgNewer)+'</span>';
+        html+='</div>';
       }
       cc.forEach(function(c){
         var fd=FDEF[c.foc];
@@ -5027,11 +5087,16 @@ function renderDash(){
         html+='<span class="sw-card-lbl">'+c.lb+'</span>';
         html+='</div>';
         html+='<div class="sw-card-bottom">';
-        html+='<span class="sw-card-score">'+( avgNewer?'<b style="color:'+lbl.c+'">'+scaleScore(avgNewer).toFixed(2)+'</b>':'\u2013')+'</span>';
-        html+='<span class="rb-inl" style="background:'+(avgNewer?RCOL[lbl.l]:'var(--t2)')+'">'+(avgNewer?lbl.l:'\u2013')+'</span>';
         if(dbCompareMode){
           var avgOlder=tableOlder.byCriterion[c.id];
+          var lblOlder2=s2l(avgOlder);
+          html+='<span class="sw-card-score" style="font-size:13px"><span style="font-size:9px;color:var(--t2);font-weight:600">เดิม</span> <b style="color:'+lblOlder2.c+'">'+scaleScore(avgOlder).toFixed(2)+'</b></span>';
+          html+='<span class="sw-card-score" style="font-size:13px"><span style="font-size:9px;color:var(--t2);font-weight:600">ล่าสุด</span> <b style="color:'+lbl.c+'">'+( avgNewer?scaleScore(avgNewer).toFixed(2):'\u2013')+'</b></span>';
+          html+='<span class="rb-inl" style="background:'+(avgNewer?RCOL[lbl.l]:'var(--t2)')+'">'+(avgNewer?lbl.l:'\u2013')+'</span>';
           html+='<span class="sw-card-cnt">'+varianceCellHtml(avgOlder,avgNewer)+'</span>';
+        } else {
+          html+='<span class="sw-card-score">'+( avgNewer?'<b style="color:'+lbl.c+'">'+scaleScore(avgNewer).toFixed(2)+'</b>':'\u2013')+'</span>';
+          html+='<span class="rb-inl" style="background:'+(avgNewer?RCOL[lbl.l]:'var(--t2)')+'">'+(avgNewer?lbl.l:'\u2013')+'</span>';
         }
         html+='</div>';
         html+='</div>';
@@ -5303,14 +5368,29 @@ function cmpCell(diff){
 }
 
 function collectFeedbacks(){
+  /* ── Feedback about ME, not feedback I just wrote about others ──
+     rsnNotes (the evaluator's own in-progress reasons) is the WRONG
+     source for this -- it only ever holds whatever the CURRENTLY
+     LOGGED-IN person personally typed while evaluating OTHER people,
+     in their own browser session. What this card needs is reasons OTHER
+     evaluators wrote about the LOGGED-IN person, which only exists in
+     SimDB (the cross-session submitted-data store) once those other
+     evaluators have actually hit Save/Submit. Until then, there is
+     genuinely nothing to show -- that's correct, not a bug, since
+     nobody else's feedback has arrived yet. */
+  if(!CU||!CU.empId)return[];
   var list=[];
-  Object.keys(rsnNotes).forEach(function(k){
-    var parts=k.split('|');if(parts.length!==2)return;
-    var pid=parts[0];var cid=parts[1];
-    var note=rsnNotes[k];if(!note)return;
-    var r=gS(pid,cid)||'G';
-    var crit=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){crit=CRITERIA[i];break;}}
-    if(crit)list.push({note:note,r:r,critLb:crit.lb,cat:CAT_META[crit.cat]?CAT_META[crit.cat].lb:crit.cat});
+  var rowsAboutMe=SimDB.allRows().filter(function(row){
+    return row['รหัสพนักงานผู้ถูกประเมิน']===CU.empId&&row['รหัสพนักงานผู้ประเมิน']!==CU.empId; /* exclude my own self-assessment row -- that's not "feedback from someone else" */
+  });
+  rowsAboutMe.forEach(function(row){
+    CRITERIA.forEach(function(c){
+      var label=buildDbColumnLabel(c.id);
+      var note=row['Reason '+label];
+      if(!note)return;
+      var r=row[label]&&RVAL[row[label]]?row[label]:'G'; /* row[label] already stores the letter grade (E/G/S/L/I) directly */
+      list.push({note:note,r:r,critLb:c.lb,cat:CAT_META[c.cat]?CAT_META[c.cat].lb:c.cat});
+    });
   });
   /* shuffle for anonymity */
   list.sort(function(){return Math.random()-.5;});
