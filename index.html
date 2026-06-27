@@ -665,6 +665,7 @@ button,input,select{font-family:var(--fb)}
   .db-summary-row{flex-direction:column}
   .db-summary-left,.db-summary-right{flex:1 1 100%}
   .db-compare-row{flex-direction:column}
+  .sw-table th{font-size:9px;padding:5px 6px} /* item 3: mobile-only header shrink -- desktop/tablet keep 10px, table content (td) is untouched */
 }
 .db-rank-num{font-family:var(--fh);font-weight:800;color:var(--pb);font-size:28px;line-height:1}
 .db-rank-of{font-size:11px;color:var(--t2)}
@@ -724,6 +725,22 @@ button,input,select{font-family:var(--fb)}
 @media(max-width:600px){
   .sw-table-wrap{display:none}
   .sw-card-list{display:block;padding:10px 14px}
+}
+/* ── Round-history table: mobile card layout (item 4) ──
+   Same wrap/list toggle pattern as the evaluation table above, but with
+   its own card styling suited to round-history content (status badge,
+   date range, action buttons) instead of the evaluation-criteria style. */
+.rh-table-wrap{display:block}
+.rh-card-list{display:none}
+.rh-card{background:var(--s1);border:1px solid var(--b0);border-radius:var(--rl);padding:12px 14px;margin-bottom:10px}
+.rh-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px}
+.rh-card-meta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:11px;color:var(--t1)}
+.rh-card-meta-item{display:flex;flex-direction:column;gap:2px}
+.rh-card-meta-lbl{font-size:9px;color:var(--t2);text-transform:uppercase;letter-spacing:.02em}
+.rh-card-actions{display:flex;gap:6px;flex-wrap:wrap}
+@media(max-width:680px){
+  .rh-table-wrap{display:none}
+  .rh-card-list{display:block}
 }
 .cmp-up{color:#1D9E75;font-size:10px;font-weight:700}
 .cmp-dn{color:#A32D2D;font-size:10px;font-weight:700}
@@ -1379,11 +1396,11 @@ button,input,select{font-family:var(--fb)}
   <!-- ADMIN: ADD ROUND PREVIEW (item 2.2) -->
   <div class="ovl" id="addRoundPreviewOvl">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> ยืนยันการสร้างรอบการประเมิน</div>
+      <div id="addRoundPreviewTitle" style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px">ยืนยันการสร้างรอบการประเมิน</div>
       <div id="addRoundPreviewBody" style="margin-bottom:14px"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" onclick="cov('addRoundPreviewOvl')">&#8592; ย้อนกลับ</button>
-        <button class="btn bt" onclick="confirmAddRoundFromPreview()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ยืนยันสร้างรอบ</button>
+        <button class="btn bt" id="addRoundPreviewConfirmBtn" onclick="confirmAddRoundFromPreview()"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> ยืนยันสร้างรอบ</button>
       </div>
     </div>
   </div>
@@ -2242,7 +2259,7 @@ var adminScoreQ='';
  * helpers below reuse that exact mechanism for an arbitrary round
  * without needing to rewrite those mock functions. */
 var adminRoundA='current';
-var adminRoundB=''; /* '' = no comparison round selected */
+var adminRoundB='current'; /* defaults to the same round as A -- per item 1.2, picking the SAME round in both is exactly how "no comparison" is expressed now; comparison only activates once B genuinely differs from A */
 function getRoundById(id){
   if(id==='current'||!id)return currentRound;
   return ROUNDS.filter(function(r){return r.id===id;})[0]||currentRound;
@@ -2259,7 +2276,6 @@ function withRound(roundId,fn){
 }
 function roundOptionsHTML(selectedId,selectId){
   var html='<select id="'+selectId+'" class="std-sel" onchange="'+selectId+'=this.value;renderAdminScores()">';
-  if(selectId==='adminRoundB')html+='<option value=""'+(selectedId===''?' selected':'')+'>\u2014 ไม่เปรียบเทียบ \u2014</option>';
   html+='<option value="current"'+(selectedId==='current'?' selected':'')+'>'+roundLabel(currentRound.year,currentRound.roundNo)+' (ปัจจุบัน)</option>';
   ROUNDS.slice().reverse().forEach(function(r){
     html+='<option value="'+r.id+'"'+(selectedId===r.id?' selected':'')+'>'+roundLabel(r.year,r.roundNo)+'</option>';
@@ -2305,7 +2321,7 @@ function renderAdminScores(){
   html+=roundOptionsHTML(adminRoundA,'adminRoundA');
   html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap;margin-left:6px">เปรียบเทียบกับ:</span>';
   html+=roundOptionsHTML(adminRoundB,'adminRoundB');
-  if(adminRoundB)html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:var(--r)">กำลังเทียบ '+roundLabel(getRoundById(adminRoundA).year,getRoundById(adminRoundA).roundNo)+' \u2194 '+roundLabel(getRoundById(adminRoundB).year,getRoundById(adminRoundB).roundNo)+'</span>';
+  if(adminRoundB&&adminRoundB!==adminRoundA)html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:var(--r)">กำลังเทียบ '+roundLabel(getRoundById(adminRoundA).year,getRoundById(adminRoundA).roundNo)+' \u2194 '+roundLabel(getRoundById(adminRoundB).year,getRoundById(adminRoundB).roundNo)+'</span>';
   html+='</div>';
 
   return withRound(adminRoundA,function(){return renderAdminScoresBody(html);});
@@ -2345,7 +2361,7 @@ function renderAdminScoresBody(html){
      the comparison round via withRound() so mockScoreFor() seeds off the
      correct round id without needing a parallel set of mock functions. */
   var avgAllB=null,avgAllDiffPct=null;
-  if(adminRoundB){
+  if(adminRoundB&&adminRoundB!==adminRoundA){
     avgAllB=withRound(adminRoundB,function(){
       var rowsB=ALL_EMP.map(function(e){return mockScoreFor(e.empId);});
       return rowsB.reduce(function(s,sc){return s+sc.avg;},0)/rowsB.length;
@@ -2697,16 +2713,16 @@ function renderAdminScoresBody(html){
 
   html+='<div class="card"><div style="overflow-x:auto"><table class="sw-table"><thead><tr>';
   html+='<th class="lft">ชื่อ</th>';
-  html+='<th>ระดับตำแหน่ง<br><select id="adminTableRoleFilter" style="margin-top:3px;font-size:9px;padding:2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer" onchange="adminTableRoleFilter=this.value;renderAdminScores()"><option value=""'+(adminTableRoleFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>ระดับตำแหน่ง<br><select id="adminTableRoleFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableRoleFilter=this.value;renderAdminScores()"><option value=""'+(adminTableRoleFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +allRoleNames.map(function(rl){return '<option value="'+rl+'"'+(adminTableRoleFilter===rl?' selected':'')+'>'+rl+'</option>';}).join('')+'</select></th>';
-  html+='<th>กลุ่ม<br><select id="adminTableGroupFilter" style="margin-top:3px;font-size:9px;padding:2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer" onchange="adminTableGroupFilter=this.value;renderAdminScores()"><option value=""'+(adminTableGroupFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>กลุ่ม<br><select id="adminTableGroupFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableGroupFilter=this.value;renderAdminScores()"><option value=""'+(adminTableGroupFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +allGroupCodes.map(function(c){return '<option value="'+c+'"'+(adminTableGroupFilter===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></th>';
-  html+='<th>ฝ่าย<br><select id="adminTableDivFilter" style="margin-top:3px;font-size:9px;padding:2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer" onchange="adminTableDivFilter=this.value;renderAdminScores()"><option value=""'+(adminTableDivFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>ฝ่าย<br><select id="adminTableDivFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableDivFilter=this.value;renderAdminScores()"><option value=""'+(adminTableDivFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +allDivCodes.map(function(c){return '<option value="'+c+'"'+(adminTableDivFilter===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></th>';
-  html+='<th>แผนก<br><select id="adminTableDeptFilter" style="margin-top:3px;font-size:9px;padding:2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer" onchange="adminTableDeptFilter=this.value;renderAdminScores()"><option value=""'+(adminTableDeptFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>แผนก<br><select id="adminTableDeptFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableDeptFilter=this.value;renderAdminScores()"><option value=""'+(adminTableDeptFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +allDeptCodes.map(function(c){return '<option value="'+c+'"'+(adminTableDeptFilter===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></th>';
   html+='<th>คะแนนเฉลี่ย</th><th>เทียบเฉลี่ยองค์กร</th><th>Min</th><th>Max</th>';
-  html+='<th>ระดับ<br><select id="adminTableLevelFilter" style="margin-top:3px;font-size:9px;padding:2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer" onchange="adminTableLevelFilter=this.value;renderAdminScores()"><option value=""'+(adminTableLevelFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>ระดับ<br><select id="adminTableLevelFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableLevelFilter=this.value;renderAdminScores()"><option value=""'+(adminTableLevelFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +RATINGS.map(function(rt){return '<option value="'+rt+'"'+(adminTableLevelFilter===rt?' selected':'')+'>'+rt+' \u2013 '+RNAME[rt]+'</option>';}).join('')+'</select></th>';
   html+='<th>History</th>';
   html+='</tr></thead><tbody>';
@@ -2816,7 +2832,34 @@ function renderAdminRounds(){
   html+='</div>';
   html+='</div>';
 
+  /* ── Reset User Submission (testing tool, Admin-only) ──
+   * Lets an Admin clear a specific person's cached submit status so
+   * they can re-evaluate during testing, without needing to manually
+   * edit anything in the shared backend. Complements the Single Source
+   * of Truth fix above: this tool clears the LOCAL side (this person's
+   * own browser will self-correct via reconcileSubmitStatusWithDatabase
+   * once it stops seeing their row server-side), and also strips any
+   * matching rows for them out of the local SimDB cache immediately so
+   * an Admin testing on the same device/browser sees the effect right
+   * away rather than waiting for the merge grace window to expire. */
+  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:rgba(186,117,23,.12)">'+icon('refresh',18)+'</div><div class="db-sh-ttl">Reset User Submission</div></div>';
+  html+='<div style="padding:14px 16px">';
+  html+='<div class="wb" style="margin-bottom:12px"><span>'+icon('info',16)+'</span><span>เครื่องมือสำหรับทดสอบระบบเท่านั้น \u2014 ใช้ล้างสถานะการ Submit ของพนักงานคนใดคนหนึ่ง เพื่อให้สามารถเข้าทำแบบประเมินใหม่ได้อีกครั้งเสมือนยังไม่เคย Submit</span></div>';
+  html+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">';
+  html+='<div style="flex:1;min-width:220px"><div style="font-size:11px;color:var(--t2);margin-bottom:4px">เลือกพนักงาน</div>';
+  html+='<select id="resetSubmitEmpSel" class="std-sel" style="width:100%">';
+  html+='<option value="">\u2014 เลือกพนักงาน \u2014</option>';
+  ALL_EMP.slice().sort(function(a,b){return a.name.localeCompare(b.name,'th');}).forEach(function(e){
+    html+='<option value="'+e.empId+'">'+e.name+' ('+(e.nick||'')+') \u2014 '+e.empId+'</option>';
+  });
+  html+='</select></div>';
+  html+='<button class="btn bt" onclick="openResetSubmissionConfirm()">'+icon('refresh',16)+' Reset Submission</button>';
+  html+='</div>';
+  html+='<div id="resetSubmitLogBox" style="margin-top:14px"></div>';
+  html+='</div></div>';
+
   h('adminRoundsBody').innerHTML=html;
+  renderResetSubmitLog();
   tickAllCountdowns(); /* fill in the countdown box immediately, don't wait for the next 1s interval tick */
 }
 
@@ -2859,24 +2902,62 @@ function toggleScopeVisibility(chk,idPrefix){
    original function name */
 function toggleEvalScopeVisibility(chk){toggleScopeVisibility(chk,'evalrule');}
 /* ── Add-round form (item 2.1): expand/collapse ── */
-function toggleAddRoundForm(){
+/* ── Create/Edit round: ONE form, two modes (item 5) ──
+ * _editingRoundId: null = Create mode (a brand-new Scheduled round will
+ * be appended). Otherwise it holds the id of the SCHEDULED_ROUNDS entry
+ * being edited in place -- the form, preview, and confirm step are all
+ * shared between both modes; only the final save action and a couple of
+ * header labels differ. */
+var _editingRoundId=null;
+function toggleAddRoundForm(editingRound){
   var form=h('adminAddRoundForm');
   if(!form)return;
   var opening=form.style.display==='none';
-  form.style.display=opening?'block':'none';
-  h('adminAddRoundToggleBtn').textContent=opening?'\u2715 ปิดฟอร์ม':'+ เพิ่มรอบการประเมิน';
-  if(opening){
-    /* sensible defaults: start the day after whatever the latest known
-       round (current, or last scheduled if any) ends, running 30 days,
-       auto-numbered the same way the rest of the app already computes
-       the next round label. */
-    var lastKnown=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1]:currentRound;
-    var defStart=lastKnown.endDate?new Date(new Date(lastKnown.endDate+'T00:00:00').getTime()+86400000).toISOString().slice(0,10):new Date().toISOString().slice(0,10);
-    var defEnd=new Date(new Date(defStart+'T00:00:00').getTime()+30*86400000).toISOString().slice(0,10);
-    h('addRoundStart').value=defStart;
-    h('addRoundEnd').value=defEnd;
-    updateAddRoundAutoFields();
+  /* allow forcing the form open directly into edit mode (called from
+     openEditScheduledRoundDialog below) even if it happened to already
+     be open in create mode -- always re-render fresh in that case. */
+  var forceReopenForEdit=editingRound&&form.style.display!=='none';
+  if(opening||forceReopenForEdit){
+    _editingRoundId=editingRound?editingRound.id:null;
+    form.innerHTML=buildAddRoundFormHTML();
+    form.style.display='block';
+    h('adminAddRoundToggleBtn').textContent='\u2715 ปิดฟอร์ม';
+    if(editingRound){
+      /* Edit mode: pre-fill everything from the round being edited --
+         dates, anonymity, and the full permissions matrix (preset via
+         buildPermissionsMatrixHTML's presetRules param) -- instead of
+         the old behavior that only ever restored dates+anonymity and
+         silently dropped whatever permissions had been set. */
+      h('addRoundStart').value=editingRound.startDate;
+      h('addRoundEnd').value=editingRound.endDate;
+      if(editingRound.isAnonymous===false)h('addRoundAnonNo').checked=true;else h('addRoundAnonYes').checked=true;
+      updateAddRoundAutoFields();
+    } else {
+      /* Create mode: sensible defaults -- start the day after whatever
+         the latest known round (current, or last scheduled if any)
+         ends, running 30 days, auto-numbered the same way the rest of
+         the app already computes the next round label. */
+      var lastKnown=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1]:currentRound;
+      var defStart=lastKnown.endDate?new Date(new Date(lastKnown.endDate+'T00:00:00').getTime()+86400000).toISOString().slice(0,10):new Date().toISOString().slice(0,10);
+      var defEnd=new Date(new Date(defStart+'T00:00:00').getTime()+30*86400000).toISOString().slice(0,10);
+      h('addRoundStart').value=defStart;
+      h('addRoundEnd').value=defEnd;
+      updateAddRoundAutoFields();
+    }
+  } else {
+    form.style.display='none';
+    h('adminAddRoundToggleBtn').textContent='+ เพิ่มรอบการประเมิน';
+    _editingRoundId=null;
   }
+}
+function cancelAddRoundForm(){
+  _editingRoundId=null;
+  toggleAddRoundForm();
+}
+function openEditScheduledRoundDialog(roundId){
+  var r=SCHEDULED_ROUNDS.filter(function(x){return x.id===roundId;})[0];
+  if(!r)return;
+  toggleAddRoundForm(r);
 }
 /* Recomputes the auto fields (duration, round label) whenever either
    date picker changes -- item 2.1's "Auto" requirements. */
@@ -2886,12 +2967,21 @@ function updateAddRoundAutoFields(){
   if(!s||!e){if(durEl)durEl.textContent='\u2013';if(labelEl)labelEl.textContent='\u2013';return;}
   var days=Math.round((new Date(e+'T00:00:00')-new Date(s+'T00:00:00'))/86400000)+1;
   if(durEl)durEl.textContent=days+' วัน';
+  if(_editingRoundId){
+    /* Edit mode: keep the round's existing number -- it was already
+       assigned when first created, and changing dates shouldn't
+       silently renumber it. */
+    var editingRound=SCHEDULED_ROUNDS.filter(function(r){return r.id===_editingRoundId;})[0];
+    if(editingRound&&labelEl){labelEl.textContent=roundLabel(editingRound.year,editingRound.roundNo);return;}
+  }
   var lastKnown=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1]:currentRound;
   var meta=nextRoundMeta(lastKnown.year,lastKnown.roundNo,s);
   if(labelEl)labelEl.textContent=roundLabel(meta.year,meta.roundNo);
 }
 function buildAddRoundFormHTML(){
+  var editingRound=_editingRoundId?SCHEDULED_ROUNDS.filter(function(r){return r.id===_editingRoundId;})[0]:null;
   var html='<div style="display:flex;flex-direction:column;gap:14px;max-width:680px">';
+  html+='<div style="font-size:13px;font-weight:700;color:var(--t0)">'+(editingRound?icon('pencil',16)+' แก้ไขรอบการประเมิน '+editingRound.label:icon('plus',16)+' เพิ่มรอบการประเมินใหม่')+'</div>';
   html+='<div style="display:flex;gap:12px;flex-wrap:wrap">';
   html+='<div style="flex:1;min-width:160px"><div style="font-size:11px;color:var(--t2);margin-bottom:4px">'+icon('calendarrange',18)+' วันที่เริ่มต้น</div>';
   html+='<input type="date" id="addRoundStart" class="lin" style="margin-bottom:0;color:var(--t0);background:var(--s0)" onchange="updateAddRoundAutoFields()"></div>';
@@ -2900,7 +2990,7 @@ function buildAddRoundFormHTML(){
   html+='</div>';
   html+='<div style="display:flex;gap:24px;flex-wrap:wrap">';
   html+='<div><div style="font-size:11px;color:var(--t2)">ระยะเวลาประเมิน (Auto)</div><div id="addRoundDuration" style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--t0)">\u2013</div></div>';
-  html+='<div><div style="font-size:11px;color:var(--t2)">รอบการประเมิน (Auto)</div><div id="addRoundAutoLabel" style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--pb)">\u2013</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">รอบการประเมิน'+(editingRound?'':' (Auto)')+'</div><div id="addRoundAutoLabel" style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--pb)">\u2013</div></div>';
   html+='</div>';
   /* การแสดงตัวตนของผู้ประเมิน (item 2.1) */
   html+='<div>';
@@ -2909,16 +2999,16 @@ function buildAddRoundFormHTML(){
   html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="addRoundAnon" id="addRoundAnonYes" value="anon" checked style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer">'+icon('lock',16)+' ไม่ระบุตัวตน (Anonymous)</label>';
   html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="radio" name="addRoundAnon" id="addRoundAnonNo" value="identified" style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer">'+icon('eye',18)+' ระบุตัวตน (Identified)</label>';
   html+='</div></div>';
-  /* สิทธิ์การประเมิน (item 2.1) -- pre-filled from the org-wide default
-     rules (EVAL_RULES) set in the card below, but editable per-round
-     without affecting that org-wide default unless explicitly re-saved
-     there too. */
+  /* สิทธิ์การประเมิน (item 2.1) -- pre-filled from the round being
+     edited if there is one, otherwise from the org-wide default rules
+     (EVAL_RULES), editable per-round without affecting that org-wide
+     default unless explicitly re-saved there too. */
   html+='<div>';
   html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin-bottom:8px">สิทธิ์การประเมิน</div>';
-  html+='<div id="addRoundPermsBox">'+buildPermissionsMatrixHTML('addrperm')+'</div>';
+  html+='<div id="addRoundPermsBox">'+buildPermissionsMatrixHTML('addrperm',editingRound?editingRound.rules:null)+'</div>';
   html+='</div>';
   html+='<div style="display:flex;gap:8px;justify-content:flex-end">';
-  html+='<button class="btn bo" onclick="toggleAddRoundForm()">ยกเลิก</button>';
+  html+='<button class="btn bo" onclick="cancelAddRoundForm()">ยกเลิก</button>';
   html+='<button class="btn bt" onclick="openAddRoundPreview()">'+icon('circlecheck',16)+' บันทึกรอบการประเมิน</button>';
   html+='</div>';
   html+='</div>';
@@ -2946,17 +3036,27 @@ function openAddRoundPreview(){
     toast(icon('alerttriangle',18),'กรุณาเลือกขอบเขต (Scope) ให้ครบ','ยังไม่ได้เลือกขอบเขตสำหรับ: '+missingScope.join(', '),'var(--I)');
     return;
   }
-  var lastKnown=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1]:currentRound;
-  var meta=nextRoundMeta(lastKnown.year,lastKnown.roundNo,s);
+  var editingRound=_editingRoundId?SCHEDULED_ROUNDS.filter(function(r){return r.id===_editingRoundId;})[0]:null;
+  var year,roundNo;
+  if(editingRound){
+    /* Edit mode: keep the original round number -- never silently
+       renumber an existing scheduled round just because its dates
+       changed. */
+    year=editingRound.year;roundNo=editingRound.roundNo;
+  } else {
+    var lastKnown=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1]:currentRound;
+    var meta=nextRoundMeta(lastKnown.year,lastKnown.roundNo,s);
+    year=meta.year;roundNo=meta.roundNo;
+  }
   var days=Math.round((new Date(e+'T00:00:00')-new Date(s+'T00:00:00'))/86400000)+1;
   var isAnon=h('addRoundAnonYes').checked;
   /* stash everything the confirm button needs -- avoids re-reading/
      re-validating the form a second time on confirm */
-  window._pendingNewRound={startDate:s,endDate:e,year:meta.year,roundNo:meta.roundNo,
-    label:roundLabel(meta.year,meta.roundNo),isAnonymous:isAnon,rules:rules};
+  window._pendingNewRound={startDate:s,endDate:e,year:year,roundNo:roundNo,
+    label:roundLabel(year,roundNo),isAnonymous:isAnon,rules:rules,editingId:_editingRoundId};
   var body=h('addRoundPreviewBody');
   var html='<div style="display:flex;flex-direction:column;gap:8px;font-size:13px">';
-  html+='<div><b>รอบ:</b> '+roundLabel(meta.year,meta.roundNo)+'</div>';
+  html+='<div><b>รอบ:</b> '+roundLabel(year,roundNo)+'</div>';
   html+='<div><b>วันที่:</b> '+fmtThaiDate(s)+' ถึง '+fmtThaiDate(e)+' (ระยะเวลา '+days+' วัน)</div>';
   html+='<div><b>การเปิดเผยผู้ประเมิน:</b> '+(isAnon?'Anonymous (ไม่ระบุตัวตน)':'Identified (ระบุตัวตน)')+'</div>';
   html+='<div><b>สิทธิ์การประเมิน:</b></div>';
@@ -2971,11 +3071,33 @@ function openAddRoundPreview(){
   }
   html+='</div>';
   body.innerHTML=html;
+  h('addRoundPreviewTitle').textContent=editingRound?'ยืนยันการแก้ไขรอบการประเมิน':'ยืนยันการสร้างรอบการประเมิน';
+  h('addRoundPreviewConfirmBtn').textContent=editingRound?'\u2713 บันทึกการแก้ไข':'\u2713 ยืนยันสร้างรอบ';
   h('addRoundPreviewOvl').classList.add('on');
 }
 function confirmAddRoundFromPreview(){
   var nr=window._pendingNewRound;
   if(!nr)return;
+  if(nr.editingId){
+    /* Edit mode: update the existing entry in place instead of
+       appending a brand-new one. */
+    var idx=SCHEDULED_ROUNDS.findIndex(function(r){return r.id===nr.editingId;});
+    if(idx>=0){
+      SCHEDULED_ROUNDS[idx]={
+        id:nr.editingId,
+        year:nr.year,roundNo:nr.roundNo,startDate:nr.startDate,endDate:nr.endDate,
+        label:nr.label,isAnonymous:nr.isAnonymous,rules:nr.rules
+      };
+    }
+    saveRoundsData();
+    h('addRoundPreviewOvl').classList.remove('on');
+    window._pendingNewRound=null;
+    _editingRoundId=null;
+    toggleAddRoundForm();
+    toast(icon('circlecheck',16),'บันทึกการแก้ไขรอบการประเมินเรียบร้อย',nr.label,'var(--E)');
+    renderAdminTab();
+    return;
+  }
   SCHEDULED_ROUNDS.push({
     id:'r_sched_'+Date.now(),
     year:nr.year,roundNo:nr.roundNo,startDate:nr.startDate,endDate:nr.endDate,
@@ -2998,10 +3120,94 @@ function anonymityBadge(isAnon){
     ?'<span title="Anonymous Evaluation" style="color:var(--t1);cursor:default">'+icon('shield',18)+'</span>'
     :'<span title="Identified Evaluation" style="color:var(--t1);cursor:default">'+icon('eye',18)+'</span>';
 }
+/* ── Reset User Submission tool logic ──
+ * Admin-only (this whole card only ever renders inside the Admin shell,
+ * which itself requires the separate Admin login -- regular employee
+ * accounts never see this page at all, satisfying item 7's access
+ * restriction structurally rather than with a separate permission
+ * check). */
+function openResetSubmissionConfirm(){
+  var empId=h('resetSubmitEmpSel').value;
+  if(!empId){toast(icon('alerttriangle',16),'กรุณาเลือกพนักงานก่อน','','var(--I)');return;}
+  var emp=ALL_EMP.filter(function(e){return e.empId===empId;})[0];
+  if(!emp)return;
+  h('roundConfirmTitle').textContent='ยืนยันการ Reset การส่งแบบประเมิน';
+  h('roundConfirmBody').innerHTML='คุณต้องการล้างสถานะการส่งแบบประเมินของ <b>'+emp.name+' ('+emp.empId+')</b> ใช่หรือไม่<br><br>การดำเนินการนี้ใช้สำหรับการทดสอบระบบเท่านั้น';
+  h('roundConfirmActionBtn').textContent='Reset';
+  h('roundConfirmActionBtn').className='btn bb';
+  h('roundConfirmActionBtn').style.background='var(--L)';
+  h('roundConfirmActionBtn').onclick=function(){resetUserSubmission(empId);};
+  h('roundConfirmOvl').classList.add('on');
+}
+function resetUserSubmission(empId){
+  var emp=ALL_EMP.filter(function(e){return e.empId===empId;})[0];
+  if(!emp)return;
+  /* ALL_EMP has no username field -- USERS (keyed by username) is the
+     only place that maps a login account to an empId, so the reverse
+     lookup has to walk it. Most of the roster has no login account at
+     all (only a handful of test accounts exist), in which case there's
+     simply no local autosave cache to clear for them -- not an error,
+     just nothing to do for that part of the reset. */
+  var username=null;
+  Object.keys(USERS).forEach(function(u){if(USERS[u].empId===empId)username=u;});
+  var roundLbl=roundLabel(currentRound.year,currentRound.roundNo);
+  /* 1. Strip any of this person's rows for the CURRENT round out of the
+     shared-database local cache, so an Admin testing on this same
+     device sees the effect immediately rather than waiting on the
+     SimDB refresh grace window. (The real backend row removal, if any
+     is wired up via Apps Script, is a separate operation outside this
+     demo's scope -- see the in-card note about future DB integration.) */
+  SimDB._cache=SimDB._cache.filter(function(row){
+    return !(row['รหัสพนักงานผู้ประเมิน']===empId&&row['รอบการประเมิน']===roundLbl);
+  });
+  /* 2. Clear this person's own local autosave cache (their sSub/oSub/
+     sSaved/oSaved flags and in-progress scores for the current round) --
+     this is the actual per-item-1 "localStorage" cited in the request.
+     Scoped ONLY to this one username's key, never touching anyone
+     else's. Skipped gracefully if this employee has no login account. */
+  if(username){try{localStorage.removeItem('sf_autosave_'+username);}catch(e){}}
+  /* 3. If this happens to be the CURRENTLY LOGGED-IN person's own
+     session (e.g. an Admin testing on the same browser, or a future
+     multi-tab scenario), also clear the live in-memory flags so the
+     effect is visible without requiring a fresh login. */
+  if(CU&&CU.empId===empId){sSub=false;oSub=false;sSaved=false;oSaved=false;autoSave();}
+  /* 4. Audit log (item 6) -- who did this, to whom, when, which round.
+     Stored in its own localStorage key (separate from any per-user
+     data) so it survives across sessions and isn't tied to the
+     resettee's own storage, which this action just cleared. */
+  var logEntry={
+    by:(CU&&CU.name)||'Admin',
+    target:emp.name+' ('+emp.empId+')',
+    ts:Date.now(),
+    round:roundLbl
+  };
+  var log=[];
+  try{log=JSON.parse(localStorage.getItem('sf_reset_submit_log')||'[]');}catch(e){}
+  log.unshift(logEntry);
+  if(log.length>50)log=log.slice(0,50); /* cap so this can't grow unbounded */
+  try{localStorage.setItem('sf_reset_submit_log',JSON.stringify(log));}catch(e){}
+
+  h('roundConfirmOvl').classList.remove('on');
+  toast(icon('circlecheck',16),'รีเซ็ตสถานะการส่งแบบประเมินเรียบร้อยแล้ว',emp.name,'var(--E)');
+  renderResetSubmitLog();
+}
+function renderResetSubmitLog(){
+  var box=h('resetSubmitLogBox');
+  if(!box)return;
+  var log=[];
+  try{log=JSON.parse(localStorage.getItem('sf_reset_submit_log')||'[]');}catch(e){}
+  if(!log.length){box.innerHTML='';return;}
+  var html='<div style="font-size:11px;font-weight:700;color:var(--t2);margin-bottom:6px">ประวัติการ Reset ล่าสุด</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:4px;max-height:180px;overflow-y:auto">';
+  log.slice(0,10).forEach(function(l){
+    var d=new Date(l.ts);
+    html+='<div style="font-size:11px;color:var(--t1);padding:6px 10px;background:var(--s1);border-radius:var(--r)">'
+      +'<b>'+l.by+'</b> รีเซ็ต <b>'+l.target+'</b> (รอบ '+l.round+') \u2014 '+d.toLocaleString('th-TH')+'</div>';
+  });
+  html+='</div>';
+  box.innerHTML=html;
+}
 function buildRoundStatusRowsHTML(){
-  var html='<table class="sw-table" style="width:100%"><thead><tr>'
-    +'<th class="lft">รอบการประเมิน</th><th>ระยะเวลา</th><th>การเปิดเผยตัวตน</th><th>ผู้ประเมิน</th><th>สถานะ</th><th class="lft">การดำเนินการ</th>'
-    +'</tr></thead><tbody>';
   function statusBadge(color,bg,text){return '<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:12px;font-size:10px;font-weight:700;color:'+color+';background:'+bg+'">'+text+'</span>';}
   function roundCell(label,startDate,endDate){
     var html='<div style="font-weight:700;font-size:13px;color:var(--t0)">'+label+'</div>';
@@ -3014,65 +3220,76 @@ function buildRoundStatusRowsHTML(){
     return '<div style="font-size:11px;color:var(--t1)">'+(completedCount!==undefined?completedCount+' / ':'')+empCount+' คน'
       +(completedCount!==undefined?'<div style="font-size:9px;color:var(--t2)">('+pct+'% ตอบแบบประเมิน)</div>':'')+'</div>';
   }
-  /* [Active/green] กำลังดำเนินการ -- the live current round, always exactly one */
-  html+='<tr>';
-  html+='<td class="lft">'+roundCell(roundLabel(currentRound.year,currentRound.roundNo),currentRound.startDate,currentRound.endDate)+'</td>';
-  html+='<td style="font-size:11px;color:var(--t1)">'+(roundDurationDays(currentRound.startDate,currentRound.endDate)||'\u2013')+' วัน</td>';
-  html+='<td>'+anonymityBadge(currentRound.isAnonymous)+'</td>';
-  html+='<td>'+evaluatorCountCell(currentRound.empCount,currentRound.completedCount)+'</td>';
-  html+='<td>'+(currentRound.closed?statusBadge('var(--I)','rgba(163,45,45,.1)',icon('circlex',12)+' ปิดรอบแล้ว'):statusBadge('var(--E)','rgba(29,158,117,.1)',icon('play',12)+' กำลังดำเนินการ'))+'</td>';
-  html+='<td class="lft"><div style="display:flex;gap:6px;flex-wrap:wrap">';
-  if(currentRound.closed){
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="toast(\''+icon('info',16)+'\',\'รอบนี้ปิดแล้ว\',\'ดูข้อมูลได้ปกติจากหน้า Dashboard\',\'var(--t2)\')">'+icon('eye',14)+' ดูรายละเอียด</button>';
-  } else {
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditRoundDatesDialog()">'+icon('pencil',14)+' แก้ไขวันที่</button>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openCloseCurrentRoundConfirm()">'+icon('lock',14)+' ปิดรอบ</button>';
-  }
-  html+='</div></td>';
-  html+='</tr>';
-  /* [Scheduled/yellow] กำหนดล่วงหน้า -- scheduled, not yet opened */
+  /* Each entry: {label,startDate,endDate,isAnonymous,empCount,completedCount,
+     statusHtml,actionsHtml} -- built ONCE per round here, then rendered
+     into BOTH the desktop <table> rows AND the mobile cards below from
+     this exact same data/markup, so the two layouts can never drift out
+     of sync with each other (item 4's "ไม่ทำให้ข้อมูลสำคัญหายไป"). */
+  var entries=[];
+  entries.push({
+    label:roundLabel(currentRound.year,currentRound.roundNo),startDate:currentRound.startDate,endDate:currentRound.endDate,
+    isAnonymous:currentRound.isAnonymous,empCount:currentRound.empCount,completedCount:currentRound.completedCount,
+    statusHtml:currentRound.closed?statusBadge('var(--I)','rgba(163,45,45,.1)',icon('circlex',12)+' ปิดรอบแล้ว'):statusBadge('var(--E)','rgba(29,158,117,.1)',icon('play',12)+' กำลังดำเนินการ'),
+    rowBg:'',
+    actionsHtml:currentRound.closed
+      ?'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="toast(\''+icon('info',16)+'\',\'รอบนี้ปิดแล้ว\',\'ดูข้อมูลได้ปกติจากหน้า Dashboard\',\'var(--t2)\')">'+icon('eye',14)+' ดูรายละเอียด</button>'
+      :'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditRoundDatesDialog()">'+icon('pencil',14)+' แก้ไขวันที่</button>'
+       +'<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openCloseCurrentRoundConfirm()">'+icon('lock',14)+' ปิดรอบ</button>'
+  });
   SCHEDULED_ROUNDS.forEach(function(r){
-    html+='<tr style="background:rgba(186,117,23,.04)">';
-    html+='<td class="lft">'+roundCell(r.label,r.startDate,r.endDate)+'</td>';
-    html+='<td style="font-size:11px;color:var(--t1)">'+(roundDurationDays(r.startDate,r.endDate)||'\u2013')+' วัน</td>';
-    html+='<td>'+anonymityBadge(r.isAnonymous)+'</td>';
-    html+='<td><span style="color:var(--t2);font-size:11px">ยังไม่เริ่ม</span></td>';
-    html+='<td>'+statusBadge('var(--L)','rgba(186,117,23,.1)',icon('clock',12)+' กำหนดล่วงหน้า')+'</td>';
-    html+='<td class="lft"><div style="display:flex;gap:6px;flex-wrap:wrap">';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditScheduledRoundDialog(\''+r.id+'\')">'+icon('pencil',14)+' แก้ไข</button>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--E);border-color:rgba(29,158,117,.3)" onclick="openActivateRoundConfirm(\''+r.id+'\')">'+icon('play',14)+' เปิดรอบ</button>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openRemoveScheduledRoundConfirm(\''+r.id+'\')">'+icon('trash',14)+' ลบ</button>';
-    html+='</div></td>';
-    html+='</tr>';
+    entries.push({
+      label:r.label,startDate:r.startDate,endDate:r.endDate,isAnonymous:r.isAnonymous,empCount:undefined,completedCount:undefined,
+      statusHtml:statusBadge('var(--L)','rgba(186,117,23,.1)',icon('clock',12)+' กำหนดล่วงหน้า'),
+      rowBg:'rgba(186,117,23,.04)',
+      evaluatorOverrideHtml:'<span style="color:var(--t2);font-size:11px">ยังไม่เริ่ม</span>',
+      actionsHtml:'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditScheduledRoundDialog(\''+r.id+'\')">'+icon('pencil',14)+' แก้ไข</button>'
+        +'<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--E);border-color:rgba(29,158,117,.3)" onclick="openActivateRoundConfirm(\''+r.id+'\')">'+icon('play',14)+' เปิดรอบ</button>'
+        +'<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openRemoveScheduledRoundConfirm(\''+r.id+'\')">'+icon('trash',14)+' ลบ</button>'
+    });
   });
-  /* [Closed/red] ปิดรอบแล้ว -- fully closed/archived rounds */
   ROUNDS.slice().reverse().forEach(function(r){
-    html+='<tr>';
-    html+='<td class="lft">'+roundCell(r.label,r.startDate,r.endDate)+'</td>';
-    html+='<td style="font-size:11px;color:var(--t1)">'+(roundDurationDays(r.startDate,r.endDate)||'\u2013')+' วัน</td>';
-    html+='<td>'+anonymityBadge(r.isAnonymous)+'</td>';
-    html+='<td>'+evaluatorCountCell(r.empCount,r.completedCount)+'</td>';
-    html+='<td>'+statusBadge('var(--I)','rgba(163,45,45,.1)',icon('circlex',12)+' ปิดรอบแล้ว')+'</td>';
-    html+='<td class="lft"><div style="display:flex;gap:6px;flex-wrap:wrap">';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openClosedRoundDetail(\''+r.id+'\')">'+icon('eye',14)+' ดูรายละเอียด</button>';
-    html+='<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="duplicateRound(\''+r.id+'\')">'+icon('copy',14)+' คัดลอกรอบ</button>';
-    html+='</div></td>';
-    html+='</tr>';
+    entries.push({
+      label:r.label,startDate:r.startDate,endDate:r.endDate,isAnonymous:r.isAnonymous,empCount:r.empCount,completedCount:r.completedCount,
+      statusHtml:statusBadge('var(--I)','rgba(163,45,45,.1)',icon('circlex',12)+' ปิดรอบแล้ว'),
+      rowBg:'',
+      actionsHtml:'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openClosedRoundDetail(\''+r.id+'\')">'+icon('eye',14)+' ดูรายละเอียด</button>'
+        +'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="duplicateRound(\''+r.id+'\')">'+icon('copy',14)+' คัดลอกรอบ</button>'
+    });
   });
-  html+='</tbody></table>';
-  return html;
-}
-function openEditScheduledRoundDialog(roundId){
-  var r=SCHEDULED_ROUNDS.filter(function(x){return x.id===roundId;})[0];
-  if(!r)return;
-  /* reuse the same expandable form UX -- open it pre-filled for editing */
-  toggleAddRoundForm();
-  setTimeout(function(){
-    h('addRoundStart').value=r.startDate;h('addRoundEnd').value=r.endDate;
-    updateAddRoundAutoFields();
-    if(r.isAnonymous===false)h('addRoundAnonNo').checked=true;else h('addRoundAnonYes').checked=true;
-    window._editingScheduledId=roundId;
-  },10);
+
+  /* ── Desktop/tablet: the original <table> ── */
+  var tableHtml='<table class="sw-table" style="width:100%"><thead><tr>'
+    +'<th class="lft">รอบการประเมิน</th><th>ระยะเวลา</th><th>การเปิดเผยตัวตน</th><th>ผู้ประเมิน</th><th>สถานะ</th><th class="lft">การดำเนินการ</th>'
+    +'</tr></thead><tbody>';
+  entries.forEach(function(e){
+    tableHtml+='<tr'+(e.rowBg?' style="background:'+e.rowBg+'"':'')+'>';
+    tableHtml+='<td class="lft">'+roundCell(e.label,e.startDate,e.endDate)+'</td>';
+    tableHtml+='<td style="font-size:11px;color:var(--t1)">'+(roundDurationDays(e.startDate,e.endDate)||'\u2013')+' วัน</td>';
+    tableHtml+='<td>'+anonymityBadge(e.isAnonymous)+'</td>';
+    tableHtml+='<td>'+(e.evaluatorOverrideHtml||evaluatorCountCell(e.empCount,e.completedCount))+'</td>';
+    tableHtml+='<td>'+e.statusHtml+'</td>';
+    tableHtml+='<td class="lft"><div style="display:flex;gap:6px;flex-wrap:wrap">'+e.actionsHtml+'</div></td>';
+    tableHtml+='</tr>';
+  });
+  tableHtml+='</tbody></table>';
+
+  /* ── Mobile: card layout (item 4) -- same data, stacked instead of
+     columned, so nothing needs horizontal scrolling and no column gets
+     silently cut off. ── */
+  var cardsHtml='';
+  entries.forEach(function(e){
+    cardsHtml+='<div class="rh-card"'+(e.rowBg?' style="background:'+e.rowBg+'"':'')+'>';
+    cardsHtml+='<div class="rh-card-top"><div>'+roundCell(e.label,e.startDate,e.endDate)+'</div>'+e.statusHtml+'</div>';
+    cardsHtml+='<div class="rh-card-meta">';
+    cardsHtml+='<div class="rh-card-meta-item"><span class="rh-card-meta-lbl">ระยะเวลา</span><span>'+(roundDurationDays(e.startDate,e.endDate)||'\u2013')+' วัน</span></div>';
+    cardsHtml+='<div class="rh-card-meta-item"><span class="rh-card-meta-lbl">การเปิดเผยตัวตน</span><span>'+anonymityBadge(e.isAnonymous)+'</span></div>';
+    cardsHtml+='<div class="rh-card-meta-item"><span class="rh-card-meta-lbl">ผู้ประเมิน</span><span>'+(e.evaluatorOverrideHtml||evaluatorCountCell(e.empCount,e.completedCount))+'</span></div>';
+    cardsHtml+='</div>';
+    cardsHtml+='<div class="rh-card-actions">'+e.actionsHtml+'</div>';
+    cardsHtml+='</div>';
+  });
+
+  return '<div class="rh-table-wrap">'+tableHtml+'</div><div class="rh-card-list">'+cardsHtml+'</div>';
 }
 function openClosedRoundDetail(roundId){
   var r=ROUNDS.filter(function(x){return x.id===roundId;})[0];
@@ -3458,19 +3675,64 @@ function doLogin(){
     curTab='self';
     showTab('self');
   } else {
-    autoLoad(); /* restores selfSc/othSc/rsnNotes + sSaved/sSub/oSaved/oSub from THIS user's own saved progress, if any */
-    if(oSub){
-      /* already submitted this round -- nothing left to fill in, so the
-         evaluation tabs would just show a frozen read-only summary;
-         land on the Dashboard instead, which is what they'd actually
-         want to see at this point. */
-      curTab='dash';
-      showTab('dash');
-    } else {
-      curTab='self';
-      showTab('self');
-    }
+    autoLoad(); /* restores selfSc/othSc/rsnNotes + sSaved/sSub/oSaved/oSub from THIS user's own saved LOCAL cache, if any */
+    /* ── Single Source of Truth verification (per explicit request) ──
+       localStorage's sSub/oSub flags are only ever a CACHE of what this
+       browser last knew -- they must never be trusted as the final
+       answer to "has this person submitted?" on their own. The real
+       answer lives in the shared database (SimDB); if a round's
+       submitted rows for this person were removed there (whether by an
+       Admin reset tool, manual cleanup, or anything else), the cached
+       oSub/sSub flag is now STALE and must not keep blocking the
+       person from evaluating again. This check runs once per login,
+       reconciling the local cache against the shared source of truth
+       before any routing decision is made. */
+    reconcileSubmitStatusWithDatabase(function(){
+      if(oSub){
+        /* already submitted this round (confirmed against the shared
+           database, not just the local cache) -- nothing left to fill
+           in, so the evaluation tabs would just show a frozen
+           read-only summary; land on the Dashboard instead, which is
+           what they'd actually want to see at this point. */
+        curTab='dash';
+        showTab('dash');
+      } else {
+        curTab='self';
+        showTab('self');
+      }
+    });
   }
+}
+/* Reconciles the locally-cached oSub/sSub/oSaved/sSaved flags against
+ * the shared database for the CURRENT round only -- this is the actual
+ * Single Source of Truth check. If the local cache says "submitted" but
+ * the shared database has no rows for this person in this round, the
+ * cache is stale (e.g. an Admin used Reset User Submission, or the
+ * backend row was otherwise removed) and gets corrected here so the
+ * person can evaluate again without any manual localStorage cleanup.
+ * Calls back once the check has settled either way (it tries a fresh
+ * SimDB.refresh() first so this isn't fooled by a merely-out-of-date
+ * local SimDB cache, but still proceeds using whatever's available if
+ * the network call fails, rather than blocking login on it). */
+function reconcileSubmitStatusWithDatabase(onDone){
+  if(!oSub&&!sSub){onDone();return;} /* nothing cached as "submitted" -- nothing to reconcile */
+  function check(){
+    var roundLbl=roundLabel(currentRound.year,currentRound.roundNo);
+    var hasRowInDb=SimDB.allRows().some(function(row){
+      return row['รหัสพนักงานผู้ประเมิน']===CU.empId&&row['รอบการประเมิน']===roundLbl;
+    });
+    if(!hasRowInDb){
+      /* stale cache -- the shared database has no record of this
+         person's submission for the current round at all. Clear the
+         local flags so they can evaluate again, and persist that
+         correction immediately so it doesn't silently revert on the
+         next page load. */
+      oSub=false;sSub=false;oSaved=false;sSaved=false;
+      autoSave();
+    }
+    onDone();
+  }
+  try{SimDB.refresh(check);}catch(e){check();}
 }
 /* lbtn uses onclick="doLogin()" in HTML */
 h('lu').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
@@ -4095,6 +4357,7 @@ var SimDB={
   _cache:[], /* array of row objects, refreshed from the Sheet via refresh() */
   _loaded:false,
   _loading:false,
+  _recentWrites:{}, /* key -> timestamp of last local upsertRows() write, used by refresh() to grant a short grace window before trusting a server response that omits that row */
   _lastError:null, /* most recent error message from refresh()/upsertRows(), shown in the Admin UI */
   _autoRefreshDone:false, /* guards against re-fetching on every re-render of the rounds page -- see renderAdminRounds */
   /* refresh: pull the latest rows from the Sheet into the local cache.
@@ -4117,7 +4380,33 @@ var SimDB={
       })
       .then(function(data){
         self._loading=false;self._loaded=true;
-        if(data&&data.ok){self._cache=data.rows||[];self._lastError=null;}
+        if(data&&data.ok){
+          /* Merge with a short grace window instead of an unconditional
+             overwrite OR an unconditional keep-forever merge: a row
+             written locally in the last few seconds (e.g. right after
+             Submit) might not have round-tripped through the backend
+             yet by the time this GET resolves, so it's kept even if the
+             server response omits it. Anything older than the grace
+             window is NOT protected -- if the server doesn't have it,
+             it's gone for real (e.g. an Admin used Reset User
+             Submission, or a row was otherwise removed at the source),
+             and the local cache must reflect that, which is the whole
+             point of Single Source of Truth: the server always wins
+             once enough time has passed for it to plausibly be caught up. */
+          var GRACE_MS=10000;
+          var now=Date.now();
+          var serverRows=data.rows||[];
+          var serverKeys={};
+          serverRows.forEach(function(r){serverKeys[r['Userid']+'::'+r['รอบการประเมิน']+'::'+r['รหัสพนักงานผู้ถูกประเมิน']]=true;});
+          var keptLocalOnly=self._cache.filter(function(r){
+            var key=r['Userid']+'::'+r['รอบการประเมิน']+'::'+r['รหัสพนักงานผู้ถูกประเมิน'];
+            if(serverKeys[key])return false; /* server already has it -- no need to keep a separate local copy, serverRows below is authoritative for it */
+            var writtenAt=self._recentWrites[key];
+            return writtenAt&&(now-writtenAt)<GRACE_MS;
+          });
+          self._cache=serverRows.concat(keptLocalOnly);
+          self._lastError=null;
+        }
         else{self._lastError=(data&&data.error)||'เซิร์ฟเวอร์ตอบกลับ ok:false โดยไม่ระบุสาเหตุ';}
         if(onDone)onDone(!!(data&&data.ok));
       })
@@ -4140,6 +4429,7 @@ var SimDB={
         return (r['Userid']+'::'+r['รอบการประเมิน']+'::'+r['รหัสพนักงานผู้ถูกประเมิน'])===key;
       });
       if(idx>=0)self._cache[idx]=row;else self._cache.push(row);
+      self._recentWrites[key]=Date.now(); /* marks this row as "just written locally" for refresh()'s grace-window merge below */
     });
     fetch(GAS_WEBAPP_URL,{
       method:'POST',
@@ -5338,7 +5628,7 @@ function renderDash(){
     var swReco=recommendationItems(CATS.map(function(c){return{key:c,value:myScoreNewer_sw.byCat[c],label:CAT_META[c].lb};}));
     var swAllE=swReco.length===0;
 
-    html+='<div class="db-summary-row" style="margin-bottom:14px">';
+    html+='<div class="db-summary-row" data-pdf-sec="singhaway" style="margin-bottom:14px">';
     /* left card */
     html+='<div class="db-summary-left"><div class="card" style="height:100%;padding:16px">';
     html+='<div class="db-sh-ttl" style="margin-bottom:10px">คะแนน Singhaway</div>';
@@ -5601,7 +5891,7 @@ function renderDash(){
     var focRank=competitionRank(allScoresA_foc,CU.empId);
     var focReco=recommendationItems(fkeysSummary.map(function(f){return{key:f,value:myScoreA_foc.byFocus[f],label:FDEF[f].nm,def:FDEF[f].df.E};}));
 
-    html+='<div class="card" style="margin-bottom:14px;padding:16px">';
+    html+='<div class="card" data-pdf-sec="focus" style="margin-bottom:14px;padding:16px">';
     html+='<div class="db-sh-ttl" style="margin-bottom:10px">คะแนน FOCUS</div>';
     html+='<div class="db-rank-of">คุณอยู่ในลำดับที่</div>';
     html+='<div class="db-rank-num db-anim-number">'+(focRank.rank||'\u2013')+' <span style="font-size:14px;font-weight:600;color:var(--t2)">จาก '+focRank.total+' คน</span></div>';
