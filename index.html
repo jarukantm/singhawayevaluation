@@ -432,9 +432,10 @@ button,input,select{font-family:var(--fb)}
  * carrying its own inline font-size. */
 .std-sel,.gcatsel{padding:8px 12px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:14px;
   font-weight:600;background:var(--s1);color:var(--t0);cursor:pointer;outline:none;line-height:1.3;
-  -webkit-appearance:none;appearance:none;
+  -webkit-appearance:none;appearance:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  min-width:140px;max-width:100%;
   background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3e%3cpath fill='%235B6F95' d='M0 0l5 6 5-6z'/%3e%3c/svg%3e");
-  background-repeat:no-repeat;background-position:right 10px center;padding-right:26px}
+  background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 .std-sel:focus,.gcatsel:focus{border-color:var(--pb)}
 .ggrid{display:grid;grid-template-columns:1fr repeat(5,minmax(88px,110px));gap:0;
   background:var(--s0);border:1px solid var(--b0);border-radius:var(--rl);box-shadow:var(--sd0);overflow:hidden}
@@ -651,7 +652,10 @@ button,input,select{font-family:var(--fb)}
 .db-ftab.on{background:var(--pb);border-color:var(--pb);color:#fff}
 /* ── Round comparison dropdowns (new) ── */
 .db-compare-row{display:flex;gap:10px;flex-wrap:wrap}
-.db-compare-sel{flex:1;min-width:160px}
+.db-compare-sel{flex:1;min-width:220px}
+@media(max-width:480px){
+  .db-compare-sel{min-width:0} /* on very narrow phones, let it shrink to the available column width -- ellipsis (inherited from .std-sel) handles any overflow instead of clipping against the arrow */
+}
 /* ── Summary cards (new): rank + recommendation, side-by-side with the
    bar chart on desktop, stacking responsively per spec section 5 ── */
 .db-summary-row{display:flex;gap:14px;align-items:stretch}
@@ -695,8 +699,79 @@ button,input,select{font-family:var(--fb)}
 .db-sh-ttl{font-family:var(--fh);font-size:14px;font-weight:700;color:var(--t0);flex:1}
 .sw-table{width:100%;border-collapse:collapse}
 .sw-table th{font-size:10px;font-weight:700;color:var(--t2);padding:7px 10px;background:var(--s2);border:1px solid var(--b0);text-align:center;white-space:nowrap}
+/* ── Admin "ตารางคะแนนรายบุคคล" header filter dropdowns ──
+   Desktop now matches the system-wide .std-sel standard exactly (14px,
+   same padding/radius/arrow) per explicit request -- these used to be
+   deliberately smaller (9px) to save horizontal table width, but that
+   made them visually inconsistent with every other dropdown in the
+   system on desktop screens, where there's no real space constraint.
+   Tablet and Mobile keep their existing smaller sizing UNCHANGED (10px/
+   9px respectively) since the table genuinely is tighter on those
+   screens and the request explicitly says not to touch them. */
+.adm-tbl-filter-sel{font-size:12px;font-weight:600;line-height:1.3;padding:6px 24px 6px 10px;border-radius:var(--r);
+  -webkit-appearance:none;appearance:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
+  background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3e%3cpath fill='%235B6F95' d='M0 0l5 6 5-6z'/%3e%3c/svg%3e");
+  background-repeat:no-repeat;background-position:right 9px center}
+@media(max-width:900px) and (min-width:681px){
+  .adm-tbl-filter-sel{font-size:10px;padding:3px 20px 3px 5px;border-radius:4px;max-width:100%;
+    -webkit-appearance:menulist;appearance:menulist;background-image:none}
+}
+@media(max-width:680px){
+  .sw-table{table-layout:fixed} /* makes the <col> width hints below authoritative instead of merely advisory, which is what actually lets the mobile-only column redistribution take effect reliably -- desktop/tablet keep the default auto layout untouched */
+  .adm-tbl-filter-sel{font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;line-height:1.3;min-height:30px;
+    -webkit-appearance:menulist;appearance:menulist;background-image:none;width:100%;max-width:54px}
+  /* ── Mobile-only column redistribution ──
+     ระดับตำแหน่ง shrinks to just enough room for its (ellipsis-truncated)
+     dropdown text instead of the desktop/tablet 13% -- that freed-up
+     space goes straight to ชื่อ, which becomes the single widest column
+     in the table on mobile, per explicit request. Other columns get
+     slightly tighter too so the table stays usable without forcing
+     unnecessary horizontal scroll on a narrow screen. */
+  .adm-col-name{width:34%}
+  .adm-col-role{width:auto;min-width:54px}
+  .adm-col-small{width:8%}
+  .adm-col-score{width:9%}
+  .adm-col-diff{width:11%}
+  .adm-col-minmax{width:6%}
+  .adm-col-history{width:13%;min-width:58px} /* still comfortably fits the icon+"ดู" button even in the tighter mobile layout */
+}
 .sw-table th.lft{text-align:left}
 .sw-table td{padding:7px 10px;border:1px solid var(--b0);font-size:11px;text-align:center;vertical-align:middle}
+/* ── Personal-table name cell (item 3) ──
+   Name-surname: exactly one line, ellipsis if too long to fit -- never
+   wraps onto a second line of its own. Nickname: exactly one line right
+   below it, same ellipsis safety net. Together they form a fixed
+   2-line-max block, so every row in the table ends up the same height
+   regardless of how long any individual name happens to be. */
+/* ── Personal-table column widths (Desktop default) ──
+   ระดับตำแหน่ง now matches กลุ่ม/ฝ่าย/แผนก exactly (7%, same as
+   .adm-col-small) instead of either the original fixed 13% or the
+   earlier auto/min-width:74px attempt -- per explicit follow-up
+   request, all four header-filter dropdown columns should be the same
+   width. The space freed up from shrinking ระดับตำแหน่ง flows entirely
+   to ชื่อ (width:auto under the table's default table-layout:auto),
+   making it the widest column on screen and wide enough to fit the
+   longest real name in the roster without wrapping.
+   Tablet gets its own override right below preserving the ORIGINAL
+   13%/fixed-width values exactly, since the desktop-only change request
+   that started this never intended to touch tablet; Mobile already has
+   its own separate override further below, unaffected by this either. */
+.adm-col-name{width:auto}
+.adm-col-role{width:7%} /* matches adm-col-small (กลุ่ม/ฝ่าย/แผนก) exactly, per explicit request -- long role names ellipsis-truncate via the dropdown's own text-overflow rather than growing this column */
+.adm-col-small{width:7%}
+.adm-col-score{width:9%}
+.adm-col-diff{width:11%}
+.adm-col-minmax{width:6%}
+.adm-col-history{width:10%;min-width:64px} /* sized to comfortably fit the icon+"ดู" button (per explicit request, the old 7% reused from adm-col-small was too narrow and let the button overflow its cell) */
+/* ── Tablet: explicitly preserved at the ORIGINAL pre-this-request
+   values, since this request is Desktop-only and tablet must look
+   exactly like it did before. ── */
+@media(max-width:900px) and (min-width:681px){
+  .adm-col-role{width:13%;min-width:0}
+}
+.adm-name-cell{max-width:0} /* lets the column's actual width come from table-layout distribution (item 2) rather than this cell's content forcing it wider */
+.adm-name-line{font-size:13px;font-weight:600;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.adm-nick-line{font-size:10px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:1px}
 .sw-table td.lft{text-align:left}
 .sw-table .cat-hdr td{background:var(--s2);font-weight:700;font-size:11px}
 .sw-table .sum-row td{background:var(--navy);color:#fff;font-family:var(--fh);font-weight:700}
@@ -863,17 +938,25 @@ button,input,select{font-family:var(--fb)}
      Mobile browsers zoom in when a focused text field has font-size < 16px.
      Forcing 16px here (mobile only) keeps desktop's tighter, denser sizing
      untouched while eliminating the zoom-jump on every tap-to-type.
-     EXCEPTION: .gcatsel (the Singhaway-topic dropdown) AND .std-sel (every
-     other standardized dropdown in the system) are intentionally excluded
-     and kept small here -- per explicit request, every dropdown in the
-     app must visually match .gcatsel's ACTUAL rendered size on mobile
-     (12px), not just its desktop size (14px), even though this means iOS
-     may briefly zoom in when any of these dropdowns is tapped open. This
-     was previously an exception for .gcatsel alone; now applied
-     system-wide so no dropdown can ever render larger than the reference
-     dropdown on any screen size. */
+     EXCEPTIONS:
+     - .gcatsel/.std-sel (every standardized dropdown in the system) are
+       intentionally excluded and kept small -- per explicit request,
+       every dropdown in the app must visually match .gcatsel's ACTUAL
+       rendered size on mobile (12px), not just its desktop size (14px).
+     - .adm-tbl-filter-sel (the ระดับตำแหน่ง/กลุ่ม/ฝ่าย/แผนก dropdowns on
+       the Personal Evaluation Table's header) is excluded too, per a
+       separate explicit request to shrink those to ~9px on mobile
+       specifically -- without this exception, the generic select{...}
+       rule's !important was silently overriding that page's own
+       .adm-tbl-filter-sel mobile rule (a more specific selector loses to
+       a less specific one when BOTH carry !important and the less
+       specific one happens to be declared later in the stylesheet, which
+       is exactly what was happening here). All of these accept the same
+       tradeoff: iOS may briefly zoom in when one of these specific
+       dropdowns is tapped open, in exchange for consistently small text. */
   input,textarea,select{font-size:16px!important}
   .gcatsel,.std-sel{font-size:12px!important;padding:6px 11px}
+  .adm-tbl-filter-sel{font-size:9px!important;padding:2px 18px 2px 4px!important;line-height:1.3!important;min-height:30px!important}
 }
 @media(max-width:420px){
   .fg{grid-template-columns:repeat(2,1fr)}
@@ -894,6 +977,7 @@ button,input,select{font-family:var(--fb)}
  * body.pdf-hide-<sectionId> additionally hides any one card the person
  * unchecked in the export-options dialog. */
 @media print{
+  @page{margin:14mm 12mm 18mm 12mm}
   body.printing-dash .sb,body.printing-dash .mob-nav,body.printing-dash .hbg-btn,
   body.printing-dash .mob-overlay,body.printing-dash .topbar,
   body.printing-dash [data-pdf-sec="controls"],
@@ -902,7 +986,7 @@ button,input,select{font-family:var(--fb)}
   body.printing-dash .view{display:none!important}
   body.printing-dash .view.on{overflow:visible!important;padding:0!important;display:block!important}
   body.printing-dash .views{overflow:visible!important;display:block!important}
-  body.printing-dash #sa{padding-bottom:0!important}
+  body.printing-dash #sa,body.printing-dash #saAdmin{padding-bottom:0!important}
   body.printing-dash .card{box-shadow:none!important;border:1px solid #ccc!important;
     page-break-inside:avoid;margin-bottom:14px}
   body.printing-dash .vi{width:100%!important}
@@ -911,6 +995,22 @@ button,input,select{font-family:var(--fb)}
   body.pdf-hide-focus [data-pdf-sec="focus"],
   body.pdf-hide-feedback [data-pdf-sec="feedback"],
   body.pdf-hide-overview [data-pdf-sec="overview"]{display:none!important}
+  /* ── Admin PDF header (item 4) -- injected by buildAdminPDFHeader(),
+     print-only (never shown on screen since it's only ever added to the
+     DOM right before window.print() and removed again on afterprint). ── */
+  .admin-pdf-header{margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #1D2A4D;page-break-after:avoid}
+  .admin-pdf-header-top{display:flex;align-items:center;gap:10px;margin-bottom:10px;color:#1D2A4D}
+  .admin-pdf-logo{display:flex;align-items:center;gap:10px}
+  .admin-pdf-sysname{font-family:var(--fh);font-size:11px;font-weight:700;color:#888;letter-spacing:.02em}
+  .admin-pdf-reporttitle{font-family:var(--fh);font-size:18px;font-weight:800;color:#1D2A4D}
+  .admin-pdf-meta{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:#444}
+  /* Page numbers: counter(page)/counter(pages) only update correctly
+     when read from a position:fixed element repeated on every printed
+     page (the @page margin-box syntax that would normally carry this is
+     unsupported in Chromium-based browsers, the most common print
+     engine, so it would silently render nothing there). */
+  .admin-pdf-pagefooter{position:fixed;bottom:0;left:0;right:0;text-align:center;font-size:9px;color:#888}
+  .admin-pdf-pagefooter::after{content:"\u0e2b\u0e19\u0e49\u0e32 " counter(page) " \u0e08\u0e32\u0e01 " counter(pages)}
 }
 </style>
 </head>
@@ -1026,8 +1126,8 @@ button,input,select{font-family:var(--fb)}
   <!-- LOGOUT CONFIRM -->
   <div class="ovl" id="logoutovl">
     <div class="mbox subm">
-      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ?</div>
-      <div style="font-size:13px;color:var(--t1);margin-bottom:1.25rem">ข้อมูลที่บันทึก (Save) ไว้แล้วจะยังอยู่ครบ \u2014 เข้าสู่ระบบใหม่เพื่อกลับมาทำต่อได้ทุกเมื่อ</div>
+      <div style="font-family:var(--fh);font-size:17px;font-weight:700;color:var(--t0);margin-bottom:10px"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ยืนยันการออกจากระบบ</div>
+      <div style="font-size:13px;color:var(--t1);margin-bottom:1.25rem">คุณต้องการออกจากระบบใช่หรือไม่<br><br>ข้อมูลที่บันทึก (Save) ไว้แล้วจะยังอยู่ครบ \u2014 เข้าสู่ระบบใหม่เพื่อกลับมาทำต่อได้ทุกเมื่อ</div>
       <div style="display:flex;gap:8px;justify-content:flex-end">
         <button class="btn bo" id="logoutcancelbtn">ยกเลิก</button>
         <button class="btn bb" id="logoutconfirmbtn" style="background:var(--I);box-shadow:0 2px 10px rgba(163,45,45,.28)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> ออกจากระบบ</button>
@@ -1227,7 +1327,7 @@ button,input,select{font-family:var(--fb)}
       <button class="nb" id="t-dash" onclick="showTab('dash')" title="ภาพรวมผลประเมิน"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></div><span class="nb-txt">ภาพรวมผลประเมิน</span></button>
     </nav>
     <div class="sb-foot">
-      <button class="sb-logout" id="loutbtn" onclick="doLogout()" title="ออกจากระบบ"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="nb-txt">ออกจากระบบ</span></button>
+      <button class="sb-logout" id="loutbtn" onclick="openLogoutConfirm()" title="ออกจากระบบ"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="nb-txt">ออกจากระบบ</span></button>
     </div>
   </aside>
 
@@ -1447,7 +1547,7 @@ button,input,select{font-family:var(--fb)}
       <button class="nb" id="at-status" onclick="showAdminTab('status')" title="สถานะการประเมิน"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div><span class="nb-txt">สถานะการประเมิน</span></button>
     </nav>
     <div class="sb-foot">
-      <button class="sb-logout" id="loutbtnA" onclick="doLogout()" title="ออกจากระบบ"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="nb-txt">ออกจากระบบ</span></button>
+      <button class="sb-logout" id="loutbtnA" onclick="openLogoutConfirm()" title="ออกจากระบบ"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg><span class="nb-txt">ออกจากระบบ</span></button>
     </div>
   </aside>
 
@@ -1967,9 +2067,30 @@ function sk(pid,cid){return pid+'|'+cid;}
 function gS(pid,cid){return othSc[sk(pid,cid)]||null;}
 function gSelf(cid){return selfSc[cid]||null;}
 function s2l(avg){
-  if(!avg)return{l:'\u2014',c:'var(--t2)'};
-  if(avg>=4.5)return{l:'E',c:RCOL.E};if(avg>=3.25)return{l:'G',c:RCOL.G};
-  if(avg>=1.8)return{l:'S',c:RCOL.S};if(avg>=0.5)return{l:'L',c:RCOL.L};
+  /* Distinguishes "no score recorded yet" (undefined/null/NaN) from a
+     genuine score of exactly 0.00, which must resolve to level I per
+     the boundary table below -- the previous `if(!avg)` check treated
+     both cases identically since 0 is falsy in JS, which was a latent
+     bug independent of the boundary values themselves. */
+  if(avg===undefined||avg===null||isNaN(avg))return{l:'\u2014',c:'var(--t2)'};
+  /* Score-level boundaries (Weight Score -> ระดับคะแนน), per explicit
+     spec -- this is the ONLY place in the entire system that performs
+     this conversion (every Dashboard, chart, table, PDF export, Admin
+     view, History popup, and Comparison view all call this same
+     function), so updating the five comparisons here is sufficient to
+     apply the new criteria everywhere at once:
+       E: 4.55 <= X <= 5.00
+       G: 3.30 <= X <  4.55
+       S: 1.80 <= X <  3.30
+       L: 0.55 <= X <  1.80
+       I: 0.00 <= X <  0.55
+     The Weight Score calculation itself is completely untouched -- this
+     function only ever receives an already-computed score and maps it
+     to a level label, never participates in the calculation. */
+  if(avg>=4.55)return{l:'E',c:RCOL.E};
+  if(avg>=3.30)return{l:'G',c:RCOL.G};
+  if(avg>=1.80)return{l:'S',c:RCOL.S};
+  if(avg>=0.55)return{l:'L',c:RCOL.L};
   return{l:'I',c:RCOL.I};
 }
 function avgFor(ids,crits,isSelf){
@@ -2039,6 +2160,10 @@ if(h('exportPdfConfirmBtn')){
 window.addEventListener('afterprint',function(){
   document.body.classList.remove('printing-dash');
   PDF_SECTIONS.forEach(function(sec){document.body.classList.remove('pdf-hide-'+sec.id);});
+  var pdfHeader=h('adminPdfHeader');
+  if(pdfHeader)pdfHeader.remove();
+  var pdfFooter=h('adminPdfFooter');
+  if(pdfFooter)pdfFooter.remove();
 });
 
 /* ══════════════════════════ ADMIN MODULE ══════════════════════════
@@ -2154,14 +2279,11 @@ function renderAdminStatus(){
   html+='<button class="btn bo" style="margin-top:10px;font-size:12px" onclick="sendDailyReminderNow()">'+icon('bell',16)+' ทดสอบส่งแจ้งเตือนตอนนี้ ('+pendingSubmit.length+' คน)</button>';
   html+='</div></div>';
 
-  /* ── filter bar: search + department dropdown ── */
-  var depts=Array.from(new Set(ALL_EMP.map(function(e){return e.dept;}).filter(function(d){return d;}))).sort();
+  /* ── filter bar: search + Export PDF (item 5: department dropdown
+     removed entirely, replaced by Export PDF in the same position) ── */
   html+='<div class="card" style="padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">';
   html+='<div style="position:relative;flex:1;min-width:200px"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t2);pointer-events:none">'+icon('search',14)+'</span><input type="text" id="adminStatusSearch" value="'+adminStatusQ+'" placeholder="ค้นหาชื่อ ชื่อเล่น หรือรหัสพนักงาน..." style="width:100%;padding:8px 12px 8px 32px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:12px;outline:none" oninput="adminStatusQ=this.value;renderAdminStatus()"></div>';
-  html+='<select id="adminStatusDept" class="std-sel" onchange="adminStatusDept=this.value;renderAdminStatus()">';
-  html+='<option value=""'+(adminStatusDept===''?' selected':'')+'>ทุกหน่วยงาน</option>';
-  depts.forEach(function(d){html+='<option value="'+d+'"'+(adminStatusDept===d?' selected':'')+'>'+d+'</option>';});
-  html+='</select>';
+  html+='<button class="btn bo" style="font-size:12px;padding:8px 14px" onclick="exportAdminStatusPDF()">'+icon('download',16)+' Export PDF</button>';
   html+='</div>';
 
   var q=adminStatusQ.trim().toLowerCase();
@@ -2309,10 +2431,11 @@ var focusFilterGroup='ALL'; /* 'ALL' = เลือกทั้งหมด (who
 var focusFilterDiv='';      /* '' = ทุกฝ่าย within the selected กลุ่ม */
 var focusFilterDept='';     /* '' = ทุกแผนก within the selected ฝ่าย */
 function renderAdminScores(){
-  var html='<div class="phd"><div><div class="ptitle">'+icon('chartcolumn',18)+' คะแนนรายบุคคล</div></div><div><button class="btn bo db-pdf-btn" style="font-size:11px;padding:6px 12px" onclick="exportDashPDF()">'+icon('download',16)+' Export PDF</button></div></div>';
+  var html='<div class="phd"><div><div class="ptitle">'+icon('chartcolumn',18)+' คะแนนรายบุคคล</div></div></div>';
   html+='<div class="wb" style="margin-bottom:14px"><span>'+icon('info',16)+'&#65039;</span><span>คะแนนด้านล่างคำนวณจากข้อมูลการประเมินล่าสุดในระบบ</span></div>';
 
-  /* ── round comparison selector ──
+  /* ── round comparison selector + Export PDF (item 4: moved onto this
+     same row, left-aligned, matching dropdown height) ──
      รอบ A drives every figure on this page (whole-page filter, per the
      request); รอบ B is optional and only feeds the small comparison
      figures next to each Round-A number -- it never replaces the page. */
@@ -2326,6 +2449,66 @@ function renderAdminScores(){
 
   return withRound(adminRoundA,function(){return renderAdminScoresBody(html);});
 }
+/* Dedicated Admin print path (item 4) -- the Dashboard's exportDashPDF()
+ * depends on data-pdf-sec="..." tags that only exist on the EMPLOYEE
+ * Dashboard's cards; the Admin scores page has none of them, so calling
+ * that same function here always found zero exportable sections and
+ * silently did nothing (the actual cause of "ปุ่ม Export PDF ไม่ทำงาน").
+ * This Admin page doesn't need granular section toggles -- it just
+ * prints everything currently visible (the round filters that drove
+ * the page's calculations included, so what's exported always matches
+ * what's on screen). */
+/* ── PDF header injection (item 4) ──
+ * Builds the standard report header (system name, report title, round/
+ * year, export date, exporter) as a print-only element inserted at the
+ * very top of whichever Admin view is currently active, right before
+ * printing -- removed again on 'afterprint' so it never lingers in the
+ * live on-screen UI. Page numbers (Page x of y) are added via @page/
+ * counter() in the print CSS below, since that's the only way to get an
+ * accurate, automatically-updating page count from a browser's own
+ * print engine -- no JS can know the final page count in advance. */
+function buildAdminPDFHeader(reportTitle){
+  var now=new Date();
+  var dateStr=now.toLocaleDateString('th-TH',{year:'numeric',month:'long',day:'numeric'})+' '+now.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  var div=document.createElement('div');
+  div.id='adminPdfHeader';
+  div.className='admin-pdf-header';
+  div.innerHTML=
+    '<div class="admin-pdf-header-top">'
+      +'<div class="admin-pdf-logo">'+icon('chartcolumn',28)+'<div><div class="admin-pdf-sysname">Singhaway FOCUS Platform</div><div class="admin-pdf-reporttitle">'+reportTitle+'</div></div></div>'
+    +'</div>'
+    +'<div class="admin-pdf-meta">'
+      +'<span><b>รอบการประเมิน:</b> '+roundLabel(currentRound.year,currentRound.roundNo)+'</span>'
+      +'<span><b>ปี:</b> '+currentRound.year+'</span>'
+      +'<span><b>วันที่ Export:</b> '+dateStr+'</span>'
+      +'<span><b>ผู้ Export:</b> '+((CU&&CU.name)||'\u2013')+'</span>'
+    +'</div>';
+  return div;
+}
+function exportAdminScoresPDF(){
+  document.body.classList.add('printing-dash');
+  var activeView=document.querySelector('#saAdmin .view.on .vi');
+  var header=buildAdminPDFHeader('รายงานคะแนนรายบุคคล');
+  if(activeView)activeView.insertBefore(header,activeView.firstChild);
+  var footer=document.createElement('div');
+  footer.id='adminPdfFooter';footer.className='admin-pdf-pagefooter';
+  document.body.appendChild(footer);
+  setTimeout(function(){window.print();},50);
+}
+/* Same direct-print pattern as exportAdminScoresPDF() above -- prints
+   whatever is currently on screen for this page, so the search term and
+   any other active filter state are always exactly what gets exported
+   (item 5's "สิ่งที่ผู้ใช้เห็นบนหน้าจอ ต้องตรงกับสิ่งที่ Export ออกมา 100%"). */
+function exportAdminStatusPDF(){
+  document.body.classList.add('printing-dash');
+  var activeView=document.querySelector('#saAdmin .view.on .vi');
+  var header=buildAdminPDFHeader('รายงานสถานะการประเมิน');
+  if(activeView)activeView.insertBefore(header,activeView.firstChild);
+  var footer=document.createElement('div');
+  footer.id='adminPdfFooter';footer.className='admin-pdf-pagefooter';
+  document.body.appendChild(footer);
+  setTimeout(function(){window.print();},50);
+}
 function renderAdminScoresBody(html){
 
   /* ── search box ──
@@ -2337,7 +2520,10 @@ function renderAdminScoresBody(html){
      focus + cursor position right after the re-render (see
      adminScoreSearchInput()). font-size is 16px to also avoid iOS/Android
      auto-zoom on focus, which was compounding the same bug visually. */
-  html+='<div style="margin-bottom:14px;position:relative;width:100%;max-width:420px"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t2);pointer-events:none">'+icon('search',14)+'</span><input type="text" id="adminScoreSearch" value="'+adminScoreQ+'" placeholder="ค้นหาชื่อ ชื่อเล่น รหัสพนักงาน หรือแผนก..." style="width:100%;padding:9px 13px 9px 32px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:16px;outline:none" oninput="onAdminScoreSearchInput(this)"></div>';
+  html+='<div class="card" style="padding:12px 14px;margin-bottom:14px;display:flex;gap:8px;flex-wrap:nowrap;align-items:center">';
+  html+='<div style="flex:1;min-width:0;position:relative"><span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t2);pointer-events:none">'+icon('search',14)+'</span><input type="text" id="adminScoreSearch" value="'+adminScoreQ+'" placeholder="ค้นหาชื่อ ชื่อเล่น รหัสพนักงาน หรือแผนก..." style="width:100%;padding:9px 13px 9px 32px;border:1.5px solid var(--b1);border-radius:var(--r);font-size:16px;outline:none" oninput="onAdminScoreSearchInput(this)"></div>';
+  html+='<button class="btn bo" style="font-size:12px;padding:9px 14px;flex-shrink:0;white-space:nowrap" onclick="exportAdminScoresPDF()">'+icon('download',16)+' Export PDF</button>';
+  html+='</div>';
 
   var allRows=ALL_EMP.map(function(e){var sc=mockScoreFor(e.empId);return{e:e,sc:sc,lbl:s2l(sc.avg)};});
   var q=adminScoreQ.trim().toLowerCase();
@@ -2711,18 +2897,30 @@ function renderAdminScoresBody(html){
   var allDeptCodes=Array.from(new Set(ALL_EMP.map(rowDeptCode))).filter(function(c){return c!=='\u2013';});
   var allRoleNames=Array.from(new Set(ALL_EMP.map(function(e){return e.role;})));
 
-  html+='<div class="card"><div style="overflow-x:auto"><table class="sw-table"><thead><tr>';
+  html+='<div class="card"><div style="overflow-x:auto"><table class="sw-table"><colgroup>'
+    +'<col class="adm-col-name">'   /* ชื่อ -- auto/fit-content on desktop+tablet; widest priority on mobile */
+    +'<col class="adm-col-role">'   /* ระดับตำแหน่ง -- medium on desktop+tablet; narrowed (auto/min-width) on mobile */
+    +'<col class="adm-col-small">'  /* กลุ่ม */
+    +'<col class="adm-col-small">'  /* ฝ่าย */
+    +'<col class="adm-col-small">'  /* แผนก */
+    +'<col class="adm-col-score">'  /* คะแนนเฉลี่ย */
+    +'<col class="adm-col-diff">'   /* เทียบเฉลี่ยองค์กร */
+    +'<col class="adm-col-minmax">' /* Min */
+    +'<col class="adm-col-minmax">' /* Max */
+    +'<col class="adm-col-score">'  /* ระดับ */
+    +'<col class="adm-col-history">'  /* History -- sized to fit the "ดู" button + icon, not reusing the short-code width */
+    +'</colgroup><thead><tr>';
   html+='<th class="lft">ชื่อ</th>';
-  html+='<th>ระดับตำแหน่ง<br><select id="adminTableRoleFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableRoleFilter=this.value;renderAdminScores()"><option value=""'+(adminTableRoleFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>ระดับตำแหน่ง<br><select id="adminTableRoleFilter" class="adm-tbl-filter-sel" style="margin-top:3px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableRoleFilter=this.value;renderAdminScores()"><option value=""'+(adminTableRoleFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +allRoleNames.map(function(rl){return '<option value="'+rl+'"'+(adminTableRoleFilter===rl?' selected':'')+'>'+rl+'</option>';}).join('')+'</select></th>';
-  html+='<th>กลุ่ม<br><select id="adminTableGroupFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableGroupFilter=this.value;renderAdminScores()"><option value=""'+(adminTableGroupFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>กลุ่ม<br><select id="adminTableGroupFilter" class="adm-tbl-filter-sel" style="margin-top:3px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableGroupFilter=this.value;renderAdminScores()"><option value=""'+(adminTableGroupFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +allGroupCodes.map(function(c){return '<option value="'+c+'"'+(adminTableGroupFilter===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></th>';
-  html+='<th>ฝ่าย<br><select id="adminTableDivFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableDivFilter=this.value;renderAdminScores()"><option value=""'+(adminTableDivFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>ฝ่าย<br><select id="adminTableDivFilter" class="adm-tbl-filter-sel" style="margin-top:3px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableDivFilter=this.value;renderAdminScores()"><option value=""'+(adminTableDivFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +allDivCodes.map(function(c){return '<option value="'+c+'"'+(adminTableDivFilter===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></th>';
-  html+='<th>แผนก<br><select id="adminTableDeptFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableDeptFilter=this.value;renderAdminScores()"><option value=""'+(adminTableDeptFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>แผนก<br><select id="adminTableDeptFilter" class="adm-tbl-filter-sel" style="margin-top:3px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableDeptFilter=this.value;renderAdminScores()"><option value=""'+(adminTableDeptFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +allDeptCodes.map(function(c){return '<option value="'+c+'"'+(adminTableDeptFilter===c?' selected':'')+'>'+c+'</option>';}).join('')+'</select></th>';
   html+='<th>คะแนนเฉลี่ย</th><th>เทียบเฉลี่ยองค์กร</th><th>Min</th><th>Max</th>';
-  html+='<th>ระดับ<br><select id="adminTableLevelFilter" style="margin-top:3px;font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableLevelFilter=this.value;renderAdminScores()"><option value=""'+(adminTableLevelFilter===''?' selected':'')+'>ทั้งหมด</option>'
+  html+='<th>ระดับ<br><select id="adminTableLevelFilter" class="adm-tbl-filter-sel" style="margin-top:3px;border-radius:4px;border:1px solid var(--b1);background:var(--s1);color:var(--t0);cursor:pointer;max-width:100%;text-overflow:ellipsis" onchange="adminTableLevelFilter=this.value;renderAdminScores()"><option value=""'+(adminTableLevelFilter===''?' selected':'')+'>ทั้งหมด</option>'
     +RATINGS.map(function(rt){return '<option value="'+rt+'"'+(adminTableLevelFilter===rt?' selected':'')+'>'+rt+' \u2013 '+RNAME[rt]+'</option>';}).join('')+'</select></th>';
   html+='<th>History</th>';
   html+='</tr></thead><tbody>';
@@ -2733,7 +2931,7 @@ function renderAdminScoresBody(html){
     var diff=r.sc.avg-avgAll;
     var diffPct=avgAll?Math.round(diff/avgAll*100):0;
     html+='<tr>';
-    html+='<td class="lft">'+r.e.name+' <span style="color:var(--t2);font-size:10px">('+r.e.nick+')</span></td>';
+    html+='<td class="lft adm-name-cell"><div class="adm-name-line" title="'+r.e.name+'">'+r.e.name+'</div>'+(r.e.nick?'<div class="adm-nick-line">('+r.e.nick+')</div>':'')+'</td>';
     html+='<td style="font-size:11px;color:var(--t2)">'+r.e.role+'</td>';
     html+='<td style="font-size:11px;color:var(--t2)">'+rowGroupCode(r.e)+'</td>';
     html+='<td style="font-size:11px;color:var(--t2)">'+rowDivCode(r.e)+'</td>';
@@ -2743,7 +2941,7 @@ function renderAdminScoresBody(html){
     html+='<td style="color:var(--t2)">'+r.sc.min.toFixed(2)+'</td>';
     html+='<td style="color:var(--t2)">'+r.sc.max.toFixed(2)+'</td>';
     html+='<td><span class="rb-inl" style="background:'+RCOL[r.lbl.l]+'">'+r.lbl.l+'</span></td>';
-    html+='<td><button class="btn bo" style="font-size:10px;padding:3px 9px" onclick="openAdminScoreHistory(\''+r.e.empId+'\')">'+icon('trendingup',18)+' ดู</button></td>';
+    html+='<td style="text-align:center;vertical-align:middle"><button class="btn bo" style="font-size:10px;padding:3px 9px;white-space:nowrap" onclick="openAdminScoreHistory(\''+r.e.empId+'\')">'+icon('trendingup',14)+' ดู</button></td>';
     html+='</tr>';
   });
   html+='</tbody></table></div></div>';
@@ -2753,13 +2951,35 @@ function renderAdminScoresBody(html){
 function openAdminScoreHistory(empId){
   var e=ALL_EMP.filter(function(x){return x.empId===empId;})[0];
   if(!e)return;
-  var points=ROUNDS.map(function(r){
-    var savedCur=currentRound;currentRound=r; /* mockScoreFor seeds off currentRound.id, so swap temporarily */
-    var sc=mockScoreFor(empId);
-    currentRound=savedCur;
-    return{label:roundLabel(r.year,r.roundNo),avg:sc.avg};
-  });
-  points.push({label:roundLabel(currentRound.year,currentRound.roundNo)+' (ปัจจุบัน)',avg:mockScoreFor(empId).avg});
+  /* Two separate series (Singhaway overall, FOCUS overall) per round,
+     instead of the old single combined "avg" -- per explicit request,
+     item 2. byCat/byFocus already exist on mockScoreFor()'s return
+     shape, so this only needs to average each instead of inventing new
+     mock data. */
+  function pointsFor(empId){
+    var pts=ROUNDS.map(function(r){
+      var savedCur=currentRound;currentRound=r; /* mockScoreFor seeds off currentRound.id, so swap temporarily */
+      var sc=mockScoreFor(empId);
+      currentRound=savedCur;
+      var catVals=CATS.map(function(c){return sc.byCat[c];});
+      var focVals=Object.keys(FDEF).map(function(f){return sc.byFocus[f];});
+      return{
+        label:roundLabel(r.year,r.roundNo),
+        singhaway:catVals.reduce(function(a,b){return a+b;},0)/catVals.length,
+        focus:focVals.reduce(function(a,b){return a+b;},0)/focVals.length
+      };
+    });
+    var curSc=mockScoreFor(empId);
+    var curCatVals=CATS.map(function(c){return curSc.byCat[c];});
+    var curFocVals=Object.keys(FDEF).map(function(f){return curSc.byFocus[f];});
+    pts.push({
+      label:roundLabel(currentRound.year,currentRound.roundNo)+' (ปัจจุบัน)',
+      singhaway:curCatVals.reduce(function(a,b){return a+b;},0)/curCatVals.length,
+      focus:curFocVals.reduce(function(a,b){return a+b;},0)/curFocVals.length
+    });
+    return pts;
+  }
+  var points=pointsFor(empId);
   var body=h('adminHistBody');
   if(!body)return;
   body.innerHTML='';
@@ -2768,22 +2988,69 @@ function openAdminScoreHistory(empId){
   title.textContent=e.name+' ('+e.nick+')';
   body.appendChild(title);
   var sub=document.createElement('div');
-  sub.style.cssText='font-size:11px;color:var(--t2);margin-bottom:14px';
-  sub.textContent='แนวโน้มคะแนนเฉลี่ยรวม ข้ามรอบประเมิน (ข้อมูลตัวอย่าง)';
+  sub.style.cssText='font-size:11px;color:var(--t2);margin-bottom:16px';
+  sub.textContent='แนวโน้มคะแนนข้ามรอบประเมิน (ข้อมูลตัวอย่าง)';
   body.appendChild(sub);
-  var chart=document.createElement('div');
-  chart.style.cssText='display:flex;align-items:flex-end;gap:10px;height:140px;border-bottom:1.5px solid var(--b0);padding:0 4px';
-  points.forEach(function(p){
-    var col=s2l(p.avg);
-    var barH=Math.max(1,Math.round(p.avg/5*120));
-    var colDiv=document.createElement('div');
-    colDiv.style.cssText='flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;max-width:80px';
-    colDiv.innerHTML='<div style="font-size:11px;font-weight:800;color:'+col.c+'">'+p.avg.toFixed(2)+'</div>'
-      +'<div style="width:100%;height:'+barH+'px;background:var(--pb);border-radius:5px 5px 0 0"></div>'
-      +'<div style="font-size:10px;color:var(--t2);text-align:center">'+p.label+'</div>';
-    chart.appendChild(colDiv);
-  });
-  body.appendChild(chart);
+  /* Shared bar-chart builder for both Singhaway and FOCUS -- beginAtZero
+     semantics (0-5 scale, height strictly proportional to chartH, value
+     label rendered ON the bar) identical to the Dashboard's own charts,
+     so this popup never drifts visually from the rest of the system. */
+  function buildBarChart(seriesKey,color,heading){
+    var chartH=120;
+    var wrap=document.createElement('div');
+    wrap.style.cssText='margin-bottom:18px';
+    var hdg=document.createElement('div');
+    hdg.style.cssText='font-size:12px;font-weight:700;color:var(--t0);margin-bottom:8px';
+    hdg.textContent=heading;
+    wrap.appendChild(hdg);
+    var plot=document.createElement('div');
+    plot.style.cssText='display:flex;align-items:flex-end;gap:10px;height:'+chartH+'px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 6px 0 20px;position:relative';
+    [5,4,3,2,1].forEach(function(v){
+      var top=(1-v/5)*100;
+      var lbl=document.createElement('div');
+      lbl.style.cssText='position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:8px;font-weight:700;color:var(--t2);width:16px;text-align:right';
+      lbl.textContent=v;
+      plot.appendChild(lbl);
+    });
+    points.forEach(function(p){
+      var val=p[seriesKey];
+      var col=s2l(val);
+      var barH=Math.max(1,Math.round(val/5*chartH)); /* beginAtZero, min 0/max 5 -- strictly proportional, same math as the Dashboard charts */
+      var fits=barH>=22;
+      var colDiv=document.createElement('div');
+      colDiv.style.cssText='flex:1;height:100%;display:flex;align-items:flex-end;min-width:0';
+      colDiv.title=p.label+': '+val.toFixed(2)+' ('+col.l+')';
+      var barDiv=document.createElement('div');
+      barDiv.style.cssText='width:100%;height:'+barH+'px;background:'+color+';border-radius:5px 5px 0 0;display:flex;align-items:center;justify-content:center;position:relative';
+      if(fits){
+        barDiv.innerHTML='<span style="font-size:10px;font-weight:800;color:#fff;font-family:var(--fh)">'+val.toFixed(2)+'</span>';
+      } else {
+        var aboveLbl=document.createElement('span');
+        aboveLbl.style.cssText='position:absolute;bottom:'+(barH+3)+'px;font-size:10px;font-weight:800;color:'+color+';font-family:var(--fh)';
+        aboveLbl.textContent=val.toFixed(2);
+        colDiv.appendChild(aboveLbl);
+      }
+      colDiv.appendChild(barDiv);
+      plot.appendChild(colDiv);
+    });
+    wrap.appendChild(plot);
+    var labelRow=document.createElement('div');
+    labelRow.style.cssText='display:flex;gap:10px;padding:6px 6px 0 20px';
+    points.forEach(function(p){
+      var lblDiv=document.createElement('div');
+      lblDiv.style.cssText='flex:1;font-size:9px;color:var(--t2);text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+      lblDiv.textContent=p.label;
+      labelRow.appendChild(lblDiv);
+    });
+    wrap.appendChild(labelRow);
+    return wrap;
+  }
+  /* Graph 1: Singhaway -- Graph 2: FOCUS, both in the same popup,
+     stacked vertically (Responsive: each chart's own flex:1 columns
+     already adapt to narrower widths the same way the Dashboard's
+     charts do). */
+  body.appendChild(buildBarChart('singhaway','var(--pb)','คะแนนรวม Singhaway'));
+  body.appendChild(buildBarChart('focus','#7C3AED','คะแนนรวม FOCUS'));
   h('adminHistOvl').classList.add('on');
 }
 
@@ -2832,7 +3099,7 @@ function renderAdminRounds(){
   html+='</div>';
   html+='</div>';
 
-  /* ── Reset User Submission (testing tool, Admin-only) ──
+  /* ── Reset User Submission (standard Admin feature) ──
    * Lets an Admin clear a specific person's cached submit status so
    * they can re-evaluate during testing, without needing to manually
    * edit anything in the shared backend. Complements the Single Source
@@ -2844,7 +3111,7 @@ function renderAdminRounds(){
    * away rather than waiting for the merge grace window to expire. */
   html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:rgba(186,117,23,.12)">'+icon('refresh',18)+'</div><div class="db-sh-ttl">Reset User Submission</div></div>';
   html+='<div style="padding:14px 16px">';
-  html+='<div class="wb" style="margin-bottom:12px"><span>'+icon('info',16)+'</span><span>เครื่องมือสำหรับทดสอบระบบเท่านั้น \u2014 ใช้ล้างสถานะการ Submit ของพนักงานคนใดคนหนึ่ง เพื่อให้สามารถเข้าทำแบบประเมินใหม่ได้อีกครั้งเสมือนยังไม่เคย Submit</span></div>';
+  html+='<div class="wb" style="margin-bottom:12px"><span>'+icon('info',16)+'</span><span>ล้างสถานะการส่งแบบประเมินของพนักงาน เพื่อให้สามารถกลับเข้าทำแบบประเมินใหม่ได้อีกครั้ง</span></div>';
   html+='<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">';
   html+='<div style="flex:1;min-width:220px"><div style="font-size:11px;color:var(--t2);margin-bottom:4px">เลือกพนักงาน</div>';
   html+='<select id="resetSubmitEmpSel" class="std-sel" style="width:100%">';
@@ -3131,9 +3398,9 @@ function openResetSubmissionConfirm(){
   if(!empId){toast(icon('alerttriangle',16),'กรุณาเลือกพนักงานก่อน','','var(--I)');return;}
   var emp=ALL_EMP.filter(function(e){return e.empId===empId;})[0];
   if(!emp)return;
-  h('roundConfirmTitle').textContent='ยืนยันการ Reset การส่งแบบประเมิน';
-  h('roundConfirmBody').innerHTML='คุณต้องการล้างสถานะการส่งแบบประเมินของ <b>'+emp.name+' ('+emp.empId+')</b> ใช่หรือไม่<br><br>การดำเนินการนี้ใช้สำหรับการทดสอบระบบเท่านั้น';
-  h('roundConfirmActionBtn').textContent='Reset';
+  h('roundConfirmTitle').textContent='ยืนยันการรีเซ็ตการส่งแบบประเมิน';
+  h('roundConfirmBody').innerHTML='คุณต้องการรีเซ็ตสถานะการส่งแบบประเมินของ <b>'+emp.name+' ('+emp.empId+')</b> ใช่หรือไม่<br><br>การดำเนินการนี้จะทำให้ผู้ใช้งานสามารถกลับไปทำแบบประเมินใหม่ได้อีกครั้ง<br><br><b style="color:var(--I)">การดำเนินการนี้ไม่สามารถย้อนกลับได้</b>';
+  h('roundConfirmActionBtn').textContent='ยืนยันการรีเซ็ต';
   h('roundConfirmActionBtn').className='btn bb';
   h('roundConfirmActionBtn').style.background='var(--L)';
   h('roundConfirmActionBtn').onclick=function(){resetUserSubmission(empId);};
@@ -5437,17 +5704,21 @@ function dataCount(empIds,crits,filter){
 }
 /* Zone chart y-position helper */
 /* Maps a 0-5 score to a vertical % position matching the FOCUS zone chart's
- * non-linear band heights (E 10% / G 25% / S 29% / L 26% / I 10%, top-to-bottom). */
+ * non-linear band heights, now recalculated to match s2l()'s updated score-
+ * level boundaries exactly (E 9% / G 25% / S 30% / L 25% / I 11%, top-to-
+ * bottom -- each band's chart-height percentage equals its boundary width
+ * as a fraction of the full 0-5 range, so the zone chart and every level
+ * badge/label elsewhere always agree on where each level's boundaries are). */
 function yPct(v){
   if(!v)return 50;
   v=Math.max(0,Math.min(5,v));
   /* zone boundaries from top (score 5) to bottom (score 0), with cumulative % */
   var bounds=[
-    {lo:4.5,hi:5,   topPct:0,  hPct:10},
-    {lo:3.25,hi:4.5,topPct:10, hPct:25},
-    {lo:1.8,hi:3.25,topPct:35, hPct:29},
-    {lo:0.5,hi:1.8, topPct:64, hPct:26},
-    {lo:0,hi:0.5,   topPct:90, hPct:10}
+    {lo:4.55,hi:5,   topPct:0,  hPct:9},
+    {lo:3.30,hi:4.55,topPct:9,  hPct:25},
+    {lo:1.80,hi:3.30,topPct:34, hPct:30},
+    {lo:0.55,hi:1.80,topPct:64, hPct:25},
+    {lo:0,hi:0.55,   topPct:89, hPct:11}
   ];
   var raw=50,bandTop=0,bandBottom=100;
   for(var i=0;i<bounds.length;i++){
@@ -6031,14 +6302,18 @@ function renderDash(){
     html+='<div style="font-size:clamp(10px,2.2vw,11px);font-weight:700;color:var(--t2);margin-bottom:6px;text-align:center">ภาพรวม FOCUS</div>';
     html+='<div style="position:relative;height:260px;border-radius:var(--r);overflow:hidden">';
     /* Zone chart -- background bands sized to match actual score ranges (not equal 20% each):
-       E 4.5-5.0 (10%), G 3.25-4.5 (25%), S 1.8-3.25 (29%), L 0.5-1.8 (26%), I 0-0.5 (10%)
-       Stacked top-to-bottom since the chart's y-axis has 5 at top, 0 at bottom. */
+       E 4.55-5.0 (9%), G 3.30-4.55 (25%), S 1.80-3.30 (30%), L 0.55-1.80 (25%), I 0-0.55 (11%)
+       Stacked top-to-bottom since the chart's y-axis has 5 at top, 0 at bottom.
+       These percentages MUST stay in sync with yPct()'s bounds table above and
+       s2l()'s boundary comparisons -- all three exist for the same score-level
+       criteria and would visibly disagree with each other if only one were
+       updated when the criteria changes. */
     var zones=[
-      ['E','rgba(29,158,117,.16)',10],
+      ['E','rgba(29,158,117,.16)',9],
       ['G','rgba(24,95,165,.14)',25],
-      ['S','rgba(91,111,149,.12)',29],
-      ['L','rgba(186,117,23,.14)',26],
-      ['I','rgba(163,45,45,.16)',10]
+      ['S','rgba(91,111,149,.12)',30],
+      ['L','rgba(186,117,23,.14)',25],
+      ['I','rgba(163,45,45,.16)',11]
     ];
     var zTop=0;
     zones.forEach(function(z,zi){
