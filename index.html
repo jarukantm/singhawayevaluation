@@ -717,23 +717,38 @@ button,input,select{font-family:var(--fb)}
     -webkit-appearance:menulist;appearance:menulist;background-image:none}
 }
 @media(max-width:680px){
-  .sw-table{table-layout:fixed} /* makes the <col> width hints below authoritative instead of merely advisory, which is what actually lets the mobile-only column redistribution take effect reliably -- desktop/tablet keep the default auto layout untouched */
-  .adm-tbl-filter-sel{font-size:9px;padding:2px 18px 2px 4px;border-radius:4px;line-height:1.3;min-height:30px;
-    -webkit-appearance:menulist;appearance:menulist;background-image:none;width:100%;max-width:54px}
-  /* ── Mobile-only column redistribution ──
-     ระดับตำแหน่ง shrinks to just enough room for its (ellipsis-truncated)
-     dropdown text instead of the desktop/tablet 13% -- that freed-up
-     space goes straight to ชื่อ, which becomes the single widest column
-     in the table on mobile, per explicit request. Other columns get
-     slightly tighter too so the table stays usable without forcing
-     unnecessary horizontal scroll on a narrow screen. */
-  .adm-col-name{width:34%}
-  .adm-col-role{width:auto;min-width:54px}
-  .adm-col-small{width:8%}
-  .adm-col-score{width:9%}
-  .adm-col-diff{width:11%}
-  .adm-col-minmax{width:6%}
-  .adm-col-history{width:13%;min-width:58px} /* still comfortably fits the icon+"ดู" button even in the tighter mobile layout */
+  /* ── Mobile: horizontal scroll instead of column-squeezing ──
+     Previous approach (table-layout:fixed + %-column redistribution)
+     tried to fit all 11 columns into the mobile viewport by crushing
+     them -- this made dropdowns overlap, text unreadable, and columns
+     indistinguishable. The spec now explicitly says: don't squeeze,
+     let the table be wider than the viewport and scroll horizontally.
+     The overflow-x:auto wrapper already exists on the table's card
+     container; all we need here is to stop fighting it by letting
+     each column be as wide as its content needs, via min-width floors
+     in pixels. table-layout:auto (the browser default, unchanged) then
+     sizes each column to its content and lets the table grow wider than
+     the viewport, enabling the outer container's horizontal scroll. */
+  .sw-table{min-width:600px} /* ensures the table is always wide enough to not crush any column, even on very narrow phones -- 600px triggers horizontal scroll at any viewport < 600px + card padding */
+  /* Dropdowns on mobile: use normal (desktop-equivalent) size now that
+     horizontal scroll handles space rather than column-squeezing --
+     the spec explicitly says "Dropdown ทุกตัวให้มีขนาดปกติ ไม่ต้องย่อ
+     จนใช้งานยาก เมื่อพื้นที่ไม่พอ ให้ผู้ใช้เลื่อนตารางแทน" */
+  .adm-tbl-filter-sel{font-size:12px;padding:6px 24px 6px 10px;border-radius:var(--r);line-height:1.3;
+    -webkit-appearance:none;appearance:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' viewBox='0 0 10 6'%3e%3cpath fill='%235B6F95' d='M0 0l5 6 5-6z'/%3e%3c/svg%3e");
+    background-repeat:no-repeat;background-position:right 9px center}
+  /* Column floor widths -- these are min-width hints under table-layout:auto,
+     not fixed widths; the browser can give columns MORE room than this but
+     never less, which is all we need to guarantee readability without
+     constraining the table's overall width. */
+  .adm-col-name{min-width:140px}
+  .adm-col-role{min-width:80px}
+  .adm-col-small{min-width:60px}
+  .adm-col-score{min-width:70px}
+  .adm-col-diff{min-width:80px}
+  .adm-col-minmax{min-width:46px}
+  .adm-col-history{min-width:60px}
 }
 .sw-table th.lft{text-align:left}
 .sw-table td{padding:7px 10px;border:1px solid var(--b0);font-size:11px;text-align:center;vertical-align:middle}
@@ -763,12 +778,11 @@ button,input,select{font-family:var(--fb)}
 .adm-col-diff{width:11%}
 .adm-col-minmax{width:6%}
 .adm-col-history{width:10%;min-width:64px} /* sized to comfortably fit the icon+"ดู" button (per explicit request, the old 7% reused from adm-col-small was too narrow and let the button overflow its cell) */
-/* ── Tablet: explicitly preserved at the ORIGINAL pre-this-request
-   values, since this request is Desktop-only and tablet must look
-   exactly like it did before. ── */
-@media(max-width:900px) and (min-width:681px){
-  .adm-col-role{width:13%;min-width:0}
-}
+/* Tablet now follows the same proportional column layout as desktop
+   (per doc 12's "Tablet -- ปรับสัดส่วนให้เหมาะสมโดยยังคงหลักการเดียวกัน");
+   the base .adm-col-role{width:7%} rule already applies here, so no
+   separate override is needed -- the old 13% tablet-specific rule is
+   intentionally removed. */
 .adm-name-cell{max-width:0} /* lets the column's actual width come from table-layout distribution (item 2) rather than this cell's content forcing it wider */
 .adm-name-line{font-size:13px;font-weight:600;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .adm-nick-line{font-size:10px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:1px}
@@ -956,7 +970,7 @@ button,input,select{font-family:var(--fb)}
        dropdowns is tapped open, in exchange for consistently small text. */
   input,textarea,select{font-size:16px!important}
   .gcatsel,.std-sel{font-size:12px!important;padding:6px 11px}
-  .adm-tbl-filter-sel{font-size:9px!important;padding:2px 18px 2px 4px!important;line-height:1.3!important;min-height:30px!important}
+  .adm-tbl-filter-sel{font-size:12px!important;padding:6px 24px 6px 10px!important;line-height:1.3!important} /* same size as desktop now -- per the new horizontal-scroll approach, the table scrolls instead of squeezing, so normal-size dropdowns fit naturally */
 }
 @media(max-width:420px){
   .fg{grid-template-columns:repeat(2,1fr)}
@@ -2547,12 +2561,25 @@ function renderAdminScoresBody(html){
      the comparison round via withRound() so mockScoreFor() seeds off the
      correct round id without needing a parallel set of mock functions. */
   var avgAllB=null,avgAllDiffPct=null;
-  if(adminRoundB&&adminRoundB!==adminRoundA){
-    avgAllB=withRound(adminRoundB,function(){
-      var rowsB=ALL_EMP.map(function(e){return mockScoreFor(e.empId);});
-      return rowsB.reduce(function(s,sc){return s+sc.avg;},0)/rowsB.length;
+  var catAvgScopedB=null,focusAvgScopedB=null; /* per-chart comparison data, populated below if B differs from A */
+  var roundALabel=roundLabel(currentRound.year,currentRound.roundNo);
+  var roundBLabel=null;
+  var isComparison=adminRoundB&&adminRoundB!==adminRoundA;
+  if(isComparison){
+    withRound(adminRoundB,function(){
+      roundBLabel=roundLabel(currentRound.year,currentRound.roundNo);
+      var rowsB=ALL_EMP.map(function(e){return{e:e,sc:mockScoreFor(e.empId)};});
+      avgAllB=rowsB.reduce(function(s,r){return s+r.sc.avg;},0)/rowsB.length;
+      avgAllDiffPct=avgAllB?Math.round((avgAll-avgAllB)/avgAllB*100):null;
+      catAvgScopedB={};CATS.forEach(function(cat){
+        var vals=rowsB.map(function(r){return r.sc.byCat[cat];});
+        catAvgScopedB[cat]=vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0;
+      });
+      focusAvgScopedB={};Object.keys(FDEF).forEach(function(f){
+        var vals=rowsB.map(function(r){return r.sc.byFocus[f];});
+        focusAvgScopedB[f]=vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0;
+      });
     });
-    avgAllDiffPct=avgAllB?Math.round((avgAll-avgAllB)/avgAllB*100):null;
   }
 
   html+='<div class="card" style="padding:14px 16px;margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end">';
@@ -2672,6 +2699,14 @@ function renderAdminScoresBody(html){
        bar top or the y-axis "5" label -- same fix pattern used on the
        employee Dashboard's FOCUS chart. */
     var focusChartH=200; /* bars scale against this EXACT height -- must match what the y-axis labels below are positioned against, or the bar will visually land on the wrong gridline */
+    /* Lighter-shade comparison colors per FOCUS letter (spec's exact color table) */
+    var focusCmpColors={F:'#93C5FD',O:'#67E8F9',C:'#BFDBFE',U:'#D8B4FE',S:'#F9A8D4'};
+    if(isComparison&&focusAvgScopedB){
+      html+='<div style="display:flex;gap:14px;font-size:10px;color:var(--t2);margin-bottom:8px;flex-wrap:wrap">';
+      html+='<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:'+FDEF[fkeysA[0]].cl+'"></span>'+roundALabel+'</span>';
+      html+='<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:'+focusCmpColors[fkeysA[0]]+'"></span>'+roundBLabel+'</span>';
+      html+='</div>';
+    }
     html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">แกนตั้ง = <b>คะแนนเฉลี่ย</b> (0-5)</div>';
     html+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
     fkeysA.forEach(function(f){
@@ -2691,11 +2726,18 @@ function renderAdminScoresBody(html){
     fkeysA.forEach(function(f){
       var fd=FDEF[f];
       var val=scopeIsOrg?focusAvgScoped[f]:scopePerson?mockScoreFor(scopePerson.empId).byFocus[f]:0;
-      var barH=Math.max(1,Math.round(val/5*focusChartH)); /* scaled against focusChartH itself, matching the axis exactly -- this was the bug: it used to scale against a separate, smaller "focusBarMaxH" that didn't match the axis */
-      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;min-width:0">';
-      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
+      var barH=Math.max(1,Math.round(val/5*focusChartH));
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;min-width:0">';
+      html+='<div title="'+roundALabel+': '+val.toFixed(2)+' ('+s2l(val).l+')" style="flex:1;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
       html+='<span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+val.toFixed(2)+'</span>';
-      html+='</div></div>';
+      html+='</div>';
+      if(isComparison&&focusAvgScopedB){
+        var valB=focusAvgScopedB[f];var barHB=Math.max(1,Math.round(valB/5*focusChartH));
+        html+='<div title="'+roundBLabel+': '+valB.toFixed(2)+' ('+s2l(valB).l+')" style="flex:1;height:'+barHB+'px;background:'+focusCmpColors[f]+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
+        html+='<span style="font-size:10px;font-weight:700;color:rgba(0,0,0,.5)">'+valB.toFixed(2)+'</span>';
+        html+='</div>';
+      }
+      html+='</div>';
     });
     html+='</div>';
     html+='<div style="display:flex;gap:14px;padding:8px 10px 0 30px">';
@@ -2793,6 +2835,14 @@ function renderAdminScoresBody(html){
     var catChartH=200;
     html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('star',16)+'</div><div class="db-sh-ttl">สรุปคะแนน Singhaway Values</div></div>';
     html+='<div style="padding:14px 16px">';
+    /* Lighter-shade comparison colors per the spec's explicit color table */
+    var catCmpColors={'Family':'#93C5FD','Courage':'#67E8F9','PremiumQuality':'#BFDBFE','Happiness':'#D8B4FE'};
+    if(isComparison){
+      html+='<div style="display:flex;gap:14px;font-size:10px;color:var(--t2);margin-bottom:8px;flex-wrap:wrap">';
+      html+='<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:'+CAT_META[CATS[0]].cl+'"></span>'+roundALabel+'</span>';
+      if(catAvgScopedB)html+='<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:'+catCmpColors[CATS[0]]+'"></span>'+roundBLabel+'</span>';
+      html+='</div>';
+    }
     html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">แกนตั้ง = <b>คะแนนเฉลี่ย</b> (0-5) \u2014 '+scopeLabel+' ('+scopeRowsForAgg.length+' คน)</div>';
     html+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
     CATS.forEach(function(cat){
@@ -2811,10 +2861,17 @@ function renderAdminScoresBody(html){
     CATS.forEach(function(cat){
       var m=CAT_META[cat];var val=catAvgScoped[cat];
       var barH=Math.max(1,Math.round(val/5*catChartH));
-      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;min-width:0">';
-      html+='<div style="width:100%;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;min-width:0">';
+      html+='<div title="'+roundALabel+': '+val.toFixed(2)+' ('+s2l(val).l+')" style="flex:1;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
       html+='<span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+val.toFixed(2)+'</span>';
-      html+='</div></div>';
+      html+='</div>';
+      if(catAvgScopedB){
+        var valB=catAvgScopedB[cat];var barHB=Math.max(1,Math.round(valB/5*catChartH));
+        html+='<div title="'+roundBLabel+': '+valB.toFixed(2)+' ('+s2l(valB).l+')" style="flex:1;height:'+barHB+'px;background:'+catCmpColors[cat]+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
+        html+='<span style="font-size:10px;font-weight:700;color:rgba(0,0,0,.5)">'+valB.toFixed(2)+'</span>';
+        html+='</div>';
+      }
+      html+='</div>';
     });
     html+='</div>';
     html+='<div style="display:flex;gap:14px;padding:8px 10px 0 30px">';
