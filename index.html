@@ -758,32 +758,35 @@ button,input,select{font-family:var(--fb)}
    below it, same ellipsis safety net. Together they form a fixed
    2-line-max block, so every row in the table ends up the same height
    regardless of how long any individual name happens to be. */
-/* ── Personal-table column widths (Desktop default) ──
-   ระดับตำแหน่ง now matches กลุ่ม/ฝ่าย/แผนก exactly (7%, same as
-   .adm-col-small) instead of either the original fixed 13% or the
-   earlier auto/min-width:74px attempt -- per explicit follow-up
-   request, all four header-filter dropdown columns should be the same
-   width. The space freed up from shrinking ระดับตำแหน่ง flows entirely
-   to ชื่อ (width:auto under the table's default table-layout:auto),
-   making it the widest column on screen and wide enough to fit the
-   longest real name in the roster without wrapping.
-   Tablet gets its own override right below preserving the ORIGINAL
-   13%/fixed-width values exactly, since the desktop-only change request
-   that started this never intended to touch tablet; Mobile already has
-   its own separate override further below, unaffected by this either. */
-.adm-col-name{width:auto}
-.adm-col-role{width:7%} /* matches adm-col-small (กลุ่ม/ฝ่าย/แผนก) exactly, per explicit request -- long role names ellipsis-truncate via the dropdown's own text-overflow rather than growing this column */
-.adm-col-small{width:7%}
-.adm-col-score{width:9%}
-.adm-col-diff{width:11%}
-.adm-col-minmax{width:6%}
-.adm-col-history{width:10%;min-width:64px} /* sized to comfortably fit the icon+"ดู" button (per explicit request, the old 7% reused from adm-col-small was too narrow and let the button overflow its cell) */
-/* Tablet now follows the same proportional column layout as desktop
-   (per doc 12's "Tablet -- ปรับสัดส่วนให้เหมาะสมโดยยังคงหลักการเดียวกัน");
-   the base .adm-col-role{width:7%} rule already applies here, so no
-   separate override is needed -- the old 13% tablet-specific rule is
-   intentionally removed. */
-.adm-name-cell{max-width:0} /* lets the column's actual width come from table-layout distribution (item 2) rather than this cell's content forcing it wider */
+/* ── Personal-table column widths (Desktop: table-layout:fixed with px values) ──
+   Under table-layout:auto (the browser default), <col> percentage hints
+   are ignored whenever cell content forces a larger minimum -- the 12px
+   dropdown with its 6px+24px padding has an intrinsic minimum width of
+   ~70-90px which is wider than 7% of a 1200px table (~84px, close, but
+   the 5 filter columns together consumed too much flex space and crushed
+   the name column to near-zero.
+   Solution: table-layout:fixed (desktop only, see media query below) makes
+   our explicit pixel widths AUTHORITATIVE -- the browser distributes columns
+   exactly as declared and lets content overflow+truncate (via text-overflow
+   and overflow:hidden) instead of expanding columns. name column gets
+   width:auto which under fixed layout means "all remaining space after
+   other columns are allocated" -- guaranteed to be wide. */
+@media(min-width:681px){
+  .sw-table{table-layout:fixed;width:100%}
+  /* Dropdown max-widths must not exceed their column's pixel allocation --
+     under table-layout:fixed the column is authoritative, so the dropdown
+     will be clipped by overflow:hidden if it exceeds this, but explicitly
+     capping it here prevents any rendering artefacts. */
+  .adm-tbl-filter-sel{max-width:100%}
+}
+.adm-col-name  {width:auto}      /* absorbs all remaining space under fixed layout */
+.adm-col-role  {width:88px}      /* fits longest option with ellipsis for very long names */
+.adm-col-small {width:62px}      /* group/div/dept: 3-char codes (CTG,WRM,WWT) + tight dropdown */
+.adm-col-score {width:76px}      /* คะแนนเฉลี่ย */
+.adm-col-diff  {width:90px}      /* เทียบเฉลี่ยองค์กร */
+.adm-col-minmax{width:52px}      /* Min / Max */
+.adm-col-history{width:70px}     /* ดู button */
+.adm-name-cell{max-width:0;overflow:hidden} /* under table-layout:fixed, max-width:0 is not needed -- width comes from the <col> allocation; overflow:hidden prevents cell content from bleeding into adjacent fixed-width columns */
 .adm-name-line{font-size:13px;font-weight:600;color:var(--t0);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .adm-nick-line{font-size:10px;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:1px}
 .sw-table td.lft{text-align:left}
@@ -2836,7 +2839,7 @@ function renderAdminScoresBody(html){
     html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('star',16)+'</div><div class="db-sh-ttl">สรุปคะแนน Singhaway Values</div></div>';
     html+='<div style="padding:14px 16px">';
     /* Lighter-shade comparison colors per the spec's explicit color table */
-    var catCmpColors={'Family':'#93C5FD','Courage':'#67E8F9','PremiumQuality':'#BFDBFE','Happiness':'#D8B4FE'};
+    var catCmpColors={'Family':'#93C5FD','Courage':'#67E8F9','Premium Quality':'#BFDBFE','Happiness':'#D8B4FE'};
     if(isComparison){
       html+='<div style="display:flex;gap:14px;font-size:10px;color:var(--t2);margin-bottom:8px;flex-wrap:wrap">';
       html+='<span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:'+CAT_META[CATS[0]].cl+'"></span>'+roundALabel+'</span>';
