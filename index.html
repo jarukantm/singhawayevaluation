@@ -1095,7 +1095,7 @@ button,input,select{font-family:var(--fb)}
     <input class="lin" id="lp" type="password" placeholder="กรอก Password">
     <button class="eyb" id="eyb"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
-  <button class="lbtn" id="lbtn" onclick="doLogin()">เข้าสู่ระบบ</button>
+  <button class="lbtn" id="lbtn">เข้าสู่ระบบ</button>
   <div class="lerr" id="lerr">Username หรือ Password ไม่ถูกต้อง</div>
 </div>
 </div>
@@ -1625,9 +1625,7 @@ button,input,select{font-family:var(--fb)}
 <!-- TOAST -->
 <div class="toast" id="toast"><span id="tico"></span><div><div id="tmsg"></div><div id="tsub" style="font-size:10px;opacity:.7;margin-top:1px"></div></div></div>
 
-<script>
-var PROFILE_IMG = 'data:image/png;base64,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';
-/* EMP_PHOTOS: generated at runtime from empId seed -- no 426KB base64 blob needed.
+<script>/* EMP_PHOTOS: generated at runtime from empId seed -- no 426KB base64 blob needed.
    getPhoto() builds a unique avatar SVG for each empId on first call, then caches it. */
 var EMP_PHOTOS={};  /* populated lazily by getPhoto() below */
 function getPhoto(eid){
@@ -1822,317 +1820,59 @@ var CRITERIA=[
   {id:'h3',cat:'Happiness',foc:'U',lb:'สร้างความสัมพันธ์เชิงบวกกับบุคคลรอบข้าง'},
   {id:'h4',cat:'Happiness',foc:'U',lb:'สร้างสมดุลชีวิตการทำงาน ส่งต่อความสุขให้ผู้คนรอบข้าง'}
 ];
-var USERS={
-  'Teerawat_b':{pass:'111111',empId:'212',name:'ธีรวัฒน์ บัวทอง',nick:'นัท',role:'ผู้บริหารระดับสูง',div:'',dept:'',pos:'AEVP',color:'#185FA5'},
-  'Nipaporn_d':{pass:'111111',empId:'3221',name:'นิภาพร ดวงราช',nick:'พร',role:'ปฏิบัติการ',div:'',dept:'',pos:'เลขานุการ',color:'#1D9E75'},
-  'Pawena_k':{pass:'111111',empId:'1856',name:'ปวีณา กออมรรัตนเลิศ',nick:'ปู',role:'ปฏิบัติการ',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกกลยุทธ์บริหารความสัมพันธ์ลูกค้า',pos:'เจ้าหน้าที่กลยุทธ์บริหารความสัมพันธ์ลูกค้า',color:'#534AB7'},
-  'Thanita_k':{pass:'111111',empId:'3444',name:'ธนิตา ขุนจินดา',nick:'ยิ้ม',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการวิศวกรรมกลาง',pos:'เจ้าหน้าที่ธุรการกลุ่มวิศวกรรมกลาง',color:'#BA7517'},
-  'Pawarisa_j':{pass:'111111',empId:'2885',name:'ปวริศา เจริญผล',nick:'โอ๋',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการวิศวกรรมกลาง',pos:'เจ้าหน้าที่ธุรการกลุ่มวิศวกรรมกลาง',color:'#A32D2D'},
-  'Surasak_s':{pass:'111111',empId:'4412',name:'สุรศักดิ์ สระทองคำ',nick:'เอ็ม',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการวิศวกรรมกลาง',pos:'พนักงานขับรถ',color:'#0F6E52'},
-  'Wannakorn_k':{pass:'111111',empId:'4349',name:'วรรณกร กล่อมจิต',nick:'แจ๊ส',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'',pos:'ผู้จัดการส่วนวิศวกรรมอาหาร',color:'#0C447C'},
-  'Prachya_j':{pass:'111111',empId:'5520',name:'ปรัชญา จันทร์แก้ว',nick:'วิน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 2',color:'#854F0B'},
-  'Nattapat_p':{pass:'111111',empId:'6862',name:'ณัฐภัทร ภัทรเวสสกุล',nick:'คิม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 2',color:'#711B13'},
-  'Setthachai_r':{pass:'111111',empId:'5901',name:'เศรษฐชัย รัตนบุตร',nick:'โอเยะ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 1',color:'#3B6D11'},
-  'Tanakorn_j':{pass:'111111',empId:'7039',name:'ธนากรณ์ จันทร์แย้ม',nick:'เอ็ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรบริการพิเศษทางวิศวกรรมร 1',color:'#1909A0'},
-  'Supradit_s':{pass:'111111',empId:'7631',name:'สุประดิษฐ์ สุขสุแดน',nick:'ปอ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 1',color:'#7C3AED'},
-  'Wasinee_p':{pass:'111111',empId:'7675',name:'วาสินี พรหมขุนทอง',nick:'ฟิล์ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 1',color:'#0891B2'},
-  'Karn_t':{pass:'111111',empId:'7851',name:'กาญจน์ ธรรมครูปัทม์',nick:'ป่าน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรบริการพิเศษทางวิศวกรรมร 1',color:'#BE185D'},
-  'Sueb_p':{pass:'111111',empId:'13036',name:'สืบ ประจันตะเสน',nick:'โอ๊ค',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรบริการพิเศษทางวิศวกรรมร 1',color:'#065F46'},
-  'Manop_m':{pass:'111111',empId:'7177',name:'มานพ มณฑา',nick:'ดาว',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'ช่างเทคนิค',color:'#92400E'},
-  'Werapong_p':{pass:'111111',empId:'6594',name:'วีรพงษ์ พรมแจ้',nick:'ไกร',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'ช่างเทคนิค',color:'#1E3A8A'},
-  'Monkol_a':{pass:'111111',empId:'5560',name:'มงคล อ่วมนนท์',nick:'นุ๊ก',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกวิศวกรรมพัฒนาธุรกิจและเทคโนโลยี',pos:'ผู้เชี่ยวชาญงานบริการพิเศษทางวิศวกรรม',color:'#166534'},
-  'Woraphon_n':{pass:'111111',empId:'13218',name:'วรพล หนูเอียด',nick:'เจมส์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกวิศวกรรมพัฒนาธุรกิจและเทคโนโลยี',pos:'วิศวกรอาหาร 1',color:'#78350F'},
-  'Benjyiam_k':{pass:'111111',empId:'11266',name:'เบญจ์เยี่ยม คำอุปละ',nick:'เยี่ยม',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'',pos:'ผู้จัดการฝ่ายวิศวกรรมเครื่องกล',color:'#831843'},
-  'Kanathip_c':{pass:'111111',empId:'12488',name:'คณาธิป ชื่นประภานุสรณ์',nick:'ดิว',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'วิศวกรเครื่องกล',color:'#185FA5'},
-  'Chalerm_n':{pass:'111111',empId:'7081',name:'เฉลิม นาคำ',nick:'ต้น',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'ผู้จัดการแผนกวิศวกรรมเครื่องกล - ออกแบบและบริการ',color:'#1D9E75'},
-  'Ladawan_p':{pass:'111111',empId:'6773',name:'ลดาวัลย์ พลมั่น',nick:'แป้ง',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'วิศวกรเครื่องกล-ออกแบบและบริการ 1',color:'#534AB7'},
-  'Krithapash_s':{pass:'111111',empId:'8010',name:'กฤตภาส ศรีจันทร์',nick:'จั๊ด',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'วิศวกรเครื่องกล-ออกแบบและบริการ 1',color:'#BA7517'},
-  'Jrakapot_p':{pass:'111111',empId:'7863',name:'ยศวีร์ พุทธครู',nick:'ตูน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'วิศวกรวิจัยและพัฒนาทางวิศวกรรม 1',color:'#A32D2D'},
-  'Pornnarong_p':{pass:'111111',empId:'4734',name:'พรณรงค์ พีระณรงค์',nick:'ไอซ์',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'ผู้จัดการแผนกประจำฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและและเทคโลยี',color:'#0F6E52'},
-  'Sitthichok_p':{pass:'111111',empId:'7988',name:'สิทธิโชค พูนสถาพร',nick:'เตอร์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',pos:'วิศวกรเครื่องกล-ต้นกำลัง 1',color:'#0C447C'},
-  'Treewit_w':{pass:'111111',empId:'12106',name:'ตรีวิทย์ วงษ์ชาลี',nick:'บอล',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',pos:'วิศวกรเครื่องกล-ต้นกำลัง 1',color:'#854F0B'},
-  'Sompong_n':{pass:'111111',empId:'13077',name:'สมพงศ์ หนูเสน',nick:'ต้น',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',pos:'วิศวกรเครื่องกล-ต้นกำลัง',color:'#711B13'},
-  'Piyachai_y':{pass:'111111',empId:'5860',name:'ปิยชัย ใหญ่เสมอ',nick:'แสตมป์',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'ผู้จัดการแผนกวิศวกรรมเครื่องกล - งานระบบ',color:'#3B6D11'},
-  'Rapeepat_b':{pass:'111111',empId:'8039',name:'ระพีพัฒน์ ภวภูตานนท์ ณ มหาสารคาม',nick:'พี',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ 1',color:'#1909A0'},
-  'Chayakorn_s':{pass:'111111',empId:'11941',name:'ชยกร สุรีย์กมลชัย',nick:'อั๊ต',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ',color:'#7C3AED'},
-  'Kuntinee_s':{pass:'111111',empId:'13030',name:'กุลธินี สุทธิหอม',nick:'มายด์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ',color:'#0891B2'},
-  'Teeratat_t':{pass:'111111',empId:'11288',name:'ธีรธัช ตั้งกาญจนภาสน์',nick:'นิก',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรไฟฟ้า 1',color:'#BE185D'},
-  'Yanathorn_p':{pass:'111111',empId:'11593',name:'ญาณาธร พ่วงสุด',nick:'โบ๊ต',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรไฟฟ้า 1',color:'#065F46'},
-  'Subin_p':{pass:'111111',empId:'3769',name:'สุบิน พรมไชย',nick:'บิน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'ช่างไฟฟ้า',color:'#92400E'},
-  'Sissda_p':{pass:'111111',empId:'2864',name:'ศิษฎา ภู่สุวรรณ์',nick:'ป้อง',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'ผู้จัดการแผนกวิศกรรมอิเล็กทรอนิกส์และควบคุม',color:'#1E3A8A'},
-  'Nattapat_b':{pass:'111111',empId:'6360',name:'ณัฐภัทร์ บุญภัทร์',nick:'อาร์ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 2',color:'#166534'},
-  'Ittimon_s':{pass:'111111',empId:'6661',name:'อิทธิมนต์ สุวรรณมณี',nick:'บิ๊ก',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกบริการเครื่องจักรการผลิต',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 2',color:'#78350F'},
-  'Pisit_t':{pass:'111111',empId:'11768',name:'พิสิษฐ์ ทองใส',nick:'ฟลุก',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม',color:'#831843'},
-  'Somchai_s':{pass:'111111',empId:'11769',name:'สมชาย สุดฝ้าย',nick:'ชาย',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม',color:'#185FA5'},
-  'Suwit_k':{pass:'111111',empId:'5225',name:'สุวิช โกสุมา',nick:'เบ็นซ์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'ช่างเทคนิคไฟฟ้าควบคุม',color:'#1D9E75'},
-  'Kidsana_b':{pass:'111111',empId:'11231',name:'กฤษณะ บรรทุจันทร์',nick:'แฟ้ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'ช่างเทคนิคไฟฟ้าควบคุม',color:'#534AB7'},
-  'Piyasak_s':{pass:'111111',empId:'3241',name:'ปิยศักดิ์ สุทธิประภา',nick:'กี้',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'ผู้จัดการแผนกวิศวกรรมสารสนเทศ',color:'#BA7517'},
-  'Chaithanan_n':{pass:'111111',empId:'6722',name:'ชัยธนันท์ เนตรนิธิอนันต์',nick:'ปั๊ป',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'นักพัฒนาซอฟต์แวร์ 2',color:'#A32D2D'},
-  'Minarat_b':{pass:'111111',empId:'10978',name:'มินารัตน์ บุ่งสุด',nick:'นุ๊กเกอร์นะ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'วิศวกรสารสนเทศ 1',color:'#0F6E52'},
-  'Perapat_s':{pass:'111111',empId:'10977',name:'พีรพัฒน์ สุขกวี',nick:'คิว',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'ช่างสารสนเทศ',color:'#0C447C'},
-  'Sakkapak_w':{pass:'111111',empId:'3437',name:'สักกภัค วิชินโรจน์จรัล',nick:'วิน',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'',pos:'ผู้จัดการฝ่ายวิศวกรรมอุตสาหการ',color:'#854F0B'},
-  'Anchalee_y':{pass:'111111',empId:'879',name:'อัญชลี ยิ้มดี',nick:'อัญ',role:'ผู้บริหารระดับกลาง',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกกลยุทธ์บริหารความสัมพันธ์ลูกค้า',pos:'ผู้เชี่ยวชาญการส่งเสริมคุณภาพงาน',color:'#711B13'},
-  'Ronnaranok_a':{pass:'111111',empId:'7836',name:'รณรณก อัครพงศธร',nick:'ปาล์มมี่',role:'ผู้บริหารระดับกลาง',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกบริหารการเปลี่ยนแปลง',pos:'ผู้จัดการแผนกบริหารการเปลี่ยนแปลง',color:'#3B6D11'},
-  'Lukkanawal_p':{pass:'111111',empId:'13075',name:'ลักขนาวัลย์ ประดับแก้ว',nick:'แอล',role:'ปฏิบัติการ',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกบริหารการเปลี่ยนแปลง',pos:'วิศวกรการผลิต',color:'#1909A0'},
-  'Thanakorn_m':{pass:'111111',empId:'3803',name:'ธนกร มหธราดล',nick:'เฟิร์น',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกส่งเสริมคุณภาพงาน',pos:'ผู้จัดการแผนกวิศวกรรมการผลิต',color:'#7C3AED'},
-  'Ratchaprat_t':{pass:'111111',empId:'5978',name:'รัชปรัชญ์ ธิมา',nick:'กั๊ก',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกส่งเสริมคุณภาพงาน',pos:'วิศวกรการผลิต 1',color:'#0891B2'},
-  'Kristsada_s':{pass:'111111',empId:'6225',name:'กฤษฎา สงวนวงศ์',nick:'โต้ด',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกส่งเสริมคุณภาพงาน',pos:'วิศวกรการผลิต 2',color:'#BE185D'},
-  'Phromporn_n':{pass:'111111',empId:'12004',name:'พรหมพร นาคบรรพตกุล',nick:'โบว์ลิ่ง',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกส่งเสริมคุณภาพงาน',pos:'วิศวกรส่งเสริมคุณภาพงาน 1',color:'#065F46'},
-  'Nipon_n':{pass:'111111',empId:'3285',name:'นิพนธ์ กิจนลินโรจน์',nick:'โน้ต',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกวิศวกรรมการผลิต',pos:'ผู้จัดการแผนกมาตรฐานวิศวกรรมและการผลิต',color:'#92400E'},
-  'Noppadon_s':{pass:'111111',empId:'5643',name:'นายนพดล สุขสุลาภ',nick:'แบงค์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกวิศวกรรมการผลิต',pos:'วิศวกรมาตรฐานวิศกรรมและการผลิต 2',color:'#1E3A8A'},
-  'Nitchaphat_v':{pass:'111111',empId:'6905',name:'ณิชชา วงษ์บัณฑิตย์',nick:'ปุ๊บ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกวิศวกรรมการผลิต',pos:'วิศวกรมาตรฐานวิศกรรมและการผลิต 2',color:'#166534'},
-  'Ratchaprap_m':{pass:'111111',empId:'12005',name:'รัชชประภา มูสิกอินทร์',nick:'ใหม่',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกวิศวกรรมการผลิต',pos:'วิศวกรการผลิต',color:'#78350F'},
-  'Sunthorn_y':{pass:'111111',empId:'216',name:'สุนทร อยู่ประเทศ',nick:'สุน',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'',pos:'ผู้ช่วยผู้อำนวยการกลุ่มวิศวกรรมกลาง',color:'#831843'},
-  'Jarukit_j':{pass:'111111',empId:'221',name:'จารุกิตติ์ ใจมั่น',nick:'หมาย',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'',pos:'ผู้เชี่ยวาญงานซ่อมบรรจุ',color:'#185FA5'},
-  'Saran_c':{pass:'111111',empId:'3657',name:'ศรัณย์ โชติภาภรณ์',nick:'มิว',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกออกแบบเครื่องจักรการผลิต',pos:'ผู้จัดการแผนกออกแบบเครื่องจักรการผลิต',color:'#1D9E75'},
-  'Thaninpisi_c':{pass:'111111',empId:'7852',name:'ธนินพิสิษฐ์ จันทร์โสภา',nick:'รอน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกออกแบบเครื่องจักรการผลิต',pos:'วิศวกรการบรรจุ 1',color:'#534AB7'},
-  'Patipan_h':{pass:'111111',empId:'10753',name:'ปฏิภาณ หริรักษ์',nick:'ออโต้',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกบริการเครื่องจักรการผลิต',pos:'ช่างซ่อมบรรจุ',color:'#BA7517'},
-  'Parichat_l':{pass:'111111',empId:'433',name:'ปาริชาติ ลิ้มไพบูลย์',nick:'ปลา',role:'ผู้บริหารระดับสูง',div:'ฝ่ายบริหารทรัพยากร',dept:'',pos:'ผู้จัดการฝ่ายบริหารทรัพยากรน้ำและสิ่งแวดล้อม',color:'#A32D2D'},
-  'Sarun_v':{pass:'111111',empId:'6265',name:'ศรัณย์ วณิชยาลัย',nick:'ตัน',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',pos:'ผู้จัดการแผนกอนุรักษ์ทรัพยากรน้ำ',color:'#0F6E52',appRole:'SUPER_ADMIN'},
-  'Jarukan_t':{pass:'111111',empId:'13132',name:'จารุกานต์ เตมียกุล',nick:'เนย',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',pos:'วิศวกรอนุรักษ์ทรัพยากรน้ำ',color:'#0C447C',appRole:'ADMIN'},
-  'Muttikhan_t':{pass:'111111',empId:'6696',name:'มัตติกานต์ ธโนปจัย',nick:'เมียม',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำดี',pos:'ผู้จัดการแผนกบำบัดน้ำดี',color:'#854F0B'},
-  'Patchar_d':{pass:'111111',empId:'11728',name:'พัดชา ดิลกวัฒนวัฒน์',nick:'หยก',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำดี',pos:'วิศวกรบำบัดน้ำดี',color:'#711B13'},
-  'Supachoke_m':{pass:'111111',empId:'4769',name:'ศุภโชค มัญจาวงษ์',nick:'อั้น',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำทิ้ง',pos:'ผู้จัดการแผนกบำบัดน้ำทิ้ง',color:'#3B6D11'},
-  'Banhan_n':{pass:'111111',empId:'6264',name:'บรรหาร นันทะโคตร',nick:'บิ๊ก',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำทิ้ง',pos:'วิศวกรบำบัดน้ำทิ้ง 1',color:'#1909A0'},
-  'Jagapong_f':{pass:'111111',empId:'10935',name:'จักรพงศ์ ฟูปลื้ม',nick:'ปอ',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำทิ้ง',pos:'วิศวกรบำบัดน้ำทิ้ง',color:'#7C3AED'},
-  'Thanaphon_p':{pass:'111111',empId:'13131',name:'ธนภรณ์ พูลสวัสดิ์',nick:'กี้',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำทิ้ง',pos:'วิศวกรบำบัดน้ำทิ้ง',color:'#0891B2'},
-  'Teerapong_p':{pass:'111111',empId:'6721',name:'ธีรพงศ์ พลนำ',nick:'ตอง',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกสิ่งแวดล้อม',pos:'วิศวกรสิ่งแวดล้อม 1',color:'#BE185D'},
-  'Sarut_p':{pass:'111111',empId:'3805',name:'ศรุต ประพัฒน์พงษ์',nick:'นิกซ์',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกสิ่งแวดล้อม',pos:'นักวิทยาศาสตร์สิ่งแวดล้อม 1',color:'#065F46'},
-  'Ratipan_k':{pass:'111111',empId:'1909',name:'รติพันธุ์ คิ้วเที่ยง',nick:'แวว',role:'ผู้บริหารระดับสูง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'',pos:'ผู้จัดการฝ่ายระบบบริหารและประกันคุณภาพ',color:'#92400E'},
-  'Sukanya_m':{pass:'111111',empId:'5518',name:'สุกันยา หมื่นตื้อ',nick:'ไก่',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'',pos:'ผู้จัดการแผนกประจำฝ่ายระบบบริหารและประกันคุณภาพ',color:'#1E3A8A'},
-  'Worakij_k':{pass:'111111',empId:'6307',name:'วรกิจ กีรติศักดิ์',nick:'แป๊ะ',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบบริหารคุณภาพ',pos:'ผู้จัดการแผนกระบบบริหารคุณภาพ',color:'#166534'},
-  'Ornpreeya_t':{pass:'111111',empId:'11797',name:'อรปรียา ทิพย์รักษ์',nick:'แอน',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบบริหารคุณภาพ',pos:'เจ้าหน้าที่ระบบคุณภาพ - เทคนิค 1',color:'#78350F'},
-  'Peeraporn_p':{pass:'111111',empId:'3695',name:'พีระพร พีระณรงค์',nick:'อิ้งค์',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบมาตรฐานคุณภาพ',pos:'ผู้จัดการแผนกระบบมาตรฐานคุณภาพ',color:'#831843'},
-  'Nawarat_o':{pass:'111111',empId:'2379',name:'นวรัตน์ อ้อนทอง',nick:'บุ๋ม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบมาตรฐานคุณภาพ',pos:'พนักงานธุรการ',color:'#185FA5'},
-  'Khwanruan_b':{pass:'111111',empId:'10885',name:'ขวัญเรือน บุญคำ',nick:'ก้อย',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'ผู้จัดการแผนกระบบปรับปรุงคุณภาพ',color:'#1D9E75'},
-  'Nattida_r':{pass:'111111',empId:'11770',name:'นัฐธิดา รัฐจักร',nick:'แพท',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'นักวิทยาศาสตร์ระบบประกันคุณภาพ 1',color:'#534AB7'},
-  'Pawinee_i':{pass:'111111',empId:'13239',name:'ภาวินี อินแฝง',nick:'หญิง',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'นักวิทยาศาสตร์ประกันคุณภาพ 1',color:'#BA7517'},
-  'Piyada_k':{pass:'111111',empId:'12513',name:'ปิยะดา เข็มทอง',nick:'แต้ว',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบประกันคุณภาพ',pos:'ผู้จัดการแผนกระบบประกันคุณภาพ',color:'#A32D2D'},
-  'Thatchatha_c':{pass:'111111',empId:'4314',name:'ธัชธรรม์ โชตินันต์สกุล',nick:'แขก',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'',pos:'วิศวกรเครื่องกล 2',color:'#0F6E52'},
-  'Banpot_p':{pass:'111111',empId:'7589',name:'บรรพต พิมพ์สุวรรณ์',nick:'บัน',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'รักษาการผู้จัดการแผนกวิจัยและพัฒนาทางวิศวกรรม',color:'#0C447C'},
-  'Wasucha_s':{pass:'111111',empId:'6830',name:'วสุชา สุดเจริญ',nick:'อ๋อง',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'วิศวกรวิจัยและพัฒนาทางวิศวกรรม 1',color:'#854F0B'},
-  'Sukanya_m2':{pass:'111111',empId:'7986',name:'สุกัญญา มีปิ่น',nick:'สุ',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'ช่างวิจัยและพัฒนาทางวิศวกรรม',color:'#711B13'},
-  'Permsub_s':{pass:'111111',empId:'7062',name:'เพิ่มทรัพย์ สุขแสงจันทร์',nick:'เอก',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกพัฒนานวัตกรรมและเทคโนโลยี',pos:'ผู้จัดการแผนกนวัตกรรมและโมเดิร์นไนซ์',color:'#3B6D11'},
-  'Nawaphat_r':{pass:'111111',empId:'7632',name:'ณวภัทร ระพิพันธุ์',nick:'ไอซ์',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกพัฒนานวัตกรรมและเทคโนโลยี',pos:'วิศวกรนวัตกรรมและโมเดิร์นไนซ์ 1',color:'#1909A0'},
-  'Suwanit_n':{pass:'111111',empId:'11592',name:'สุวนิต เนตร์นันท์',nick:'ติ๊ก',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกพัฒนานวัตกรรมและเทคโนโลยี',pos:'ช่างไฟฟ้า',color:'#7C3AED'},
-  'Nantana_s':{pass:'111111',empId:'10748',name:'นันทนา สุขเจริญ',nick:'เบล',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนา บรรจุภัณฑ์',pos:'ผู้จัดการแผนกวิจัยและพัฒนาบรรจุภัณฑ์',color:'#0891B2'},
-  'Suparinee_k':{pass:'111111',empId:'7387',name:'สุภารินี การีสรรพ์',nick:'กอล์ฟ',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนา บรรจุภัณฑ์',pos:'นักวิทยาศาสตร์บรรจุภัณฑ์ 1',color:'#BE185D'},
-  'Punyapha_j':{pass:'111111',empId:'10392',name:'ปุณยภา จำปาดิษฐ์',nick:'มายด์',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนา บรรจุภัณฑ์',pos:'นักวิทยาศาสตร์บรรจุภัณฑ์',color:'#065F46'},
-  'Nathamon_p':{pass:'111111',empId:'10396',name:'ณฐมน พรหมดวงดี',nick:'ชล',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนา บรรจุภัณฑ์',pos:'นักวิทยาศาสตร์บรรจุภัณฑ์ 1',color:'#92400E'},
-  'Chinnapat_d':{pass:'111111',empId:'6259',name:'ชิณท์ณภัทร ดียิ่ง',nick:'ตู่',role:'ผู้บริหารระดับกลาง',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'ผู้เชี่ยวชาญด้านความมั่นคง',color:'#1E3A8A'},
-  'Nuttaphat_p':{pass:'111111',empId:'5003',name:'ณัฏฐพัฒน์ บุณยรัตพันธุ์',nick:'ก้อง',role:'ปฏิบัติการ',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'เจ้าหน้าที่ความปลอดภัยในการทำงานระดับวิชาชีพ',color:'#166534'},
-  'Phattharap_k':{pass:'111111',empId:'11061',name:'ภัทราภา กาสอน',nick:'คีย์',role:'ปฏิบัติการ',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'เจ้าหน้าที่ความปลอดภัยในการทำงานระดับวิชาชีพ',color:'#78350F'},
-  'Panomkorn_t':{pass:'111111',empId:'5208',name:'พนมกร ธัญญเจริญ',nick:'เสริม',role:'ปฏิบัติการ',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'เจ้าหน้าที่ความปลอดภัยในการทำงานระดับวิชาชีพ',color:'#831843'},
-  'Sitthita_n':{pass:'111111',empId:'7063',name:'สิทธิตา นางสันเทียะ',nick:'การ์ตูน',role:'ผู้บริหารระดับกลาง',div:'',dept:'หน่วยธุรการเทคนิคกลาง',pos:'หัวหน้าหน่วยธุรการเทคนิคกลาง',color:'#185FA5'},
-  'Mayrin_s':{pass:'111111',empId:'13069',name:'เมริน สุยะไชย',nick:'เมย์',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการเทคนิคกลาง',pos:'เจ้าหน้าที่ธุรการเทคนิคกลาง',color:'#1D9E75'},
-  'Warinthorn_v':{pass:'111111',empId:'13076',name:'วรินทร วณิชยาลัย',nick:'เนปจูน',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการเทคนิคกลาง',pos:'เจ้าหน้าที่ธุรการเทคนิคกลาง',color:'#534AB7'},
-  'Nawapon_y':{pass:'111111',empId:'7676',name:'นวพล อยู่เย็น',nick:'ซิล',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการเทคนิคกลาง',pos:'พนักงานธุรการเทคนิคกลาง',color:'#BA7517'},
-  'Somjai_m':{pass:'111111',empId:'4013',name:'สมใจ มะกง',nick:'หงษ์',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'ผู้จัดการส่วนวิศวกรรมโยธา',color:'#A32D2D'},
-  'Videt_k':{pass:'111111',empId:'353',name:'วิเด็จ แก้วใส',nick:'เดช',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'วิศวกรโยธา 2',color:'#0F6E52'},
-  'Kimhan_k':{pass:'111111',empId:'7091',name:'คิมหันต์ กุลวัตร',nick:'เบส',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'วิศวกรโยธา 2',color:'#0C447C'},
-  'Chitsupa_m':{pass:'111111',empId:'7754',name:'จิตสุภา มีศิริ',nick:'หมิว',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'วิศวกรโยธา',color:'#854F0B'},
-  'Pana_p':{pass:'111111',empId:'2000',name:'พนา ไพฑูรย์',nick:'เสริฐ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'ผู้ช่วยสถาปนิก',color:'#711B13'},
-  'Nissara_r':{pass:'111111',empId:'3142',name:'นิสรา เจตนาพาณิชย์กุล',nick:'แอน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'มัณฑนากร',color:'#3B6D11'},
-  'Payung':{pass:'111111',empId:'693',name:'พยุง พรรณธรรม',nick:'เเป๊ะ',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'หัวหน้างานศิลป์',color:'#1909A0'},
-  'Apichart_h':{pass:'111111',empId:'349',name:'อภิชาติ เหมะมูล',nick:'ชาติ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'ช่างศิลป์และกราฟฟิคดีไซน์',color:'#7C3AED'},
-  'Gumthorn':{pass:'111111',empId:'251',name:'กำธร อินทร์สุข',nick:'หนู',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'แผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',pos:'ผู้จัดการแผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',color:'#0891B2'},
-  'Somkaun_r':{pass:'111111',empId:'2001',name:'สมควร รื่นนิมิตร',nick:'เป็ด',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'แผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',pos:'เจ้าหน้าที่ธุรการวิศวกรรมโยธาและการออกแบบ',color:'#BE185D'},
-  'Kanokvalai_j':{pass:'111111',empId:'1857',name:'กนกวลัย จันทรธรรม',nick:'แอน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'แผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',pos:'พนักงานธุรการวิศวกรรมโยธาและการออกแบบ',color:'#065F46'},
-  'Nantawan_k':{pass:'111111',empId:'13650',name:'นันทวัน ขำศิริ',nick:'อ้อม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'วิศวกรระบบปรับปรุงคุณภาพ 1',color:'#92400E'},
-  'Apiradee_p':{pass:'111111',empId:'13900',name:'อภิรดี พ่วงฉ่ำ',nick:'อ๋อม',role:'ปฏิบัติการ',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'เจ้าหน้าที่ความปลอดภัยในการทำงานระดับวิชาชีพ',color:'#1E3A8A'},
-  'Kanokwan_j':{pass:'111111',empId:'13644',name:'กนกวรรณ จรโคกกรวด',nick:'ฟิล์ม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบมาตรฐานคุณภาพ',pos:'วิศวกรระบบมาตรฐานคุณภาพ 1',color:'#166534'},
-  'Nattakit_k':{pass:'111111',empId:'13648',name:'ณัฏฐกิตต์ กองเก่งกิจ',nick:'ฮาร์ท',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรไฟฟ้า 1',color:'#78350F'},
-  'Sirawit_j':{pass:'111111',empId:'13651',name:'ศิรวิทย์ เจริญศิริ',nick:'L',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 1',color:'#831843'},
-  'Apitchaya_s':{pass:'111111',empId:'14031',name:'อภิชญา โสภาจารีย์',nick:'พลอย',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำดี',pos:'วิศวกรบำบัดน้ำดี',color:'#185FA5'},
-  'Thanachit_o':{pass:'111111',empId:'13391',name:'ธนชิต อ่อนน้อย',nick:'ฟิล์ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'ช่างเขียนแบบ',color:'#1D9E75'},
-  'Piyarach_k':{pass:'111111',empId:'13446',name:'ปิยราช เกรียงไกร',nick:'แก่น',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ 1',color:'#534AB7'},
-  'Natanan_c':{pass:'111111',empId:'13647',name:'ณฐนันท์ ชัยนันท์',nick:'แฟลช',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'นักวิทยาศาสตร์ประกันคุณภาพ 1',color:'#BA7517'},
-  'Bootsarapo_c':{pass:'111111',empId:'13580',name:'บุษราพร ไชยพันธ์',nick:'หนุงหนิง',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกสิ่งแวดล้อม',pos:'นักวิทยาศาสตร์เกษตรกรรม',color:'#A32D2D'},
-  'Phumipat_p':{pass:'111111',empId:'13978',name:'ภูมิพัฒน์ พินธิตรารติบดี',nick:'ก้อง',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',pos:'วิศวกรเครื่องกล-ต้นกำลัง',color:'#0F6E52'},
-  'Primprita_k':{pass:'111111',empId:'13566',name:'พริมพริตาน์ แก้วกุลบัณฑิต',nick:'เอิร์น',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'เจ้าหน้าที่เขียนแบบ',color:'#0C447C'},
-  'Anuchit_n':{pass:'111111',empId:'14359',name:'อนุชิต โนนทิง',nick:'บอย',role:'ผู้บริหารระดับสูง',div:'ส่วนความมั่นคง ปลอดภัย',dept:'',pos:'ผู้จัดการส่วนความมั่นคงปลอดภัยโรงงาน',color:'#854F0B'},
-  'Janejira_n':{pass:'111111',empId:'14442',name:'เจนจิรา หนูตีด',nick:'เจน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'',pos:'วิศวกรอาหาร 1',color:'#711B13'},
-  'Subkerd.sah':{pass:'111111',empId:'14547',name:'สหรัฐ ทรัพย์เกิด',nick:'นับหนึ่ง',role:'ปฏิบัติการ',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกบริหารการเปลี่ยนแปลง',pos:'นักบริหารการเปลี่ยนแปลง',color:'#3B6D11'},
-  'Tanapat_t':{pass:'111111',empId:'14549',name:'ธนภัทร ธัญลักษณ์ชัยกุล',nick:'ภัทร',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ 1',color:'#1909A0'},
-  'Ekasit_p':{pass:'111111',empId:'14977',name:'เอกศิษฎิ์ พันธ์ธนนันท์',nick:'ไนท์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกออกแบบเครื่องจักรการผลิต',pos:'วิศวกรการบรรจุ 1',color:'#7C3AED'},
-  'Korapat_a':{pass:'111111',empId:'15203',name:'กรภัทร อาราม',nick:'ฮาร์ท',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกบริการเครื่องจักรการผลิต',pos:'วิศวกรการบรรจุ',color:'#0891B2'},
-  'Wutthikorn_c':{pass:'111111',empId:'15345',name:'วุฒิกร ชัยนุรักษ์',nick:'รักษ์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 1',color:'#BE185D'},
-  'Papitchaya_d':{pass:'111111',empId:'15346',name:'ปพิชญา ดีอินทร์',nick:'ฟรอยด์',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกพัฒนานวัตกรรมและเทคโนโลยี',pos:'นักนวัตกรรม',color:'#065F46'},
-  'Patipat_l':{pass:'111111',empId:'15672',name:'ปฏิพัทธ์ ลี้ตระกูลศิลป',nick:'แฮม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรรมไฟฟ้า',color:'#92400E'},
-  'Varisa_t':{pass:'111111',empId:'15735',name:'วริษา ธรรมสาร',nick:'ใบเตย',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'เจ้าหน้าที่ธุรการกลุ่มวิศวกรรมกลาง',color:'#1E3A8A'},
-  'Chayanee_n':{pass:'111111',empId:'15873',name:'ชญานี นาคเจริญ',nick:'แอ๋ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรรมไฟฟ้า',color:'#166534'},
-  'Parnuwich_t':{pass:'111111',empId:'15625',name:'ภาณุวิชญ์ ตันติมา',nick:'มาร์ค',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'วิศวกรโยธา',color:'#78350F'},
-  'Tanyapat_j':{pass:'111111',empId:'16107',name:'ธันยาภัทร์ จิระทิพย์สกุล',nick:'เบญ',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'วิศวกรอิเล็กทรอนิกส์',color:'#831843'},
-  'Natphatsor_k':{pass:'111111',empId:'16112',name:'ณัฐภัสสร คมพิพัฒน์พงศ์',nick:'แบม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบมาตรฐานคุณภาพ',pos:'นักวิทยาศาสตร์ระบบมาตรฐานคุณภาพ',color:'#185FA5'},
-  'Supreeya_k':{pass:'111111',empId:'16122',name:'สุปรียา ก๊กเฮง',nick:'ดรีม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'วิศวกรสารสนเทศ 1',color:'#1D9E75'},
-  'Akenat_l':{pass:'111111',empId:'16515',name:'เอกณัฐ เหล่ากิจพาณิชย์',nick:'ซัน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 1',color:'#534AB7'},
-  'Nissara_r2':{pass:'111111',empId:'13691',name:'กิตติธัช เอมใจ',nick:'แบงค์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'มัณฑนากร',color:'#BA7517'},
-  'Plubplueng_b':{pass:'111111',empId:'2822',name:'พลับพลึง บุตรโคตร',nick:'จ๊ะเอ๋',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบบริหารคุณภาพ',pos:'เจ้าหน้าที่ระบบคุณภาพ - เทคนิค 1',color:'#A32D2D'},
-  'Sirintra_j':{pass:'111111',empId:'16430',name:'สิรินทรา จันทชีวกุล',nick:'เพชร',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'แผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',pos:'Graphic and Design Officer',color:'#0F6E52'},
-  'Pariyapat_d':{pass:'111111',empId:'16599',name:'ปริยาภัทร ดวงคำสวัสดิ์',nick:'มิลลิ',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',pos:'วิศวกรอนุรักษ์ทรัพยากรน้ำ',color:'#0C447C'},
-  'Jutamas_w':{pass:'111111',empId:'16581',name:'จุฑามาส วัฒนศิริ',nick:'น้ำส้ม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบประกันคุณภาพ',pos:'นักวิทยาศาสตร์ประกันคุณภาพ',color:'#854F0B'},
-  'Boonrod_k':{pass:'111111',empId:'16595',name:'บุญรอด กองศิลป์',nick:'เอม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบบริหารคุณภาพ',pos:'Quality Management System Officer - General',color:'#711B13'},
-  'Pafan_p':{pass:'111111',empId:'16666',name:'พาฝัน ภู่พูลเพียร',nick:'มิ้นท์',role:'ปฏิบัติการ',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกบริหารการเปลี่ยนแปลง',pos:'Change Management Officer',color:'#3B6D11'},
-  'Natchaya_f':{pass:'111111',empId:'16743',name:'ณัฐชยา แฝงเมืองคุก',nick:'ปริ่ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'วิศวกรระบบดิจิทัล1',color:'#1909A0'},
-  'Sirada_c':{pass:'111111',empId:'13565',name:'ศิรดา ไชยสิทธิ์',nick:'น้ำขิง',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'เจ้าหน้าที่เทคโนโลยีการก่อสร้าง',color:'#7C3AED'},
-  'Chalit_n':{pass:'111111',empId:'14716',name:'ชลิต เนียมแก้ว',nick:'มิน',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิศวกรรมพัฒนาธุรกิจและเทคโนโลยี',pos:'พนักงานจัดแสดงสินค้า',color:'#0891B2'},
-  'Admin':{pass:'111111',isAdmin:true,name:'ผู้ดูแลระบบ',nick:'Admin',role:'System Admin',color:'#0D1B2A'}
+/* ══════════════════════════════════════════════════════════════════
+   EMPLOYEE DATA — loaded dynamically from Google Sheets via Apps Script
+   The hardcoded USERS / ALL_EMP arrays have been removed to keep the
+   HTML file small. On boot, loadEmployeeData() fetches them from the
+   Apps Script Web App URL set in APPS_SCRIPT_URL below.
+   ══════════════════════════════════════════════════════════════════ */
+
+/* ▶ SET THIS to your deployed Apps Script Web App URL after deploying */
+var APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx--Clni1L8Y0KTtBkpIGsdb4hsCF97RXyOp9nKBfHpLEOKigUIo4nco6dRyNXbiMJr/exec';
+
+var USERS = {};    /* populated by loadEmployeeData() at boot          */
+var ALL_EMP = [];  /* populated by loadEmployeeData() at boot          */
+var _empDataLoaded = false;
+var _empDataLoading = false;
+var _empDataCallbacks = [];
+
+/* Default RBAC roles — overridden by Sheet data or RUNTIME_ROLES */
+var RBAC_DEFAULTS = {
+  'Sarun_v':  'SUPER_ADMIN',
+  'Jarukan_t':'ADMIN'
 };
-var ALL_EMP=[
-  {empId:'212',name:'ธีรวัฒน์ บัวทอง',nick:'นัท',role:'ผู้บริหารระดับสูง',div:'',dept:'',pos:'AEVP',group:'CTEG',color:'#185FA5'},
-  {empId:'3221',name:'นิภาพร ดวงราช',nick:'พร',role:'ปฏิบัติการ',div:'',dept:'',pos:'เลขานุการ',group:'CTEG',color:'#1D9E75'},
-  {empId:'1856',name:'ปวีณา กออมรรัตนเลิศ',nick:'ปู',role:'ปฏิบัติการ',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกกลยุทธ์บริหารความสัมพันธ์ลูกค้า',pos:'เจ้าหน้าที่กลยุทธ์บริหารความสัมพันธ์ลูกค้า',group:'CMT',color:'#534AB7'},
-  {empId:'3444',name:'ธนิตา ขุนจินดา',nick:'ยิ้ม',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการวิศวกรรมกลาง',pos:'เจ้าหน้าที่ธุรการกลุ่มวิศวกรรมกลาง',group:'CTEG',color:'#BA7517'},
-  {empId:'2885',name:'ปวริศา เจริญผล',nick:'โอ๋',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการวิศวกรรมกลาง',pos:'เจ้าหน้าที่ธุรการกลุ่มวิศวกรรมกลาง',group:'CTEG',color:'#A32D2D'},
-  {empId:'4412',name:'สุรศักดิ์ สระทองคำ',nick:'เอ็ม',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการวิศวกรรมกลาง',pos:'พนักงานขับรถ',group:'CTEG',color:'#0F6E52'},
-  {empId:'4349',name:'วรรณกร กล่อมจิต',nick:'แจ๊ส',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'',pos:'ผู้จัดการส่วนวิศวกรรมอาหาร',group:'BTDE',color:'#0C447C'},
-  {empId:'5520',name:'ปรัชญา จันทร์แก้ว',nick:'วิน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 2',group:'BTDE',color:'#854F0B'},
-  {empId:'6862',name:'ณัฐภัทร ภัทรเวสสกุล',nick:'คิม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 2',group:'BTDE',color:'#711B13'},
-  {empId:'5901',name:'เศรษฐชัย รัตนบุตร',nick:'โอเยะ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 1',group:'BTDE',color:'#3B6D11'},
-  {empId:'7039',name:'ธนากรณ์ จันทร์แย้ม',nick:'เอ็ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรบริการพิเศษทางวิศวกรรมร 1',group:'BTDE',color:'#1909A0'},
-  {empId:'7631',name:'สุประดิษฐ์ สุขสุแดน',nick:'ปอ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 1',group:'BTDE',color:'#7C3AED'},
-  {empId:'7675',name:'วาสินี พรหมขุนทอง',nick:'ฟิล์ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรพัฒนาธุรกิจและเทคโนโลยี 1',group:'BTDE',color:'#0891B2'},
-  {empId:'7851',name:'กาญจน์ ธรรมครูปัทม์',nick:'ป่าน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรบริการพิเศษทางวิศวกรรมร 1',group:'BTDE',color:'#BE185D'},
-  {empId:'13036',name:'สืบ ประจันตะเสน',nick:'โอ๊ค',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'วิศวกรบริการพิเศษทางวิศวกรรมร 1',group:'BTDE',color:'#065F46'},
-  {empId:'7177',name:'มานพ มณฑา',nick:'ดาว',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'ช่างเทคนิค',group:'BTDE',color:'#92400E'},
-  {empId:'6594',name:'วีรพงษ์ พรมแจ้',nick:'ไกร',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'ช่างเทคนิค',group:'BTDE',color:'#1E3A8A'},
-  {empId:'5560',name:'มงคล อ่วมนนท์',nick:'นุ๊ก',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกวิศวกรรมพัฒนาธุรกิจและเทคโนโลยี',pos:'ผู้เชี่ยวชาญงานบริการพิเศษทางวิศวกรรม',group:'BTDE',color:'#166534'},
-  {empId:'13218',name:'วรพล หนูเอียด',nick:'เจมส์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกวิศวกรรมพัฒนาธุรกิจและเทคโนโลยี',pos:'วิศวกรอาหาร 1',group:'BTDE',color:'#78350F'},
-  {empId:'11266',name:'เบญจ์เยี่ยม คำอุปละ',nick:'เยี่ยม',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'',pos:'ผู้จัดการฝ่ายวิศวกรรมเครื่องกล',group:'CTEG',color:'#831843'},
-  {empId:'12488',name:'คณาธิป ชื่นประภานุสรณ์',nick:'ดิว',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'วิศวกรเครื่องกล',group:'CTEG',color:'#185FA5'},
-  {empId:'7081',name:'เฉลิม นาคำ',nick:'ต้น',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'ผู้จัดการแผนกวิศวกรรมเครื่องกล - ออกแบบและบริการ',group:'CTEG',color:'#1D9E75'},
-  {empId:'6773',name:'ลดาวัลย์ พลมั่น',nick:'แป้ง',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'วิศวกรเครื่องกล-ออกแบบและบริการ 1',group:'CTEG',color:'#534AB7'},
-  {empId:'8010',name:'กฤตภาส ศรีจันทร์',nick:'จั๊ด',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'วิศวกรเครื่องกล-ออกแบบและบริการ 1',group:'CTEG',color:'#BA7517'},
-  {empId:'7863',name:'ยศวีร์ พุทธครู',nick:'ตูน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลทั่วไป',pos:'วิศวกรวิจัยและพัฒนาทางวิศวกรรม 1',group:'CTEG',color:'#A32D2D'},
-  {empId:'4734',name:'พรณรงค์ พีระณรงค์',nick:'ไอซ์',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'ผู้จัดการแผนกประจำฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและและเทคโลยี',group:'BTDE',color:'#0F6E52'},
-  {empId:'7988',name:'สิทธิโชค พูนสถาพร',nick:'เตอร์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',pos:'วิศวกรเครื่องกล-ต้นกำลัง 1',group:'CTEG',color:'#0C447C'},
-  {empId:'12106',name:'ตรีวิทย์ วงษ์ชาลี',nick:'บอล',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',pos:'วิศวกรเครื่องกล-ต้นกำลัง 1',group:'CTEG',color:'#854F0B'},
-  {empId:'13077',name:'สมพงศ์ หนูเสน',nick:'ต้น',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',pos:'วิศวกรเครื่องกล-ต้นกำลัง',group:'CTEG',color:'#711B13'},
-  {empId:'5860',name:'ปิยชัย ใหญ่เสมอ',nick:'แสตมป์',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'ผู้จัดการแผนกวิศวกรรมเครื่องกล - งานระบบ',group:'CTEG',color:'#3B6D11'},
-  {empId:'8039',name:'ระพีพัฒน์ ภวภูตานนท์ ณ มหาสารคาม',nick:'พี',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ 1',group:'CTEG',color:'#1909A0'},
-  {empId:'11941',name:'ชยกร สุรีย์กมลชัย',nick:'อั๊ต',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ',group:'CTEG',color:'#7C3AED'},
-  {empId:'13030',name:'กุลธินี สุทธิหอม',nick:'มายด์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ',group:'CTEG',color:'#0891B2'},
-  {empId:'11288',name:'ธีรธัช ตั้งกาญจนภาสน์',nick:'นิก',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรไฟฟ้า 1',group:'CTEG',color:'#BE185D'},
-  {empId:'11593',name:'ญาณาธร พ่วงสุด',nick:'โบ๊ต',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรไฟฟ้า 1',group:'CTEG',color:'#065F46'},
-  {empId:'3769',name:'สุบิน พรมไชย',nick:'บิน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'ช่างไฟฟ้า',group:'CTEG',color:'#92400E'},
-  {empId:'2864',name:'ศิษฎา ภู่สุวรรณ์',nick:'ป้อง',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'ผู้จัดการแผนกวิศกรรมอิเล็กทรอนิกส์และควบคุม',group:'CTEG',color:'#1E3A8A'},
-  {empId:'6360',name:'ณัฐภัทร์ บุญภัทร์',nick:'อาร์ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 2',group:'CTEG',color:'#166534'},
-  {empId:'6661',name:'อิทธิมนต์ สุวรรณมณี',nick:'บิ๊ก',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกบริการเครื่องจักรการผลิต',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 2',group:'CTEG',color:'#78350F'},
-  {empId:'11768',name:'พิสิษฐ์ ทองใส',nick:'ฟลุก',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม',group:'CTEG',color:'#831843'},
-  {empId:'11769',name:'สมชาย สุดฝ้าย',nick:'ชาย',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม',group:'CTEG',color:'#185FA5'},
-  {empId:'5225',name:'สุวิช โกสุมา',nick:'เบ็นซ์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'ช่างเทคนิคไฟฟ้าควบคุม',group:'CTEG',color:'#1D9E75'},
-  {empId:'11231',name:'กฤษณะ บรรทุจันทร์',nick:'แฟ้ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'ช่างเทคนิคไฟฟ้าควบคุม',group:'CTEG',color:'#534AB7'},
-  {empId:'3241',name:'ปิยศักดิ์ สุทธิประภา',nick:'กี้',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'ผู้จัดการแผนกวิศวกรรมสารสนเทศ',group:'CTEG',color:'#BA7517'},
-  {empId:'6722',name:'ชัยธนันท์ เนตรนิธิอนันต์',nick:'ปั๊ป',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'นักพัฒนาซอฟต์แวร์ 2',group:'CTEG',color:'#A32D2D'},
-  {empId:'10978',name:'มินารัตน์ บุ่งสุด',nick:'นุ๊กเกอร์นะ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'วิศวกรสารสนเทศ 1',group:'CTEG',color:'#0F6E52'},
-  {empId:'10977',name:'พีรพัฒน์ สุขกวี',nick:'คิว',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'ช่างสารสนเทศ',group:'CTEG',color:'#0C447C'},
-  {empId:'3437',name:'สักกภัค วิชินโรจน์จรัล',nick:'วิน',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'',pos:'ผู้จัดการฝ่ายวิศวกรรมอุตสาหการ',group:'CTEG',color:'#854F0B'},
-  {empId:'879',name:'อัญชลี ยิ้มดี',nick:'อัญ',role:'ผู้บริหารระดับกลาง',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกกลยุทธ์บริหารความสัมพันธ์ลูกค้า',pos:'ผู้เชี่ยวชาญการส่งเสริมคุณภาพงาน',group:'CMT',color:'#711B13'},
-  {empId:'7836',name:'รณรณก อัครพงศธร',nick:'ปาล์มมี่',role:'ผู้บริหารระดับกลาง',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกบริหารการเปลี่ยนแปลง',pos:'ผู้จัดการแผนกบริหารการเปลี่ยนแปลง',group:'CMT',color:'#3B6D11'},
-  {empId:'13075',name:'ลักขนาวัลย์ ประดับแก้ว',nick:'แอล',role:'ปฏิบัติการ',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกบริหารการเปลี่ยนแปลง',pos:'วิศวกรการผลิต',group:'CMT',color:'#1909A0'},
-  {empId:'3803',name:'ธนกร มหธราดล',nick:'เฟิร์น',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกส่งเสริมคุณภาพงาน',pos:'ผู้จัดการแผนกวิศวกรรมการผลิต',group:'CTEG',color:'#7C3AED'},
-  {empId:'5978',name:'รัชปรัชญ์ ธิมา',nick:'กั๊ก',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกส่งเสริมคุณภาพงาน',pos:'วิศวกรการผลิต 1',group:'CTEG',color:'#0891B2'},
-  {empId:'6225',name:'กฤษฎา สงวนวงศ์',nick:'โต้ด',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกส่งเสริมคุณภาพงาน',pos:'วิศวกรการผลิต 2',group:'CTEG',color:'#BE185D'},
-  {empId:'12004',name:'พรหมพร นาคบรรพตกุล',nick:'โบว์ลิ่ง',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกส่งเสริมคุณภาพงาน',pos:'วิศวกรส่งเสริมคุณภาพงาน 1',group:'CTEG',color:'#065F46'},
-  {empId:'3285',name:'นิพนธ์ กิจนลินโรจน์',nick:'โน้ต',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกวิศวกรรมการผลิต',pos:'ผู้จัดการแผนกมาตรฐานวิศวกรรมและการผลิต',group:'CTEG',color:'#92400E'},
-  {empId:'5643',name:'นายนพดล สุขสุลาภ',nick:'แบงค์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกวิศวกรรมการผลิต',pos:'วิศวกรมาตรฐานวิศกรรมและการผลิต 2',group:'CTEG',color:'#1E3A8A'},
-  {empId:'6905',name:'ณิชชา วงษ์บัณฑิตย์',nick:'ปุ๊บ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกวิศวกรรมการผลิต',pos:'วิศวกรมาตรฐานวิศกรรมและการผลิต 2',group:'CTEG',color:'#166534'},
-  {empId:'12005',name:'รัชชประภา มูสิกอินทร์',nick:'ใหม่',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมอุตสาหการ',dept:'แผนกวิศวกรรมการผลิต',pos:'วิศวกรการผลิต',group:'CTEG',color:'#78350F'},
-  {empId:'216',name:'สุนทร อยู่ประเทศ',nick:'สุน',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'',pos:'ผู้ช่วยผู้อำนวยการกลุ่มวิศวกรรมกลาง',group:'CTEG',color:'#831843'},
-  {empId:'221',name:'จารุกิตติ์ ใจมั่น',nick:'หมาย',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'',pos:'ผู้เชี่ยวาญงานซ่อมบรรจุ',group:'CTEG',color:'#185FA5'},
-  {empId:'3657',name:'ศรัณย์ โชติภาภรณ์',nick:'มิว',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกออกแบบเครื่องจักรการผลิต',pos:'ผู้จัดการแผนกออกแบบเครื่องจักรการผลิต',group:'CTEG',color:'#1D9E75'},
-  {empId:'7852',name:'ธนินพิสิษฐ์ จันทร์โสภา',nick:'รอน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกออกแบบเครื่องจักรการผลิต',pos:'วิศวกรการบรรจุ 1',group:'CTEG',color:'#534AB7'},
-  {empId:'10753',name:'ปฏิภาณ หริรักษ์',nick:'ออโต้',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกบริการเครื่องจักรการผลิต',pos:'ช่างซ่อมบรรจุ',group:'CTEG',color:'#BA7517'},
-  {empId:'433',name:'ปาริชาติ ลิ้มไพบูลย์',nick:'ปลา',role:'ผู้บริหารระดับสูง',div:'ฝ่ายบริหารทรัพยากร',dept:'',pos:'ผู้จัดการฝ่ายบริหารทรัพยากรน้ำและสิ่งแวดล้อม',group:'CTG',color:'#A32D2D'},
-  {empId:'6265',name:'ศรัณย์ วณิชยาลัย',nick:'ตัน',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',pos:'ผู้จัดการแผนกอนุรักษ์ทรัพยากรน้ำ',group:'CTG',color:'#0F6E52'},
-  {empId:'13132',name:'จารุกานต์ เตมียกุล',nick:'เนย',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',pos:'วิศวกรอนุรักษ์ทรัพยากรน้ำ',group:'CTG',color:'#0C447C'},
-  {empId:'6696',name:'มัตติกานต์ ธโนปจัย',nick:'เมียม',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำดี',pos:'ผู้จัดการแผนกบำบัดน้ำดี',group:'CTG',color:'#854F0B'},
-  {empId:'11728',name:'พัดชา ดิลกวัฒนวัฒน์',nick:'หยก',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำดี',pos:'วิศวกรบำบัดน้ำดี',group:'CTG',color:'#711B13'},
-  {empId:'4769',name:'ศุภโชค มัญจาวงษ์',nick:'อั้น',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำทิ้ง',pos:'ผู้จัดการแผนกบำบัดน้ำทิ้ง',group:'CTG',color:'#3B6D11'},
-  {empId:'6264',name:'บรรหาร นันทะโคตร',nick:'บิ๊ก',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำทิ้ง',pos:'วิศวกรบำบัดน้ำทิ้ง 1',group:'CTG',color:'#1909A0'},
-  {empId:'10935',name:'จักรพงศ์ ฟูปลื้ม',nick:'ปอ',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำทิ้ง',pos:'วิศวกรบำบัดน้ำทิ้ง',group:'CTG',color:'#7C3AED'},
-  {empId:'13131',name:'ธนภรณ์ พูลสวัสดิ์',nick:'กี้',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำทิ้ง',pos:'วิศวกรบำบัดน้ำทิ้ง',group:'CTG',color:'#0891B2'},
-  {empId:'6721',name:'ธีรพงศ์ พลนำ',nick:'ตอง',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกสิ่งแวดล้อม',pos:'วิศวกรสิ่งแวดล้อม 1',group:'CTG',color:'#BE185D'},
-  {empId:'3805',name:'ศรุต ประพัฒน์พงษ์',nick:'นิกซ์',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกสิ่งแวดล้อม',pos:'นักวิทยาศาสตร์สิ่งแวดล้อม 1',group:'CTG',color:'#065F46'},
-  {empId:'1909',name:'รติพันธุ์ คิ้วเที่ยง',nick:'แวว',role:'ผู้บริหารระดับสูง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'',pos:'ผู้จัดการฝ่ายระบบบริหารและประกันคุณภาพ',group:'CTG',color:'#92400E'},
-  {empId:'5518',name:'สุกันยา หมื่นตื้อ',nick:'ไก่',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'',pos:'ผู้จัดการแผนกประจำฝ่ายระบบบริหารและประกันคุณภาพ',group:'CTG',color:'#1E3A8A'},
-  {empId:'6307',name:'วรกิจ กีรติศักดิ์',nick:'แป๊ะ',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบบริหารคุณภาพ',pos:'ผู้จัดการแผนกระบบบริหารคุณภาพ',group:'CTG',color:'#166534'},
-  {empId:'11797',name:'อรปรียา ทิพย์รักษ์',nick:'แอน',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบบริหารคุณภาพ',pos:'เจ้าหน้าที่ระบบคุณภาพ - เทคนิค 1',group:'CTG',color:'#78350F'},
-  {empId:'3695',name:'พีระพร พีระณรงค์',nick:'อิ้งค์',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบมาตรฐานคุณภาพ',pos:'ผู้จัดการแผนกระบบมาตรฐานคุณภาพ',group:'CTG',color:'#831843'},
-  {empId:'2379',name:'นวรัตน์ อ้อนทอง',nick:'บุ๋ม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบมาตรฐานคุณภาพ',pos:'พนักงานธุรการ',group:'CTG',color:'#185FA5'},
-  {empId:'10885',name:'ขวัญเรือน บุญคำ',nick:'ก้อย',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'ผู้จัดการแผนกระบบปรับปรุงคุณภาพ',group:'CTG',color:'#1D9E75'},
-  {empId:'11770',name:'นัฐธิดา รัฐจักร',nick:'แพท',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'นักวิทยาศาสตร์ระบบประกันคุณภาพ 1',group:'CTG',color:'#534AB7'},
-  {empId:'13239',name:'ภาวินี อินแฝง',nick:'หญิง',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'นักวิทยาศาสตร์ประกันคุณภาพ 1',group:'CTG',color:'#BA7517'},
-  {empId:'12513',name:'ปิยะดา เข็มทอง',nick:'แต้ว',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบประกันคุณภาพ',pos:'ผู้จัดการแผนกระบบประกันคุณภาพ',group:'CTG',color:'#A32D2D'},
-  {empId:'4314',name:'ธัชธรรม์ โชตินันต์สกุล',nick:'แขก',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'',pos:'วิศวกรเครื่องกล 2',group:'CTG',color:'#0F6E52'},
-  {empId:'7589',name:'บรรพต พิมพ์สุวรรณ์',nick:'บัน',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'รักษาการผู้จัดการแผนกวิจัยและพัฒนาทางวิศวกรรม',group:'CTG',color:'#0C447C'},
-  {empId:'6830',name:'วสุชา สุดเจริญ',nick:'อ๋อง',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'วิศวกรวิจัยและพัฒนาทางวิศวกรรม 1',group:'CTG',color:'#854F0B'},
-  {empId:'7986',name:'สุกัญญา มีปิ่น',nick:'สุ',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'ช่างวิจัยและพัฒนาทางวิศวกรรม',group:'CTG',color:'#711B13'},
-  {empId:'7062',name:'เพิ่มทรัพย์ สุขแสงจันทร์',nick:'เอก',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกพัฒนานวัตกรรมและเทคโนโลยี',pos:'ผู้จัดการแผนกนวัตกรรมและโมเดิร์นไนซ์',group:'CTG',color:'#3B6D11'},
-  {empId:'7632',name:'ณวภัทร ระพิพันธุ์',nick:'ไอซ์',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกพัฒนานวัตกรรมและเทคโนโลยี',pos:'วิศวกรนวัตกรรมและโมเดิร์นไนซ์ 1',group:'CTG',color:'#1909A0'},
-  {empId:'11592',name:'สุวนิต เนตร์นันท์',nick:'ติ๊ก',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกพัฒนานวัตกรรมและเทคโนโลยี',pos:'ช่างไฟฟ้า',group:'CTG',color:'#7C3AED'},
-  {empId:'10748',name:'นันทนา สุขเจริญ',nick:'เบล',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนา บรรจุภัณฑ์',pos:'ผู้จัดการแผนกวิจัยและพัฒนาบรรจุภัณฑ์',group:'CTG',color:'#0891B2'},
-  {empId:'7387',name:'สุภารินี การีสรรพ์',nick:'กอล์ฟ',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนา บรรจุภัณฑ์',pos:'นักวิทยาศาสตร์บรรจุภัณฑ์ 1',group:'CTG',color:'#BE185D'},
-  {empId:'10392',name:'ปุณยภา จำปาดิษฐ์',nick:'มายด์',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนา บรรจุภัณฑ์',pos:'นักวิทยาศาสตร์บรรจุภัณฑ์',group:'CTG',color:'#065F46'},
-  {empId:'10396',name:'ณฐมน พรหมดวงดี',nick:'ชล',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนา บรรจุภัณฑ์',pos:'นักวิทยาศาสตร์บรรจุภัณฑ์ 1',group:'CTG',color:'#92400E'},
-  {empId:'6259',name:'ชิณท์ณภัทร ดียิ่ง',nick:'ตู่',role:'ผู้บริหารระดับกลาง',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'ผู้เชี่ยวชาญด้านความมั่นคง',group:'CTG',color:'#1E3A8A'},
-  {empId:'5003',name:'ณัฏฐพัฒน์ บุณยรัตพันธุ์',nick:'ก้อง',role:'ปฏิบัติการ',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'เจ้าหน้าที่ความปลอดภัยในการทำงานระดับวิชาชีพ',group:'CTG',color:'#166534'},
-  {empId:'11061',name:'ภัทราภา กาสอน',nick:'คีย์',role:'ปฏิบัติการ',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'เจ้าหน้าที่ความปลอดภัยในการทำงานระดับวิชาชีพ',group:'CTG',color:'#78350F'},
-  {empId:'5208',name:'พนมกร ธัญญเจริญ',nick:'เสริม',role:'ปฏิบัติการ',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'เจ้าหน้าที่ความปลอดภัยในการทำงานระดับวิชาชีพ',group:'CTG',color:'#831843'},
-  {empId:'7063',name:'สิทธิตา นางสันเทียะ',nick:'การ์ตูน',role:'ผู้บริหารระดับกลาง',div:'',dept:'หน่วยธุรการเทคนิคกลาง',pos:'หัวหน้าหน่วยธุรการเทคนิคกลาง',group:'CTG',color:'#185FA5'},
-  {empId:'13069',name:'เมริน สุยะไชย',nick:'เมย์',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการเทคนิคกลาง',pos:'เจ้าหน้าที่ธุรการเทคนิคกลาง',group:'CTG',color:'#1D9E75'},
-  {empId:'13076',name:'วรินทร วณิชยาลัย',nick:'เนปจูน',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการเทคนิคกลาง',pos:'เจ้าหน้าที่ธุรการเทคนิคกลาง',group:'CTG',color:'#534AB7'},
-  {empId:'7676',name:'นวพล อยู่เย็น',nick:'ซิล',role:'ปฏิบัติการ',div:'',dept:'หน่วยธุรการเทคนิคกลาง',pos:'พนักงานธุรการเทคนิคกลาง',group:'CTG',color:'#BA7517'},
-  {empId:'4013',name:'สมใจ มะกง',nick:'หงษ์',role:'ผู้บริหารระดับสูง',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'ผู้จัดการส่วนวิศวกรรมโยธา',group:'CED',color:'#A32D2D'},
-  {empId:'353',name:'วิเด็จ แก้วใส',nick:'เดช',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'วิศวกรโยธา 2',group:'CED',color:'#0F6E52'},
-  {empId:'7091',name:'คิมหันต์ กุลวัตร',nick:'เบส',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'วิศวกรโยธา 2',group:'CED',color:'#0C447C'},
-  {empId:'7754',name:'จิตสุภา มีศิริ',nick:'หมิว',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'วิศวกรโยธา',group:'CED',color:'#854F0B'},
-  {empId:'2000',name:'พนา ไพฑูรย์',nick:'เสริฐ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'ผู้ช่วยสถาปนิก',group:'CED',color:'#711B13'},
-  {empId:'3142',name:'นิสรา เจตนาพาณิชย์กุล',nick:'แอน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'มัณฑนากร',group:'CED',color:'#3B6D11'},
-  {empId:'693',name:'พยุง พรรณธรรม',nick:'เเป๊ะ',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'หัวหน้างานศิลป์',group:'CED',color:'#1909A0'},
-  {empId:'349',name:'อภิชาติ เหมะมูล',nick:'ชาติ',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'ช่างศิลป์และกราฟฟิคดีไซน์',group:'CED',color:'#7C3AED'},
-  {empId:'251',name:'กำธร อินทร์สุข',nick:'หนู',role:'ผู้บริหารระดับกลาง',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'แผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',pos:'ผู้จัดการแผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',group:'CED',color:'#0891B2'},
-  {empId:'2001',name:'สมควร รื่นนิมิตร',nick:'เป็ด',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'แผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',pos:'เจ้าหน้าที่ธุรการวิศวกรรมโยธาและการออกแบบ',group:'CED',color:'#BE185D'},
-  {empId:'1857',name:'กนกวลัย จันทรธรรม',nick:'แอน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'แผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',pos:'พนักงานธุรการวิศวกรรมโยธาและการออกแบบ',group:'CED',color:'#065F46'},
-  {empId:'13650',name:'นันทวัน ขำศิริ',nick:'อ้อม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'วิศวกรระบบปรับปรุงคุณภาพ 1',group:'CTG',color:'#92400E'},
-  {empId:'13900',name:'อภิรดี พ่วงฉ่ำ',nick:'อ๋อม',role:'ปฏิบัติการ',div:'ส่วนความมั่นคง ปลอดภัย',dept:'แผนกบริหารความมั่นคงและปลอดภัย',pos:'เจ้าหน้าที่ความปลอดภัยในการทำงานระดับวิชาชีพ',group:'CTG',color:'#1E3A8A'},
-  {empId:'13644',name:'กนกวรรณ จรโคกกรวด',nick:'ฟิล์ม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบมาตรฐานคุณภาพ',pos:'วิศวกรระบบมาตรฐานคุณภาพ 1',group:'CTG',color:'#166534'},
-  {empId:'13648',name:'ณัฏฐกิตต์ กองเก่งกิจ',nick:'ฮาร์ท',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรไฟฟ้า 1',group:'CTEG',color:'#78350F'},
-  {empId:'13651',name:'ศิรวิทย์ เจริญศิริ',nick:'L',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 1',group:'CTEG',color:'#831843'},
-  {empId:'14031',name:'อภิชญา โสภาจารีย์',nick:'พลอย',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกบำบัดน้ำดี',pos:'วิศวกรบำบัดน้ำดี',group:'CTG',color:'#185FA5'},
-  {empId:'13391',name:'ธนชิต อ่อนน้อย',nick:'ฟิล์ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'ช่างเขียนแบบ',group:'CED',color:'#1D9E75'},
-  {empId:'13446',name:'ปิยราช เกรียงไกร',nick:'แก่น',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ 1',group:'CTEG',color:'#534AB7'},
-  {empId:'13647',name:'ณฐนันท์ ชัยนันท์',nick:'แฟลช',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบปรับปรุงคุณภาพ',pos:'นักวิทยาศาสตร์ประกันคุณภาพ 1',group:'CTG',color:'#BA7517'},
-  {empId:'13580',name:'บุษราพร ไชยพันธ์',nick:'หนุงหนิง',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกสิ่งแวดล้อม',pos:'นักวิทยาศาสตร์เกษตรกรรม',group:'CTG',color:'#A32D2D'},
-  {empId:'13978',name:'ภูมิพัฒน์ พินธิตรารติบดี',nick:'ก้อง',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',pos:'วิศวกรเครื่องกล-ต้นกำลัง',group:'CTEG',color:'#0F6E52'},
-  {empId:'13566',name:'พริมพริตาน์ แก้วกุลบัณฑิต',nick:'เอิร์น',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'แผนกบริการพิเศษทางวิศวกรรม',pos:'เจ้าหน้าที่เขียนแบบ',group:'BTDE',color:'#0C447C'},
-  {empId:'14359',name:'อนุชิต โนนทิง',nick:'บอย',role:'ผู้บริหารระดับสูง',div:'ส่วนความมั่นคง ปลอดภัย',dept:'',pos:'ผู้จัดการส่วนความมั่นคงปลอดภัยโรงงาน',group:'CTG',color:'#854F0B'},
-  {empId:'14442',name:'เจนจิรา หนูตีด',nick:'เจน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',dept:'',pos:'วิศวกรอาหาร 1',group:'BTDE',color:'#711B13'},
-  {empId:'14547',name:'สหรัฐ ทรัพย์เกิด',nick:'นับหนึ่ง',role:'ปฏิบัติการ',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกบริหารการเปลี่ยนแปลง',pos:'นักบริหารการเปลี่ยนแปลง',group:'CMT',color:'#3B6D11'},
-  {empId:'14549',name:'ธนภัทร ธัญลักษณ์ชัยกุล',nick:'ภัทร',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องกล',dept:'แผนกวิศวกรรมเครื่องกลระบบ',pos:'วิศวกรเครื่องกล-งานระบบ 1',group:'CTEG',color:'#1909A0'},
-  {empId:'14977',name:'เอกศิษฎิ์ พันธ์ธนนันท์',nick:'ไนท์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกออกแบบเครื่องจักรการผลิต',pos:'วิศวกรการบรรจุ 1',group:'CTEG',color:'#7C3AED'},
-  {empId:'15203',name:'กรภัทร อาราม',nick:'ฮาร์ท',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',dept:'แผนกบริการเครื่องจักรการผลิต',pos:'วิศวกรการบรรจุ',group:'CTEG',color:'#0891B2'},
-  {empId:'15345',name:'วุฒิกร ชัยนุรักษ์',nick:'รักษ์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 1',group:'CTEG',color:'#BE185D'},
-  {empId:'15346',name:'ปพิชญา ดีอินทร์',nick:'ฟรอยด์',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกพัฒนานวัตกรรมและเทคโนโลยี',pos:'นักนวัตกรรม',group:'CTG',color:'#065F46'},
-  {empId:'15672',name:'ปฏิพัทธ์ ลี้ตระกูลศิลป',nick:'แฮม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรรมไฟฟ้า',group:'CTEG',color:'#92400E'},
-  {empId:'15735',name:'วริษา ธรรมสาร',nick:'ใบเตย',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'เจ้าหน้าที่ธุรการกลุ่มวิศวกรรมกลาง',group:'CTG',color:'#1E3A8A'},
-  {empId:'15873',name:'ชญานี นาคเจริญ',nick:'แอ๋ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมไฟฟ้า',pos:'วิศวกรรมไฟฟ้า',group:'CTEG',color:'#166534'},
-  {empId:'15625',name:'ภาณุวิชญ์ ตันติมา',nick:'มาร์ค',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'วิศวกรโยธา',group:'CED',color:'#78350F'},
-  {empId:'16107',name:'ธันยาภัทร์ จิระทิพย์สกุล',nick:'เบญ',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิจัยและพัฒนาทางวิศวกรรม',pos:'วิศวกรอิเล็กทรอนิกส์',group:'CTG',color:'#831843'},
-  {empId:'16112',name:'ณัฐภัสสร คมพิพัฒน์พงศ์',nick:'แบม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบมาตรฐานคุณภาพ',pos:'นักวิทยาศาสตร์ระบบมาตรฐานคุณภาพ',group:'CTG',color:'#185FA5'},
-  {empId:'16122',name:'สุปรียา ก๊กเฮง',nick:'ดรีม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'วิศวกรสารสนเทศ 1',group:'CTEG',color:'#1D9E75'},
-  {empId:'16515',name:'เอกณัฐ เหล่ากิจพาณิชย์',nick:'ซัน',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบอัตโนมัติ',pos:'วิศวกรอิเล็กทรอนิกส์และควบคุม 1',group:'CTEG',color:'#534AB7'},
-  {empId:'13691',name:'กิตติธัช เอมใจ',nick:'แบงค์',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนออกแบบ',pos:'มัณฑนากร',group:'CED',color:'#BA7517'},
-  {empId:'2822',name:'พลับพลึง บุตรโคตร',nick:'จ๊ะเอ๋',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบบริหารคุณภาพ',pos:'เจ้าหน้าที่ระบบคุณภาพ - เทคนิค 1',group:'CTG',color:'#A32D2D'},
-  {empId:'16430',name:'สิรินทรา จันทชีวกุล',nick:'เพชร',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'แผนกงานธุรการวิศวกรรมโยธาและการออกแบบ',pos:'Graphic and Design Officer',group:'CED',color:'#0F6E52'},
-  {empId:'16599',name:'ปริยาภัทร ดวงคำสวัสดิ์',nick:'มิลลิ',role:'ปฏิบัติการ',div:'ฝ่ายบริหารทรัพยากร',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',pos:'วิศวกรอนุรักษ์ทรัพยากรน้ำ',group:'CTG',color:'#0C447C'},
-  {empId:'16581',name:'จุฑามาส วัฒนศิริ',nick:'น้ำส้ม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบประกันคุณภาพ',pos:'นักวิทยาศาสตร์ประกันคุณภาพ',group:'CTG',color:'#854F0B'},
-  {empId:'16595',name:'บุญรอด กองศิลป์',nick:'เอม',role:'ปฏิบัติการ',div:'ฝ่ายระบบบริหารและประกันคุณภาพ',dept:'แผนกระบบบริหารคุณภาพ',pos:'Quality Management System Officer - General',group:'CTG',color:'#711B13'},
-  {empId:'16666',name:'พาฝัน ภู่พูลเพียร',nick:'มิ้นท์',role:'ปฏิบัติการ',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',dept:'แผนกบริหารการเปลี่ยนแปลง',pos:'Change Management Officer',group:'CMT',color:'#3B6D11'},
-  {empId:'16743',name:'ณัฐชยา แฝงเมืองคุก',nick:'ปริ่ม',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมไฟฟ้าและระบบอัตโนมัติ',dept:'แผนกวิศวกรรมระบบดิจิทัล',pos:'วิศวกรระบบดิจิทัล1',group:'CTEG',color:'#1909A0'},
-  {empId:'13565',name:'ศิรดา ไชยสิทธิ์',nick:'น้ำขิง',role:'ปฏิบัติการ',div:'ฝ่ายวิศวกรรมโยธาและการออกแบบ',dept:'ส่วนวิศวกรรมโยธา',pos:'เจ้าหน้าที่เทคโนโลยีการก่อสร้าง',group:'CED',color:'#7C3AED'},
-  {empId:'14716',name:'ชลิต เนียมแก้ว',nick:'มิน',role:'ปฏิบัติการ',div:'ฝ่ายวิจัยพัฒนา นวัตกรรมและบรรจุภัณฑ์',dept:'แผนกวิศวกรรมพัฒนาธุรกิจและเทคโนโลยี',pos:'พนักงานจัดแสดงสินค้า',group:'CTG',color:'#0891B2'}
-];
+
+function loadEmployeeData(onDone) {
+  if (_empDataLoaded) { if(onDone)onDone(); return; }
+  if (_empDataLoading) { if(onDone)_empDataCallbacks.push(onDone); return; }
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('REPLACE') === 0) {
+    console.error('APPS_SCRIPT_URL not configured'); if(onDone)onDone(); return;
+  }
+  _empDataLoading = true;
+  if(onDone)_empDataCallbacks.push(onDone);
+  fetch(APPS_SCRIPT_URL)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if(!data.ok) throw new Error(data.error || 'Apps Script error');
+      ALL_EMP = data.employees || [];
+      USERS   = data.users   || {};
+      /* Apply any runtime role overrides on top */
+      Object.keys(RBAC_DEFAULTS).forEach(function(u){
+        if(USERS[u] && !USERS[u].appRole) USERS[u].appRole = RBAC_DEFAULTS[u];
+      });
+      _empDataLoaded = true;
+      _empDataLoading = false;
+      _empDataCallbacks.forEach(function(cb){ try{cb();}catch(e){} });
+      _empDataCallbacks = [];
+    })
+    .catch(function(err){
+      _empDataLoading = false;
+      console.error('loadEmployeeData error:', err);
+    });
+}
+
+
+
 
 /* STATE */
 var CU=null,persons=[],selfSc={},othSc={};
@@ -4473,41 +4213,44 @@ if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
 /* LOGIN */
 h('eyb').addEventListener('click',function(){var el=h('lp');el.type=el.type==='password'?'text':'password';});
 function doLogin(){
-  try{
-  var u=h('lu').value.trim();var p=h('lp').value;
-  var ud=USERS[u];
-  if(!ud||ud.pass!==p){h('lerr').style.display='block';h('lerr').textContent='Username หรือ Password ไม่ถูกต้อง';h('lp').value='';return;}
-  /* Check if account is disabled by Super Admin */
-  if(localStorage.getItem('sf_user_disabled_'+u)==='1'){
-    h('lerr').style.display='block';h('lerr').textContent='บัญชีนี้ถูกปิดใช้งาน กรุณาติดต่อผู้ดูแลระบบ';h('lp').value='';return;
+  var u=h('lu').value.trim();
+  var p=h('lp').value;
+  if(!u||!p){return;}
+  /* If employee data not yet loaded, load it first then retry */
+  if(!_empDataLoaded){
+    loadEmployeeData(function(){ doLogin(); });
+    return;
   }
-  h('lerr').style.display='none';
-  /* Load user data but do NOT route yet -- check RBAC role first */
-  var pendingUser=Object.assign({},ud,{username:u});
-  /* Merge runtime role override */
-  var effectiveAppRole=getEffectiveAppRole(u);
-  pendingUser.appRole=effectiveAppRole;
+  if(!u||!p){return;}
+  var ud=USERS[u];
+  if(!ud||ud.pass!==p){
+    var el=h('lerr');
+    if(el){el.style.display='block';el.textContent='Username หรือ Password ไม่ถูกต้อง';}
+    h('lp').value='';
+    return;
+  }
+  var el=h('lerr');if(el)el.style.display='none';
+  CU=Object.assign({},ud,{username:u});
+  /* RBAC: determine effective role */
+  var appRole=(RUNTIME_ROLES&&RUNTIME_ROLES[u])||(ud.appRole)||'USER';
+  CU.appRole=appRole;
   loadRoundsData();
   ensureMockRound1();
   loadEvalRules();
   dbRoundView='current';
-  if(effectiveAppRole==='USER'){
-    /* USER: route directly, no modal */
-    pendingUser.currentRole='USER';
-    CU=pendingUser;
-    finishLogin();
-  } else {
-    /* ADMIN or SUPER_ADMIN: show role selection modal */
-    window._pendingLoginUser=pendingUser;
-    openRoleSelectModal(pendingUser);
+  if(appRole==='ADMIN'||appRole==='SUPER_ADMIN'){
+    /* Show role selection modal */
+    CU.currentRole=null;
+    window._pendingLoginUser=CU;
+    openRoleSelectModal(CU);
+    return;
   }
-  }catch(e){
-    /* Catch and display any runtime error so it's visible in the UI
-       instead of silently failing -- remove this after login works */
-    h('lerr').style.display='block';
-    h('lerr').textContent='[DEBUG] Error: '+e.message+' ('+(e.stack||'').split('\n')[1]+')';
-  }
+  /* USER: go straight in */
+  CU.currentRole='USER';
+  finishLogin();
 }
+
+
 function openRoleSelectModal(userData){
   /* Populate avatar */
   var avatarEl=h('roleSelectAvatar');
@@ -4654,7 +4397,10 @@ function reconcileSubmitStatusWithDatabase(onDone){
   }
   try{SimDB.refresh(check);}catch(e){check();}
 }
-/* lbtn uses onclick="doLogin()" in HTML */
+/* lbtn uses onclick="doLogin()" in HTML -- backup listener in case onclick attribute is stripped */
+if(h('lbtn'))h('lbtn').addEventListener('click',doLogin);
+/* Pre-load employee data as soon as the page loads so it's ready before the user types */
+loadEmployeeData();
 h('lu').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 /* Global error handler -- catches any uncaught JS error and displays it
    visibly in the page so we can debug without needing browser DevTools */
