@@ -1079,6 +1079,7 @@ button,input,select{font-family:var(--fb)}
 <div class="mob-overlay" id="mobOvl"></div>
 
 <!-- LOGIN -->
+  <div id="jsErrBanner" style="display:none;background:#c00;color:#fff;padding:10px 16px;font-size:12px;font-family:monospace;position:fixed;top:0;left:0;right:0;z-index:99999;white-space:pre-wrap;word-break:break-all"></div>
 <div class="scr on" id="sl">
 <div class="sl-wrap">
 <div class="lc">
@@ -4472,9 +4473,10 @@ if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
 /* LOGIN */
 h('eyb').addEventListener('click',function(){var el=h('lp');el.type=el.type==='password'?'text':'password';});
 function doLogin(){
+  try{
   var u=h('lu').value.trim();var p=h('lp').value;
   var ud=USERS[u];
-  if(!ud||ud.pass!==p){h('lerr').style.display='block';h('lp').value='';return;}
+  if(!ud||ud.pass!==p){h('lerr').style.display='block';h('lerr').textContent='Username หรือ Password ไม่ถูกต้อง';h('lp').value='';return;}
   /* Check if account is disabled by Super Admin */
   if(localStorage.getItem('sf_user_disabled_'+u)==='1'){
     h('lerr').style.display='block';h('lerr').textContent='บัญชีนี้ถูกปิดใช้งาน กรุณาติดต่อผู้ดูแลระบบ';h('lp').value='';return;
@@ -4498,6 +4500,12 @@ function doLogin(){
     /* ADMIN or SUPER_ADMIN: show role selection modal */
     window._pendingLoginUser=pendingUser;
     openRoleSelectModal(pendingUser);
+  }
+  }catch(e){
+    /* Catch and display any runtime error so it's visible in the UI
+       instead of silently failing -- remove this after login works */
+    h('lerr').style.display='block';
+    h('lerr').textContent='[DEBUG] Error: '+e.message+' ('+(e.stack||'').split('\n')[1]+')';
   }
 }
 function openRoleSelectModal(userData){
@@ -4648,6 +4656,17 @@ function reconcileSubmitStatusWithDatabase(onDone){
 }
 /* lbtn uses onclick="doLogin()" in HTML */
 h('lu').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+/* Global error handler -- catches any uncaught JS error and displays it
+   visibly in the page so we can debug without needing browser DevTools */
+window.onerror=function(msg,src,line,col,err){
+  var banner=document.getElementById('jsErrBanner');
+  if(banner){banner.style.display='block';banner.textContent='JS ERROR: '+msg+'\nFile: '+src+' Line:'+line+':'+col+(err?'\nStack: '+(err.stack||'').slice(0,300):'');}
+  return false;
+};
+window.addEventListener('unhandledrejection',function(e){
+  var banner=document.getElementById('jsErrBanner');
+  if(banner){banner.style.display='block';banner.textContent='UNHANDLED PROMISE: '+(e.reason||e);}
+});
 h('lp').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
 
 /* LOGOUT */
