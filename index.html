@@ -1093,7 +1093,7 @@ button,input,select{font-family:var(--fb)}
     <input class="lin" id="lp" type="password" placeholder="กรอก Password">
     <button class="eyb" id="eyb"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
-  <button class="lbtn" id="lbtn" onclick="doLogin()">เข้าสู่ระบบ</button>
+  <button class="lbtn" id="lbtn" onclick="if(typeof doLogin==='function'){doLogin();}else{alert('JS ยังโหลดไม่เสร็จ หรือ doLogin ไม่ถูก define - ลอง refresh หน้าแล้วรออีกครั้ง');}">เข้าสู่ระบบ</button>
   <div class="lerr" id="lerr">Username หรือ Password ไม่ถูกต้อง</div>
 </div>
 </div>
