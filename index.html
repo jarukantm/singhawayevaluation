@@ -995,6 +995,13 @@ button,input,select{font-family:var(--fb)}
  * unchecked in the export-options dialog. */
 @media print{
   @page{margin:14mm 12mm 18mm 12mm}
+  /* Browsers strip background colors/images by default when printing
+     (to save ink) unless told otherwise -- this is exactly why the
+     FOCUS/Singhaway bar charts (colored divs, no actual images) were
+     printing with no fill at all, making the chart look empty/cut off
+     even though the layout itself was fine. Force every element to
+     keep its background/color exactly as shown on screen. */
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
   body.printing-dash .sb,body.printing-dash .mob-nav,body.printing-dash .hbg-btn,
   body.printing-dash .mob-overlay,body.printing-dash .topbar,
   body.printing-dash [data-pdf-sec="controls"],
