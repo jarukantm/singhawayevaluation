@@ -2905,18 +2905,6 @@ function renderAdminScores(){
   html+='<button class="btn bt" style="font-size:12px;padding:9px 14px;flex-shrink:0;white-space:nowrap" onclick="openExportReportPopup(\'report\')">'+icon('download',16)+' Export Report</button>';
   html+='</div></div>';
 
-  /* ── round comparison selector (item 4) ──
-     รอบ A drives every figure on this page (whole-page filter, per the
-     request); รอบ B is optional and only feeds the small comparison
-     figures next to each Round-A number -- it never replaces the page. */
-  html+='<div class="card" style="padding:12px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
-  html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap">'+icon('calendarrange',18)+' รอบหลัก:</span>';
-  html+=roundOptionsHTML(adminRoundA,'adminRoundA');
-  html+='<span style="font-size:11px;font-weight:700;color:var(--t1);white-space:nowrap;margin-left:6px">เปรียบเทียบกับ:</span>';
-  html+=roundOptionsHTML(adminRoundB,'adminRoundB');
-  if(adminRoundB&&adminRoundB!==adminRoundA)html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:var(--r)">กำลังเทียบ '+roundLabel(getRoundById(adminRoundA).year,getRoundById(adminRoundA).roundNo)+' \u2194 '+roundLabel(getRoundById(adminRoundB).year,getRoundById(adminRoundB).roundNo)+'</span>';
-  html+='</div>';
-
   html+=withRound(adminRoundA,function(){return renderFocusSinghawayFilterCardHTML()+renderCompareCardHTML()+renderFocusChartHTML()+renderSinghawayChartHTML();});
   h('adminScoresBody').innerHTML=html;
 }
@@ -2931,12 +2919,10 @@ function renderAdminScores(){
 var adminCmpA='current';
 var adminCmpB='current';
 function renderCompareCardHTML(){
-  var scope=focusSinghawayScope();
-  var peopleInScope=scope.peopleInScope;
   var selectableRounds=allSelectableRounds();
   var html='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">'+icon('calendarrange',18)+'</div><div class="db-sh-ttl">Compare</div></div>';
   html+='<div style="padding:14px 16px">';
-  html+='<div class="db-compare-row" style="margin-bottom:14px">';
+  html+='<div class="db-compare-row">';
   html+='<select class="db-compare-sel std-sel" onchange="adminCmpA=this.value;renderAdminTab()">';
   selectableRounds.forEach(function(r){html+='<option value="'+r.id+'"'+(adminCmpA===r.id?' selected':'')+'>\u0e1b\u0e35 '+r.year+' '+r.label+(r.isCurrent?' (\u0e1b\u0e31\u0e08\u0e08\u0e38\u0e1a\u0e31\u0e19)':'')+'</option>';});
   html+='</select>';
@@ -2944,55 +2930,6 @@ function renderCompareCardHTML(){
   selectableRounds.forEach(function(r){html+='<option value="'+r.id+'"'+(adminCmpB===r.id?' selected':'')+'>\u0e1b\u0e35 '+r.year+' '+r.label+(r.isCurrent?' (\u0e1b\u0e31\u0e08\u0e08\u0e38\u0e1a\u0e31\u0e19)':'')+'</option>';});
   html+='</select>';
   html+='</div>';
-  if(!peopleInScope.length){
-    html+='<div class="wb" style="margin-bottom:0"><span>\u2139\uFE0F</span><span>\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1e\u0e19\u0e31\u0e01\u0e07\u0e32\u0e19\u0e43\u0e19\u0e02\u0e2d\u0e1a\u0e40\u0e02\u0e15\u0e17\u0e35\u0e48\u0e40\u0e25\u0e37\u0e2d\u0e01</span></div></div></div>';
-    return html;
-  }
-  var cmpMode=adminCmpA!==adminCmpB;
-  var ord=chronologicalOrder(adminCmpA,adminCmpB);
-  var older=ord.older,newer=ord.newer;
-  function avgAt(roundId,keyFn){
-    var vals=peopleInScope.map(function(e){return keyFn(getRoundScoreFor(roundId,e.empId));});
-    return vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0;
-  }
-  html+='<div class="db-gbar-legend" style="margin-bottom:8px">';
-  if(cmpMode)html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-hollow"></span>'+compactRoundLabel(older)+'</span>';
-  html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-filled"></span>'+compactRoundLabel(newer)+'</span>';
-  html+='</div>';
-  function cmpBarBlock(keys,keyFn,colorOf,labelOf){
-    var chH=170;
-    var b='<div style="display:flex;align-items:flex-end;gap:14px;height:'+chH+'px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 10px 0 30px;position:relative;margin-bottom:8px">';
-    [5,4,3,2,1,0].forEach(function(v){
-      var top=(1-v/5)*100;
-      b+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--t2);width:24px;text-align:right">'+v+'</div>';
-      b+='<div style="position:absolute;left:30px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
-    });
-    keys.forEach(function(k){
-      var newVal=avgAt(newer.id,function(s){return keyFn(s,k);});
-      var oldVal=cmpMode?avgAt(older.id,function(s){return keyFn(s,k);}):null;
-      var col=colorOf(k);
-      var newH=Math.max(1,Math.round(newVal/5*chH));
-      b+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;min-width:0">';
-      if(cmpMode){
-        var oldH=Math.max(1,Math.round((oldVal||0)/5*chH));
-        b+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+labelOf(k)+' \u2013 '+compactRoundLabel(older)+': '+(oldVal||0).toFixed(2)+'">';
-        b+='<div style="width:100%;height:'+oldH+'px;background:'+lightVariantOf(col)+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:10px;font-weight:700;color:#111827">'+(oldVal||0).toFixed(2)+'</span></div></div>';
-      }
-      b+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+labelOf(k)+' \u2013 '+compactRoundLabel(newer)+': '+newVal.toFixed(2)+'">';
-      b+='<div style="width:100%;height:'+newH+'px;background:'+col+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+newVal.toFixed(2)+'</span></div></div>';
-      b+='</div>';
-    });
-    b+='</div>';
-    b+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
-    keys.forEach(function(k){b+='<div style="flex:1;text-align:center;font-size:11px;font-weight:800;color:'+colorOf(k)+';min-width:0">'+labelOf(k)+'</div>';});
-    b+='</div>';
-    return b;
-  }
-  var fkeysC=Object.keys(FDEF);
-  html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin-bottom:6px">FOCUS</div>';
-  html+=cmpBarBlock(fkeysC,function(s,f){return s.byFocus[f];},function(f){return FDEF[f].cl;},function(f){return f;});
-  html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin:16px 0 6px">Singhaway Values</div>';
-  html+=cmpBarBlock(CATS,function(s,cat){return s.byCat[cat];},function(cat){return CAT_META[cat].cl;},function(cat){return CAT_META[cat].lb;});
   html+='</div></div>';
   return html;
 }
@@ -3082,6 +3019,13 @@ function renderFocusSinghawayFilterCardHTML(){
   html+='</div></div>';
   return html;
 }
+/* Shared by both charts: resolves the Compare Card's two round pickers
+ * into {cmpMode, older, newer} once. */
+function getCmpRounds(){
+  var cmpMode=adminCmpA!==adminCmpB;
+  var ord=chronologicalOrder(adminCmpA,adminCmpB);
+  return{cmpMode:cmpMode,older:ord.older,newer:ord.newer};
+}
 function renderFocusChartHTML(){
   var scope=focusSinghawayScope();
   var peopleInScope=scope.peopleInScope,scopeLabel=scope.scopeLabel;
@@ -3091,26 +3035,33 @@ function renderFocusChartHTML(){
     html+='<div class="wb" style="margin-bottom:0"><span>\u2139\uFE0F</span><span>\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1e\u0e19\u0e31\u0e01\u0e07\u0e32\u0e19\u0e43\u0e19\u0e23\u0e30\u0e14\u0e31\u0e1a "'+scopeLabel+'" \u2014 \u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e15\u0e31\u0e27\u0e2d\u0e22\u0e48\u0e32\u0e07 (Demo) \u0e02\u0e13\u0e30\u0e19\u0e35\u0e49\u0e21\u0e35\u0e2d\u0e22\u0e39\u0e48\u0e40\u0e09\u0e1e\u0e32\u0e30\u0e43\u0e15\u0e49 WRM (\u0e1a\u0e23\u0e34\u0e2b\u0e32\u0e23\u0e17\u0e23\u0e31\u0e1e\u0e22\u0e32\u0e01\u0e23) \u0e40\u0e17\u0e48\u0e32\u0e19\u0e31\u0e49\u0e19</span></div></div></div>';
     return html;
   }
-  var focusStatScoped={};fkeysA.forEach(function(f){
-    var vals=peopleInScope.map(function(e){return mockScoreFor(e.empId).byFocus[f];});
-    focusStatScoped[f]={
+  var cmp=getCmpRounds();
+  function statsAt(roundId,f){
+    var vals=peopleInScope.map(function(e){return getRoundScoreFor(roundId,e.empId).byFocus[f];});
+    return{
       avg:vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0,
       min:vals.length?Math.min.apply(null,vals):0,
       max:vals.length?Math.max.apply(null,vals):0
     };
-  });
+  }
+  var focusStatScoped={};fkeysA.forEach(function(f){focusStatScoped[f]=statsAt(cmp.newer.id,f);});
+  var focusStatOlder=null;
+  if(cmp.cmpMode){focusStatOlder={};fkeysA.forEach(function(f){focusStatOlder[f]=statsAt(cmp.older.id,f);});}
   /* Item 2: overall FOCUS score across all 5 letters (equal weight),
      shown as one summary number + its E/G/S/L/I letter grade. */
   var focusOverallAvg=fkeysA.reduce(function(s,f){return s+focusStatScoped[f].avg;},0)/fkeysA.length;
   var focusOverallLbl=s2l(focusOverallAvg);
   html+='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--b0)">';
-  html+='<span style="font-size:11px;color:var(--t1)">คะแนนรวม FOCUS ภาพรวม:</span>';
+  html+='<span style="font-size:11px;color:var(--t1)">คะแนนรวม FOCUS ภาพรวม'+(cmp.cmpMode?' ('+compactRoundLabel(cmp.newer)+')':'')+':</span>';
   html+='<span style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t0)">'+focusOverallAvg.toFixed(2)+'</span>';
   html+='<span class="rb-inl" style="background:'+RCOL[focusOverallLbl.l]+'">'+focusOverallLbl.l+' \u2013 '+RNAME[focusOverallLbl.l]+'</span>';
   html+='</div>';
   if(focusChartAxis==='focus'){
     var focusChartH=200;
     html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">\u0e41\u0e01\u0e19\u0e15\u0e31\u0e49\u0e07 = <b>\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22</b> (0-5)</div>';
+    if(cmp.cmpMode){
+      html+='<div class="db-gbar-legend" style="margin-bottom:8px"><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-hollow"></span>'+compactRoundLabel(cmp.older)+'</span><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-filled"></span>'+compactRoundLabel(cmp.newer)+'</span></div>';
+    }
     html+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
     fkeysA.forEach(function(f){
       var lbl=s2l(focusStatScoped[f].avg);
@@ -3126,15 +3077,22 @@ function renderFocusChartHTML(){
     fkeysA.forEach(function(f){
       var fd=FDEF[f];var st=focusStatScoped[f];var val=st.avg;
       var barH=Math.max(1,Math.round(val/5*focusChartH));
-      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;min-width:0">';
-      html+='<div title="'+val.toFixed(2)+' ('+s2l(val).l+')" style="flex:1;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;min-width:0">';
+      if(cmp.cmpMode){
+        var oldVal=focusStatOlder[f].avg;
+        var oldH=Math.max(1,Math.round(oldVal/5*focusChartH));
+        html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+f+' \u2013 '+compactRoundLabel(cmp.older)+': '+oldVal.toFixed(2)+'"><div style="width:100%;height:'+oldH+'px;background:'+lightVariantOf(fd.cl)+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:10px;font-weight:700;color:#111827">'+oldVal.toFixed(2)+'</span></div></div>';
+      }
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+val.toFixed(2)+' ('+s2l(val).l+')">';
+      html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
       html+='<span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+val.toFixed(2)+'</span></div></div>';
+      html+='</div>';
     });
     html+='</div>';
     html+='<div style="display:flex;gap:14px;padding:8px 10px 0 30px">';
     fkeysA.forEach(function(f){
       var fd=FDEF[f];var st=focusStatScoped[f];
-      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0"><div style="font-size:13px;font-weight:800;color:'+fd.cl+'">'+f+'</div><div style="font-size:9px;color:var(--t2);text-align:center">'+fd.nm+'</div><div style="font-size:9px;color:var(--t2);text-align:center">Min '+st.min.toFixed(2)+' \u00b7 Max '+st.max.toFixed(2)+'</div></div>';
+      html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0"><div style="font-size:13px;font-weight:800;color:'+fd.cl+'">'+f+'</div><div style="font-size:9px;color:var(--t2);text-align:center">'+fd.nm+'</div>'+(cmp.cmpMode?'':'<div style="font-size:9px;color:var(--t2);text-align:center">Min '+st.min.toFixed(2)+' \u00b7 Max '+st.max.toFixed(2)+'</div>')+'</div>';
     });
     html+='</div>';
   } else {
@@ -3189,20 +3147,24 @@ function renderSinghawayChartHTML(){
     html+='<div class="wb" style="margin-bottom:0"><span>\u2139\uFE0F</span><span>\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1e\u0e19\u0e31\u0e01\u0e07\u0e32\u0e19\u0e43\u0e19\u0e23\u0e30\u0e14\u0e31\u0e1a "'+scopeLabel+'"</span></div></div></div>';
     return html;
   }
-  var catStatScoped={};CATS.forEach(function(cat){
-    var vals=peopleInScope.map(function(e){return mockScoreFor(e.empId).byCat[cat];});
-    catStatScoped[cat]={
+  var cmp=getCmpRounds();
+  function statsAt(roundId,cat){
+    var vals=peopleInScope.map(function(e){return getRoundScoreFor(roundId,e.empId).byCat[cat];});
+    return{
       avg:vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0,
       min:vals.length?Math.min.apply(null,vals):0,
       max:vals.length?Math.max.apply(null,vals):0
     };
-  });
+  }
+  var catStatScoped={};CATS.forEach(function(cat){catStatScoped[cat]=statsAt(cmp.newer.id,cat);});
+  var catStatOlder=null;
+  if(cmp.cmpMode){catStatOlder={};CATS.forEach(function(cat){catStatOlder[cat]=statsAt(cmp.older.id,cat);});}
   /* Item 2: overall Singhaway score across all 4 values (equal weight),
      shown as one summary number + its E/G/S/L/I letter grade. */
   var catOverallAvg=CATS.reduce(function(s,cat){return s+catStatScoped[cat].avg;},0)/CATS.length;
   var catOverallLbl=s2l(catOverallAvg);
   html+='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--b0)">';
-  html+='<span style="font-size:11px;color:var(--t1)">คะแนนรวม Singhaway ภาพรวม:</span>';
+  html+='<span style="font-size:11px;color:var(--t1)">\u0e04\u0e30\u0e41\u0e19\u0e19\u0e23\u0e27\u0e21 Singhaway \u0e20\u0e32\u0e1e\u0e23\u0e27\u0e21'+(cmp.cmpMode?' ('+compactRoundLabel(cmp.newer)+')':'')+':</span>';
   html+='<span style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t0)">'+catOverallAvg.toFixed(2)+'</span>';
   html+='<span class="rb-inl" style="background:'+RCOL[catOverallLbl.l]+'">'+catOverallLbl.l+' \u2013 '+RNAME[catOverallLbl.l]+'</span>';
   html+='</div>';
@@ -3213,6 +3175,9 @@ function renderSinghawayChartHTML(){
   }
   var catChartH=200;
   html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">\u0e41\u0e01\u0e19\u0e15\u0e31\u0e49\u0e07 = <b>\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22</b> (0-5) \u2014 '+scopeLabel+' ('+peopleInScope.length+' \u0e04\u0e19)</div>';
+  if(cmp.cmpMode){
+    html+='<div class="db-gbar-legend" style="margin-bottom:8px"><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-hollow"></span>'+compactRoundLabel(cmp.older)+'</span><span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-filled"></span>'+compactRoundLabel(cmp.newer)+'</span></div>';
+  }
   html+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
   CATS.forEach(function(cat){
     var lbl=s2l(catStatScoped[cat].avg);
@@ -3228,15 +3193,22 @@ function renderSinghawayChartHTML(){
   CATS.forEach(function(cat){
     var m=CAT_META[cat];var st=catStatScoped[cat];var val=st.avg;
     var barH=Math.max(1,Math.round(val/5*catChartH));
-    html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:2px;min-width:0">';
-    html+='<div title="'+val.toFixed(2)+' ('+s2l(val).l+')" style="flex:1;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
+    html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;min-width:0">';
+    if(cmp.cmpMode){
+      var oldVal=catStatOlder[cat].avg;
+      var oldH=Math.max(1,Math.round(oldVal/5*catChartH));
+      html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+m.lb+' \u2013 '+compactRoundLabel(cmp.older)+': '+oldVal.toFixed(2)+'"><div style="width:100%;height:'+oldH+'px;background:'+lightVariantOf(m.cl)+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:10px;font-weight:700;color:#111827">'+oldVal.toFixed(2)+'</span></div></div>';
+    }
+    html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+val.toFixed(2)+' ('+s2l(val).l+')">';
+    html+='<div style="width:100%;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
     html+='<span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+val.toFixed(2)+'</span></div></div>';
+    html+='</div>';
   });
   html+='</div>';
   html+='<div style="display:flex;gap:14px;padding:8px 10px 0 30px">';
   CATS.forEach(function(cat){
     var m=CAT_META[cat];var st=catStatScoped[cat];
-    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0"><div style="font-size:11px;font-weight:800;color:'+m.cl+';text-align:center">'+m.lb+'</div><div style="font-size:9px;color:var(--t2);text-align:center">Min '+st.min.toFixed(2)+' \u00b7 Max '+st.max.toFixed(2)+'</div></div>';
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0"><div style="font-size:11px;font-weight:800;color:'+m.cl+';text-align:center">'+m.lb+'</div>'+(cmp.cmpMode?'':'<div style="font-size:9px;color:var(--t2);text-align:center">Min '+st.min.toFixed(2)+' \u00b7 Max '+st.max.toFixed(2)+'</div>')+'</div>';
   });
   html+='</div>';
   html+='</div></div>';
@@ -6374,7 +6346,18 @@ function defaultAssignCandidates(senderE){
   return candidates.filter(function(e){return e.empId!==senderE.empId;});
 }
 function activeAssignmentsAsReceiver(empId){
-  return ASSIGNMENTS.filter(function(a){return a.receiverEmpId===empId&&a.status==='Accepted';});
+  var accepted=ASSIGNMENTS.filter(function(a){return a.receiverEmpId===empId&&a.status==='Accepted';});
+  /* de-dupe by org: if the same org somehow ended up assigned more than
+     once (e.g. duplicates created before this guard existed), only show
+     one tab for it -- the most recently accepted one. */
+  var seen={};var deduped=[];
+  accepted.forEach(function(a){
+    var key=a.orgType+'|'+a.orgValue;
+    if(seen[key])return;
+    seen[key]=true;
+    deduped.push(a);
+  });
+  return deduped;
 }
 function createAssignment(senderE,org,receiverE){
   var a={
@@ -6538,6 +6521,17 @@ function doCreateAssignment(){
   if(!org||!recSel||!recSel.value)return;
   var receiverE=ALL_EMP.filter(function(e){return e.empId===recSel.value;})[0];
   if(!receiverE)return;
+  /* Item 2: don't let the same org+receiver pair get assigned twice --
+     a Pending or already-Accepted assignment for this exact pair means
+     there's nothing new to create (and the receiver would otherwise see
+     the same org show up as two duplicate tabs on their Dashboard). */
+  var dup=ASSIGNMENTS.filter(function(a){
+    return a.orgType===org.type&&a.orgValue===org.value&&a.receiverEmpId===receiverE.empId&&(a.status==='Pending'||a.status==='Accepted');
+  })[0];
+  if(dup){
+    toast(icon('alerttriangle',18),'มีการมอบหมายนี้อยู่แล้ว',receiverE.name+' \u2014 '+org.type+': '+org.value+' (สถานะ: '+dup.status+') ไม่สามารถมอบหมายซ้ำได้','var(--L)');
+    return;
+  }
   createAssignment(senderE,org,receiverE);
   toast(icon('circlecheck',18),'ส่งคำขอมอบหมายแล้ว','รอ '+receiverE.name+' ตอบรับ','var(--E)');
   assignAddPersonMode=false;
@@ -7803,6 +7797,55 @@ function renderAssignedOrgDashboardHTML(assignment){
     html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0"><div style="width:100%;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;color:#fff">'+val.toFixed(2)+'</span></div><div style="font-size:10px;font-weight:700;color:'+m.cl+';text-align:center">'+m.lb+'</div></div>';
   });
   html+='</div></div></div>';
+  html+=renderAssignedOrgIndividualScoreTableHTML(peopleInOrg,assignment);
+  return html;
+}
+/* Item 1: same "ภาพรวมคะแนนรายบุคคล" table style/columns a ก/ส-level
+ * manager sees for their own team (see scoreOverviewSection()), but for
+ * the ASSIGNED org instead, sourced from the same mock per-employee
+ * scores the Admin Report pages use (mockScoreFor) rather than the
+ * live selfSc/othSc caches -- those only ever reflect whichever person
+ * is currently logged in, not the original assigner, so they'd be the
+ * wrong data source here. The assigner (peopleInOrg already has them
+ * excluded) never appears in this table. */
+function renderAssignedOrgIndividualScoreTableHTML(peopleInOrg,assignment){
+  var roleOrder={s:0,k:1,p:2};
+  var fkeys=Object.keys(FDEF);
+  var sorted=peopleInOrg.slice().sort(function(a,b){
+    var ra=roleOrder[personLevelKey(a.role)],rb=roleOrder[personLevelKey(b.role)];
+    if(ra!==rb)return ra-rb;
+    return mockScoreFor(b.empId).avg-mockScoreFor(a.empId).avg;
+  });
+  var html='<div class="card" style="margin-top:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--blt)">'+icon('trendingup',18)+'</div><div class="db-sh-ttl">\u0e20\u0e32\u0e1e\u0e23\u0e27\u0e21\u0e04\u0e30\u0e41\u0e19\u0e19\u0e23\u0e32\u0e22\u0e1a\u0e38\u0e04\u0e04\u0e25 \u2014 '+assignment.orgValue+'</div></div>';
+  html+='<div style="padding:14px 16px"><div style="overflow-x:auto"><table class="sov-tbl"><thead><tr>';
+  html+='<th style="text-align:left;min-width:180px">\u0e1e\u0e19\u0e31\u0e01\u0e07\u0e32\u0e19</th><th>\u0e23\u0e30\u0e14\u0e31\u0e1a</th>';
+  CATS.forEach(function(c){var m=CAT_META[c];html+='<th style="color:'+m.cl+';font-size:9px">'+c.split(' ').slice(-1)[0]+'</th>';});
+  html+='<th style="color:#1D9E75;font-size:10px;min-width:90px">\u0e04\u0e30\u0e41\u0e19\u0e19\u0e23\u0e27\u0e21 Singhaway</th>';
+  fkeys.forEach(function(f){html+='<th style="color:'+FDEF[f].cl+';font-size:9px">'+f+'</th>';});
+  html+='<th style="color:#534AB7;font-size:10px;min-width:90px">\u0e04\u0e30\u0e41\u0e19\u0e19\u0e23\u0e27\u0e21 FOCUS</th>';
+  html+='</tr></thead><tbody>';
+  var prevLvl='';
+  sorted.forEach(function(p){
+    var s=mockScoreFor(p.empId);
+    var lvl=personLevelKey(p.role);
+    if(lvl!==prevLvl){
+      prevLvl=lvl;
+      html+='<tr><td colspan="'+(3+CATS.length+fkeys.length)+'" style="background:var(--s1);padding:5px 10px;border:1px solid var(--b0)"><span style="display:inline-block;padding:2px 10px;border-radius:5px;background:var(--pb);color:#fff;font-size:10px;font-weight:700">\u0e23\u0e30\u0e14\u0e31\u0e1a '+PERSON_LEVEL_LABEL[lvl]+'</span></td></tr>';
+    }
+    var ph=getPhoto(p.empId);
+    var avH=ph?'<img src="'+ph+'" style="width:24px;height:24px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px" alt="'+p.name+'">'
+      :'<span style="width:24px;height:24px;border-radius:50%;background:'+p.color+';display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700;margin-right:6px;vertical-align:middle">'+ini(p.name)+'</span>';
+    html+='<tr><td><div style="display:flex;align-items:center">'+avH+'<div><div style="font-size:11px;font-weight:700;color:var(--t0)">'+p.name+' <span style="font-size:9px;color:var(--t2)">('+p.nick+')</span></div><div style="font-size:9px;color:var(--t2)">'+p.empId+' \u00B7 '+(p.dept||p.div)+'</div></div></div></td>';
+    html+='<td><span style="font-size:9px;color:var(--t2)">'+p.pos+'</span></td>';
+    CATS.forEach(function(cat){var l=s2l(s.byCat[cat]);html+='<td><span class="rb-inl" style="background:'+RCOL[l.l]+';font-size:10px">'+l.l+'</span></td>';});
+    var swL=s2l(CATS.reduce(function(a,cat){return a+s.byCat[cat];},0)/CATS.length);
+    html+='<td><b style="color:'+swL.c+'">'+(CATS.reduce(function(a,cat){return a+s.byCat[cat];},0)/CATS.length).toFixed(2)+'</b></td>';
+    fkeys.forEach(function(f){var l=s2l(s.byFocus[f]);html+='<td><span class="rb-inl" style="background:'+RCOL[l.l]+';font-size:10px">'+l.l+'</span></td>';});
+    var focL=s2l(fkeys.reduce(function(a,f){return a+s.byFocus[f];},0)/fkeys.length);
+    html+='<td><b style="color:'+focL.c+'">'+(fkeys.reduce(function(a,f){return a+s.byFocus[f];},0)/fkeys.length).toFixed(2)+'</b></td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div></div>';
   return html;
 }
 function renderDash(){
