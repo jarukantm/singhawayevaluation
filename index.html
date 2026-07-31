@@ -4019,18 +4019,23 @@ function renderAdminRounds(){
   html+='<div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('calendarrange',18)+'</div><div class="db-sh-ttl">ประวัติรอบการประเมิน</div>';
   html+='<button class="ach" id="adminAddRoundToggleBtn" style="margin-left:auto" onclick="toggleAddRoundForm()">+ เพิ่มรอบการประเมิน</button></div>';
 
-  /* current round summary strip, always visible at the top */
+  /* current round summary strip, always visible at the top -- when
+     currentRound itself is closed, show the LATEST actual round from
+     history instead of currentRound's own (now stale/placeholder)
+     fields, so this always matches what the table below shows as the
+     most recent entry. */
+  var summaryRound=(currentRound.closed&&ROUNDS.length)?ROUNDS[ROUNDS.length-1]:currentRound;
   html+='<div style="padding:14px 16px;border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">';
   html+='<div>';
-  html+='<div style="font-family:var(--fh);font-size:18px;font-weight:800;color:var(--t0)">'+roundLabel(currentRound.year,currentRound.roundNo)+' <span style="font-size:11px;font-weight:600;color:'+(currentRound.closed?'var(--I)':'var(--E)')+'">'+(currentRound.closed?'(ปิดรอบแล้ว)':'(กำลังดำเนินการ)')+'</span></div>';
-  if(currentRound.startDate&&currentRound.endDate)html+='<div style="font-size:11px;color:var(--t1);margin-top:2px">'+fmtThaiDate(currentRound.startDate)+' \u2013 '+fmtThaiDate(currentRound.endDate)+' \u00B7 '+(currentRound.isAnonymous?icon('lock',14)+' ไม่ระบุตัวตน':icon('eye',14)+' ระบุตัวตน')+'</div>';
+  html+='<div style="font-family:var(--fh);font-size:18px;font-weight:800;color:var(--t0)">'+roundLabel(summaryRound.year,summaryRound.roundNo)+' <span style="font-size:11px;font-weight:600;color:'+(summaryRound.closed?'var(--I)':'var(--E)')+'">'+(summaryRound.closed?'(ปิดรอบแล้ว)':'(กำลังดำเนินการ)')+'</span></div>';
+  if(summaryRound.startDate&&summaryRound.endDate)html+='<div style="font-size:11px;color:var(--t1);margin-top:2px">'+fmtThaiDate(summaryRound.startDate)+' \u2013 '+fmtThaiDate(summaryRound.endDate)+' \u00B7 '+(summaryRound.isAnonymous?icon('lock',14)+' ไม่ระบุตัวตน':icon('eye',14)+' ระบุตัวตน')+'</div>';
   html+='</div>';
-  if(!currentRound.closed){
-    var rdA=daysRemaining(currentRound.endDate);
+  if(!summaryRound.closed){
+    var rdA=daysRemaining(summaryRound.endDate);
     if(rdA!==null){
       var rdColA=rdA<0?'var(--I)':rdA<=3?'var(--L)':'var(--E)';
       html+='<div style="text-align:center;padding:6px 14px;background:'+rdColA+'14;border-radius:var(--r)">';
-      html+='<div id="countdownBox_admin" data-end="'+(currentRound.endDate||'')+'"></div>';
+      html+='<div id="countdownBox_admin" data-end="'+(summaryRound.endDate||'')+'"></div>';
       html+='</div>';
     }
   }
@@ -4291,26 +4296,60 @@ function renderPermAuditLogInnerHTML(){
  * used both by the org-wide default settings card AND the per-round
  * add-round form, so the two never drift out of sync visually. idPrefix
  * keeps each instance's input names/classes unique on the page. */
+/* Which scope levels are offered for a given (evaluator role -> target
+ * role) pair -- narrower levels drop away as either side gets more
+ * senior, since e.g. "only within the same department" stops being a
+ * meaningful boundary once you're talking about ผู้บริหารระดับสูง, who
+ * aren't scoped to a single department to begin with. */
+var SCOPE_LEVELS=[
+  {v:'dept',lb:'\u0e41\u0e1c\u0e19\u0e01/\u0e2b\u0e19\u0e48\u0e27\u0e22'},
+  {v:'div',lb:'\u0e1d\u0e48\u0e32\u0e22/\u0e2a\u0e48\u0e27\u0e19'},
+  {v:'group',lb:'\u0e01\u0e25\u0e38\u0e48\u0e21'},
+  {v:'company',lb:'TPKs'}
+];
+function scopeOptionsFor(role,targetRole){
+  var s='\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e2b\u0e32\u0e23\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e2a\u0e39\u0e07'; /* ผู้บริหารระดับสูง */
+  var p='\u0e1b\u0e0f\u0e34\u0e1a\u0e31\u0e15\u0e34\u0e01\u0e32\u0e23'; /* ปฏิบัติการ */
+  var k='\u0e1c\u0e39\u0e49\u0e1a\u0e23\u0e34\u0e2b\u0e32\u0e23\u0e23\u0e30\u0e14\u0e31\u0e1a\u0e01\u0e25\u0e32\u0e07'; /* ผู้บริหารระดับกลาง */
+  /* "แผนก/หน่วย" only makes sense as a boundary when the evaluator is
+     themself operational-level (scoped to one dept to begin with), or
+     a middle manager evaluating their own direct operational reports.
+     Senior management (ส) is never confined to a single department, so
+     that option never appears for them as evaluator, regardless of
+     who they're evaluating. */
+  var offerDept=(role===p&&targetRole!==s)||(role===k&&targetRole===p);
+  /* "ฝ่าย/ส่วน" drops too, but only on the senior-evaluating-senior peer
+     row -- at that point only กลุ่ม/TPKs remain as meaningful scopes. */
+  var offerDiv=!(role===s&&targetRole===s);
+  return SCOPE_LEVELS.filter(function(l){
+    if(l.v==='dept')return offerDept;
+    if(l.v==='div')return offerDiv;
+    return true;
+  });
+}
+function scopeLabel(scope){
+  var m=SCOPE_LEVELS.filter(function(l){return l.v===scope;})[0];
+  return m?m.lb:scope;
+}
 function buildPermissionsMatrixHTML(idPrefix,presetRules){
   var html='';
   var rules=presetRules||(EVAL_RULES||{});
   ALL_ROLES.forEach(function(role){
     var roleRules=rules[role]||{};
     html+='<div style="margin-bottom:12px;padding:11px 13px;border:1px solid var(--b0);border-radius:var(--r)">';
-    html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin-bottom:10px">'+role+' ต้องประเมิน:</div>';
+    html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin-bottom:10px">'+role+' \u0e2a\u0e32\u0e21\u0e32\u0e23\u0e16\u0e40\u0e25\u0e37\u0e2d\u0e01\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19:</div>';
     html+='<div style="display:flex;flex-direction:column;gap:10px">';
     ALL_ROLES.forEach(function(targetRole){
       var entry=roleRules[targetRole]||{checked:false,scope:''};
+      var opts=scopeOptionsFor(role,targetRole);
       html+='<div>';
       html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;font-weight:600">'
         +'<input type="checkbox" class="'+idPrefix+'-chk" data-role="'+role+'" data-target="'+targetRole+'" '+(entry.checked?'checked':'')+' style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer" onchange="toggleScopeVisibility(this,\''+idPrefix+'\')">'+targetRole+'</label>';
-      /* item 3: shortened scope labels -- "เฉพาะหน่วยงานเดียวกัน" / "ทั้ง
-         TPKs", same format reused identically at every role level */
       html+='<div class="'+idPrefix+'-scope" data-role="'+role+'" data-target="'+targetRole+'" style="display:'+(entry.checked?'flex':'none')+';flex-direction:column;gap:5px;margin-top:6px;margin-left:23px;padding-left:10px;border-left:2px solid var(--b1)">';
-      html+='<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t1);cursor:pointer">'
-        +'<input type="radio" name="'+idPrefix+'scope_'+role+'_'+targetRole+'" class="'+idPrefix+'-scope-radio" data-role="'+role+'" data-target="'+targetRole+'" value="dept" '+(entry.scope==='dept'?'checked':'')+' style="width:13px;height:13px;accent-color:var(--pb);cursor:pointer">เฉพาะหน่วยงานเดียวกัน</label>';
-      html+='<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t1);cursor:pointer">'
-        +'<input type="radio" name="'+idPrefix+'scope_'+role+'_'+targetRole+'" class="'+idPrefix+'-scope-radio" data-role="'+role+'" data-target="'+targetRole+'" value="company" '+(entry.scope==='company'?'checked':'')+' style="width:13px;height:13px;accent-color:var(--pb);cursor:pointer">ทั้ง TPKs</label>';
+      opts.forEach(function(o){
+        html+='<label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t1);cursor:pointer">'
+          +'<input type="radio" name="'+idPrefix+'scope_'+role+'_'+targetRole+'" class="'+idPrefix+'-scope-radio" data-role="'+role+'" data-target="'+targetRole+'" value="'+o.v+'" '+(entry.scope===o.v?'checked':'')+' style="width:13px;height:13px;accent-color:var(--pb);cursor:pointer">'+o.lb+'</label>';
+      });
       html+='</div>';
       html+='</div>';
     });
@@ -4487,7 +4526,7 @@ function openAddRoundPreview(){
   if(summaryLines.length){
     html+='<div style="display:flex;flex-direction:column;gap:3px;padding-left:10px">';
     summaryLines.forEach(function(l){
-      html+='<div>'+icon('circlecheck',16)+' '+l.role+' \u27A1\uFE0F '+l.target+' ('+(l.scope==='dept'?'เฉพาะหน่วยงาน':'ทั้ง TPKs')+')</div>';
+      html+='<div>'+icon('circlecheck',16)+' '+l.role+' \u27A1\uFE0F '+l.target+' ('+scopeLabel(l.scope)+')</div>';
     });
     html+='</div>';
   } else {
@@ -5361,6 +5400,10 @@ function saveEvalRules(){
 var ALL_ROLES=['ปฏิบัติการ','ผู้บริหารระดับกลาง','ผู้บริหารระดับสูง'];
 function getDefaults(user){
   var id=user.empId,dept=user.dept,div=user.div,role=user.role;
+  /* USERS/CU objects don't carry a .group field (only ALL_EMP records
+     do) -- resolve it fresh here rather than assuming user.group exists. */
+  var selfEmpRecord=ALL_EMP.filter(function(e){return e.empId===id;})[0];
+  var group=selfEmpRecord?selfEmpRecord.group:null;
   /* custom Admin-defined rule takes priority if one exists for this role.
      New structure (item 9): {targetRole: {checked, scope:'dept'|'company'}}
      -- scope is applied per target role, not just a flat allow-list, so
@@ -5373,6 +5416,8 @@ function getDefaults(user){
       var entry=roleRules[e.role];
       if(!entry||!entry.checked)return false;
       if(entry.scope==='dept')return e.dept===dept;
+      if(entry.scope==='div')return e.div===div;
+      if(entry.scope==='group')return e.group===group;
       return true; /* scope==='company' (or unset, treated permissively as company-wide) */
     });
   }
@@ -6653,14 +6698,18 @@ var NOTIF_ICON={AssignRequest:'\uD83D\uDCE5',AssignAccepted:'\u2705',AssignRejec
 function renderBellDropdown(ddId){
   if(!CU)return;
   var mine=APP_NOTIFS.filter(function(n){return n.toUsername===CU.username;});
-  var html='<div style="padding:10px 14px;border-bottom:1px solid var(--b0);font-weight:700;font-size:12px;color:var(--t0)">การแจ้งเตือน</div>';
+  var html='<div style="padding:10px 14px;border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;gap:8px">';
+  html+='<span style="font-weight:700;font-size:12px;color:var(--t0)">การแจ้งเตือน</span>';
+  if(mine.length)html+='<button class="btn bo" style="font-size:10px;padding:3px 9px" onclick="clearAllNotifs(\''+ddId+'\')">'+icon('trash',12)+' ล้างทั้งหมด</button>';
+  html+='</div>';
   if(!mine.length){
     html+='<div style="padding:20px;text-align:center;color:var(--t2);font-size:12px">ไม่มีการแจ้งเตือน</div>';
   } else {
     mine.slice(0,30).forEach(function(n){
-      html+='<div style="padding:10px 14px;border-bottom:1px solid var(--b0);'+(n.read?'':'background:rgba(13,110,231,.05)')+'">';
-      html+='<div style="font-size:12px;font-weight:700;color:var(--t0)">'+(NOTIF_ICON[n.type]||'')+' '+n.title+'</div>';
-      html+='<div style="font-size:11px;color:var(--t1);margin-top:2px">'+n.body+'</div>';
+      html+='<div style="padding:10px 14px;border-bottom:1px solid var(--b0);position:relative;'+(n.read?'':'background:rgba(13,110,231,.05)')+'">';
+      html+='<button onclick="deleteNotif(\''+n.id+'\',\''+ddId+'\')" title="\u0e25\u0e1a\u0e01\u0e32\u0e23\u0e41\u0e08\u0e49\u0e07\u0e40\u0e15\u0e37\u0e2d\u0e19\u0e19\u0e35\u0e49" style="position:absolute;top:8px;right:10px;width:20px;height:20px;border:none;background:none;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px">'+icon('trash',13)+'</button>';
+      html+='<div style="font-size:12px;font-weight:700;color:var(--t0);padding-right:22px">'+(NOTIF_ICON[n.type]||'')+' '+n.title+'</div>';
+      html+='<div style="font-size:11px;color:var(--t1);margin-top:2px;padding-right:22px">'+n.body+'</div>';
       html+='<div style="font-size:9px;color:var(--t2);margin-top:4px">'+fmtThaiDateTime(n.ts)+'</div>';
       if(n.type==='AssignRequest'){
         var a=ASSIGNMENTS.filter(function(x){return x.id===n.relatedAssignmentId;})[0];
@@ -6675,6 +6724,19 @@ function renderBellDropdown(ddId){
   mine.forEach(function(n){n.read=true;});
   saveAssignmentData();
   refreshBellBadges();
+}
+/* Delete a single notification, or every notification belonging to the
+ * current user -- both just re-render the same dropdown afterward. */
+function deleteNotif(notifId,ddId){
+  APP_NOTIFS=APP_NOTIFS.filter(function(n){return n.id!==notifId;});
+  saveAssignmentData();
+  renderBellDropdown(ddId);
+}
+function clearAllNotifs(ddId){
+  if(!CU)return;
+  APP_NOTIFS=APP_NOTIFS.filter(function(n){return n.toUsername!==CU.username;});
+  saveAssignmentData();
+  renderBellDropdown(ddId);
 }
 function refreshBellBadges(){
   if(!CU)return;
