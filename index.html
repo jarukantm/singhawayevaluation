@@ -4029,19 +4029,26 @@ function renderAdminRounds(){
   html+='<div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('calendarrange',18)+'</div><div class="db-sh-ttl">ประวัติรอบการประเมิน</div>';
   html+='<button class="ach" id="adminAddRoundToggleBtn" style="margin-left:auto" onclick="toggleAddRoundForm()">+ เพิ่มรอบการประเมิน</button></div>';
 
-  /* current round summary strip, always visible at the top -- when
-     currentRound itself is closed, show the LATEST actual round from
-     history instead of currentRound's own (now stale/placeholder)
-     fields, so this always matches what the table below shows as the
-     most recent entry. */
-  var summaryRound=(currentRound.closed&&ROUNDS.length)?ROUNDS[ROUNDS.length-1]:currentRound;
-  var summaryNotStarted=roundNotYetStarted(summaryRound);
+  /* current round summary strip, always visible at the top -- ROUNDS
+     entries are ALWAYS closed by this app's convention (that's what
+     archiving them there means) even though individual entries don't
+     necessarily carry an explicit .closed field, so this uses its own
+     explicit flag rather than trusting summaryRound.closed directly.
+     Also: if currentRound itself was never properly marked closed (a
+     stale/leftover state) but a ROUNDS entry with the same year+roundNo
+     already exists, that archived entry is the source of truth -- the
+     table below already treats it as closed, so the summary must match
+     it instead of showing currentRound's inconsistent open state. */
+  var matchingClosedRound=ROUNDS.filter(function(r){return r.year===currentRound.year&&r.roundNo===currentRound.roundNo;})[0];
+  var summaryClosed=currentRound.closed||!!matchingClosedRound;
+  var summaryRound=summaryClosed?(matchingClosedRound||(ROUNDS.length?ROUNDS[ROUNDS.length-1]:currentRound)):currentRound;
+  var summaryNotStarted=!summaryClosed&&roundNotYetStarted(summaryRound);
   html+='<div style="padding:14px 16px;border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">';
   html+='<div>';
-  html+='<div style="font-family:var(--fh);font-size:18px;font-weight:800;color:var(--t0)">'+roundLabel(summaryRound.year,summaryRound.roundNo)+' <span style="font-size:11px;font-weight:600;color:'+(summaryRound.closed?'var(--I)':summaryNotStarted?'var(--L)':'var(--E)')+'">'+(summaryRound.closed?'(ปิดรอบแล้ว)':summaryNotStarted?'(ยังไม่เริ่ม)':'(กำลังดำเนินการ)')+'</span></div>';
+  html+='<div style="font-family:var(--fh);font-size:18px;font-weight:800;color:var(--t0)">'+roundLabel(summaryRound.year,summaryRound.roundNo)+' <span style="font-size:11px;font-weight:600;color:'+(summaryClosed?'var(--I)':summaryNotStarted?'var(--L)':'var(--E)')+'">'+(summaryClosed?'(ปิดรอบแล้ว)':summaryNotStarted?'(ยังไม่เริ่ม)':'(กำลังดำเนินการ)')+'</span></div>';
   if(summaryRound.startDate&&summaryRound.endDate)html+='<div style="font-size:11px;color:var(--t1);margin-top:2px">'+fmtThaiDate(summaryRound.startDate)+' \u2013 '+fmtThaiDate(summaryRound.endDate)+' \u00B7 '+(summaryRound.isAnonymous?icon('lock',14)+' ไม่ระบุตัวตน':icon('eye',14)+' ระบุตัวตน')+'</div>';
   html+='</div>';
-  if(!summaryRound.closed&&!summaryNotStarted){
+  if(!summaryClosed&&!summaryNotStarted){
     var rdA=daysRemaining(summaryRound.endDate);
     if(rdA!==null){
       var rdColA=rdA<0?'var(--I)':rdA<=3?'var(--L)':'var(--E)';
@@ -4361,6 +4368,9 @@ function buildPermissionsMatrixHTML(idPrefix,presetRules){
     ALL_ROLES.forEach(function(targetRole){
       var entry=roleRules[targetRole]||{checked:false,scope:''};
       var opts=scopeOptionsFor(role,targetRole);
+      if(entry.checked&&opts.length&&!opts.some(function(o){return o.v===entry.scope;})){
+        entry=Object.assign({},entry,{scope:opts[0].v}); /* checked but no valid scope saved -- default to the first option, same as the live auto-select */
+      }
       html+='<div>';
       html+='<label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;font-weight:600">'
         +'<input type="checkbox" class="'+idPrefix+'-chk" data-role="'+role+'" data-target="'+targetRole+'" '+(entry.checked?'checked':'')+' style="width:15px;height:15px;accent-color:var(--pb);cursor:pointer" onchange="toggleScopeVisibility(this,\''+idPrefix+'\')">'+targetRole+'</label>';
@@ -4377,8 +4387,21 @@ function buildPermissionsMatrixHTML(idPrefix,presetRules){
   return html;
 }
 function toggleScopeVisibility(chk,idPrefix){
-  var scopeBox=document.querySelector('.'+idPrefix+'-scope[data-role="'+chk.dataset.role+'"][data-target="'+chk.dataset.target+'"]');
+  /* walk the DOM directly to this checkbox's own scope box (its
+     <label>'s next sibling, by construction in buildPermissionsMatrixHTML)
+     instead of re-querying by data-role/data-target -- guarantees this
+     exact checkbox is always paired with its own row's scope options,
+     never a different row's. */
+  var scopeBox=chk.closest('label')&&chk.closest('label').nextElementSibling;
   if(scopeBox)scopeBox.style.display=chk.checked?'flex':'none';
+  /* Checking a level shouldn't leave its scope sub-options unanswered --
+     auto-pick the first one immediately so "checked but no scope
+     selected" (the state that used to trigger the save-time validation
+     error) can no longer happen through normal use of this control. */
+  if(chk.checked&&scopeBox&&!scopeBox.querySelector('input[type="radio"]:checked')){
+    var firstRadio=scopeBox.querySelector('input[type="radio"]');
+    if(firstRadio)firstRadio.checked=true;
+  }
 }
 /* backward-compatible alias -- some older call sites still reference the
    original function name */
@@ -4497,10 +4520,26 @@ function buildAddRoundFormHTML(){
   return html;
 }
 /* ── Preview/confirm modal (item 2.2) ── */
+function findOverlappingRound(s,e,excludeId){
+  var all=[];
+  if(!currentRound.closed&&currentRound.startDate&&currentRound.endDate)all.push({label:roundLabel(currentRound.year,currentRound.roundNo),startDate:currentRound.startDate,endDate:currentRound.endDate,id:currentRound.id});
+  SCHEDULED_ROUNDS.forEach(function(r){all.push({label:r.label,startDate:r.startDate,endDate:r.endDate,id:r.id});});
+  ROUNDS.forEach(function(r){all.push({label:r.label,startDate:r.startDate,endDate:r.endDate,id:r.id});});
+  return all.filter(function(r){
+    if(excludeId&&r.id===excludeId)return false;
+    if(!r.startDate||!r.endDate)return false;
+    return s<=r.endDate&&r.startDate<=e; /* YYYY-MM-DD strings sort chronologically as plain strings */
+  })[0];
+}
 function openAddRoundPreview(){
   var s=h('addRoundStart').value,e=h('addRoundEnd').value;
   if(!s||!e){toast(icon('alerttriangle',18),'กรุณาเลือกวันที่ให้ครบ','','var(--I)');return;}
   if(e<s){toast(icon('alerttriangle',18),'วันสิ้นสุดต้องอยู่หลังวันเริ่มต้น','','var(--I)');return;}
+  var overlap=findOverlappingRound(s,e,_editingRoundId);
+  if(overlap){
+    toast(icon('alerttriangle',18),'วันที่ทับซ้อนกับรอบที่มีอยู่แล้ว',overlap.label+' ('+fmtThaiDate(overlap.startDate)+' \u2013 '+fmtThaiDate(overlap.endDate)+') \u2014 กรุณาเลือกช่วงวันที่ที่ไม่ทับซ้อนกัน','var(--I)');
+    return;
+  }
   /* collect + validate the per-round permissions the same way the
      org-wide settings card does -- scope is mandatory for every checked
      target role here too. */
@@ -4509,7 +4548,13 @@ function openAddRoundPreview(){
     var role=chk.dataset.role,target=chk.dataset.target;
     if(!rules[role])rules[role]={};
     if(!chk.checked){rules[role][target]={checked:false,scope:''};return;}
-    var scopeRadio=document.querySelector('#addRoundPermsBox .addrperm-scope-radio[data-role="'+role+'"][data-target="'+target+'"]:checked');
+    /* walk the DOM directly to this exact checkbox's own scope box
+       (guaranteed to be the next sibling of its <label>, by construction
+       in buildPermissionsMatrixHTML) instead of re-querying by
+       data-role/data-target -- avoids any chance of an attribute-selector
+       mismatch pairing a checkbox with the wrong row's scope options. */
+    var scopeBox=chk.closest('label')&&chk.closest('label').nextElementSibling;
+    var scopeRadio=scopeBox&&scopeBox.querySelector('input[type="radio"]:checked');
     if(!scopeRadio){missingScope.push(role+' \u2192 '+target);rules[role][target]={checked:true,scope:''};return;}
     rules[role][target]={checked:true,scope:scopeRadio.value};
     summaryLines.push({role:role,target:target,scope:scopeRadio.value});
