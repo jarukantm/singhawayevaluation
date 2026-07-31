@@ -5473,9 +5473,17 @@ function getDefaults(user){
      New structure (item 9): {targetRole: {checked, scope:'dept'|'company'}}
      -- scope is applied per target role, not just a flat allow-list, so
      "ปฏิบัติการ ต้องประเมิน ปฏิบัติการ (เฉพาะหน่วยงานเดียวกัน)" actually
-     restricts to the same dept, while "...(ทั้งบริษัท)" doesn't. */
-  if(EVAL_RULES&&EVAL_RULES[role]){
-    var roleRules=EVAL_RULES[role];
+     restricts to the same dept, while "...(ทั้งบริษัท)" doesn't.
+     Reads currentRound.rules -- that's what actually gets configured and
+     carried through the whole create -> schedule -> activate lifecycle
+     (see activateScheduledRound) for the round that's actually live right
+     now. The standalone EVAL_RULES global is a separate org-wide-default
+     concept that nothing in the live UI ever populates, so it must never
+     be the primary source here -- it's kept only as a last-resort
+     fallback in case something else sets it in the future. */
+  var activeRules=(currentRound&&currentRound.rules)||EVAL_RULES;
+  if(activeRules&&activeRules[role]){
+    var roleRules=activeRules[role];
     return ALL_EMP.filter(function(e){
       if(e.empId===id)return false;
       var entry=roleRules[e.role];
