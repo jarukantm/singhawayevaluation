@@ -1879,7 +1879,7 @@ var USERS={
   'patipan_h':{pass:'111111',empId:'EMP10753',name:'ปฏิภาณ หริรักษ์',nick:'ออโต้',role:'ปฏิบัติการ',dept:'แผนกบริการเครื่องจักรการผลิต',div:'ฝ่ายวิศวกรรมเครื่องจักรการผลิต',pos:'ช่างซ่อมบรรจุ',color:'#065F46'},
   'parichat_l':{pass:'111111',empId:'EMP433',name:'ปาริชาติ ลิ้มไพบูลย์',nick:'ปลา',role:'ผู้บริหารระดับสูง',dept:'',div:'ฝ่ายบริหารทรัพยากร',pos:'ผู้จัดการฝ่ายบริหารทรัพยากรน้ำและสิ่งแวดล้อม',color:'#0D6EE7'},
   'sarun_v':{pass:'111111',empId:'EMP6265',name:'ศรัณย์ วณิชยาลัย',nick:'ตัน',role:'ผู้บริหารระดับกลาง',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',div:'ฝ่ายบริหารทรัพยากร',pos:'ผู้จัดการแผนกอนุรักษ์ทรัพยากรน้ำ',color:'#1D9E75',assignedRole:'SuperAdmin'},
-  'jarukan_t':{pass:'111111',empId:'EMP13132',name:'จารุกานต์ เตมียกุล',nick:'เนย',role:'ปฏิบัติการ',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',div:'ฝ่ายบริหารทรัพยากร',pos:'วิศวกรอนุรักษ์ทรัพยากรน้ำ',color:'#185FA5',assignedRole:'Admin'},
+  'jarukan_t':{pass:'111111',empId:'EMP13132',name:'จารุกานต์ เตมียกุล',nick:'เนย',role:'ปฏิบัติการ',dept:'แผนกอนุรักษ์ทรัพยากรน้ำ',div:'ฝ่ายบริหารทรัพยากร',pos:'วิศวกรอนุรักษ์ทรัพยากรน้ำ',color:'#185FA5',assignedRole:'SuperAdmin'},
   'muttikhan_t':{pass:'111111',empId:'EMP6696',name:'มัตติกานต์ ธโนปจัย',nick:'เมียม',role:'ผู้บริหารระดับกลาง',dept:'แผนกบำบัดน้ำดี',div:'ฝ่ายบริหารทรัพยากร',pos:'ผู้จัดการแผนกบำบัดน้ำดี',color:'#534AB7'},
   'patchar_d':{pass:'111111',empId:'EMP11728',name:'พัดชา ดิลกวัฒนวัฒน์',nick:'หยก',role:'ปฏิบัติการ',dept:'แผนกบำบัดน้ำดี',div:'ฝ่ายบริหารทรัพยากร',pos:'วิศวกรบำบัดน้ำดี',color:'#711B13'},
   'supachoke_m':{pass:'111111',empId:'EMP4769',name:'ศุภโชค มัญจาวงษ์',nick:'อั้น',role:'ผู้บริหารระดับกลาง',dept:'แผนกบำบัดน้ำทิ้ง',div:'ฝ่ายบริหารทรัพยากร',pos:'ผู้จัดการแผนกบำบัดน้ำทิ้ง',color:'#A32D2D'},
@@ -2249,6 +2249,16 @@ function daysRemaining(endDate){
   var now=new Date();
   var diff=Math.ceil((end-now)/86400000);
   return diff;
+}
+/* True when a round has been activated (not closed) but its own start
+ * date hasn't actually arrived yet -- this app has no server-side
+ * cron, so "activating" a round just makes it the live currentRound
+ * immediately; if an Admin sets a future start date, the round was
+ * still showing as "กำลังดำเนินการ" (in progress) right away, which is
+ * misleading before that date actually arrives. */
+function roundNotYetStarted(r){
+  if(!r||r.closed||!r.startDate)return false;
+  return new Date()<new Date(r.startDate+'T00:00:00');
 }
 var THAI_MONTHS=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
 function fmtThaiDate(dateStr){
@@ -4025,12 +4035,13 @@ function renderAdminRounds(){
      fields, so this always matches what the table below shows as the
      most recent entry. */
   var summaryRound=(currentRound.closed&&ROUNDS.length)?ROUNDS[ROUNDS.length-1]:currentRound;
+  var summaryNotStarted=roundNotYetStarted(summaryRound);
   html+='<div style="padding:14px 16px;border-bottom:1px solid var(--b0);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">';
   html+='<div>';
-  html+='<div style="font-family:var(--fh);font-size:18px;font-weight:800;color:var(--t0)">'+roundLabel(summaryRound.year,summaryRound.roundNo)+' <span style="font-size:11px;font-weight:600;color:'+(summaryRound.closed?'var(--I)':'var(--E)')+'">'+(summaryRound.closed?'(ปิดรอบแล้ว)':'(กำลังดำเนินการ)')+'</span></div>';
+  html+='<div style="font-family:var(--fh);font-size:18px;font-weight:800;color:var(--t0)">'+roundLabel(summaryRound.year,summaryRound.roundNo)+' <span style="font-size:11px;font-weight:600;color:'+(summaryRound.closed?'var(--I)':summaryNotStarted?'var(--L)':'var(--E)')+'">'+(summaryRound.closed?'(ปิดรอบแล้ว)':summaryNotStarted?'(ยังไม่เริ่ม)':'(กำลังดำเนินการ)')+'</span></div>';
   if(summaryRound.startDate&&summaryRound.endDate)html+='<div style="font-size:11px;color:var(--t1);margin-top:2px">'+fmtThaiDate(summaryRound.startDate)+' \u2013 '+fmtThaiDate(summaryRound.endDate)+' \u00B7 '+(summaryRound.isAnonymous?icon('lock',14)+' ไม่ระบุตัวตน':icon('eye',14)+' ระบุตัวตน')+'</div>';
   html+='</div>';
-  if(!summaryRound.closed){
+  if(!summaryRound.closed&&!summaryNotStarted){
     var rdA=daysRemaining(summaryRound.endDate);
     if(rdA!==null){
       var rdColA=rdA<0?'var(--I)':rdA<=3?'var(--L)':'var(--E)';
@@ -4280,7 +4291,10 @@ function logPermAudit(target,oldRole,newRole){
 function renderPermAuditLogInnerHTML(){
   var log=[];
   try{log=JSON.parse(localStorage.getItem('sf_permission_audit_log')||'null')||[];}catch(e){}
-  var html='<div style="font-size:13px;font-weight:700;color:var(--t0);margin-bottom:8px">'+icon('clock',16)+' Audit Log</div>';
+  var html='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px">';
+  html+='<div style="font-size:13px;font-weight:700;color:var(--t0)">'+icon('clock',16)+' Audit Log</div>';
+  if(log.length)html+='<button class="btn bo" style="font-size:11px;padding:4px 10px" onclick="clearAuditLog()">'+icon('trash',13)+' ล้างประวัติ</button>';
+  html+='</div>';
   html+='<div style="overflow-x:auto"><table class="sw-table"><thead><tr><th class="lft">วันที่/เวลา</th><th class="lft">ผู้ดำเนินการ</th><th class="lft">ผู้ถูกเปลี่ยนสิทธิ์</th><th>Role เดิม</th><th>Role ใหม่</th></tr></thead><tbody>';
   if(!log.length){
     html+='<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--t2)">ยังไม่มีประวัติการเปลี่ยนสิทธิ์</td></tr>';
@@ -4290,6 +4304,11 @@ function renderPermAuditLogInnerHTML(){
   });
   html+='</tbody></table></div>';
   return html;
+}
+function clearAuditLog(){
+  try{localStorage.removeItem('sf_permission_audit_log');}catch(e){}
+  toast(icon('circlecheck',18),'ล้างประวัติ Audit Log แล้ว','','var(--E)');
+  renderAdminTab();
 }
 
 /* Shared permissions-matrix builder (item 3: short checkbox text) --
@@ -4694,10 +4713,11 @@ function buildRoundStatusRowsHTML(){
        open -- once closed it's already been archived into ROUNDS (see
        confirmCloseCurrentRound), so keeping this row too would just
        show the exact same round twice. */
+    var curNotStarted=roundNotYetStarted(currentRound);
     entries.push({
       label:roundLabel(currentRound.year,currentRound.roundNo),startDate:currentRound.startDate,endDate:currentRound.endDate,
       isAnonymous:currentRound.isAnonymous,empCount:currentRound.empCount,completedCount:currentRound.completedCount,
-      statusHtml:statusBadge('var(--E)','rgba(29,158,117,.1)',icon('play',12)+' กำลังดำเนินการ'),
+      statusHtml:curNotStarted?statusBadge('var(--L)','rgba(186,117,23,.1)',icon('clock',12)+' ยังไม่เริ่ม'):statusBadge('var(--E)','rgba(29,158,117,.1)',icon('play',12)+' กำลังดำเนินการ'),
       rowBg:'',
       actionsHtml:'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditRoundDatesDialog()">'+icon('pencil',14)+' แก้ไขวันที่</button>'
          +'<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openCloseCurrentRoundConfirm()">'+icon('lock',14)+' ปิดรอบ</button>'
