@@ -236,6 +236,10 @@ button,input,select{font-family:var(--fb)}
 .lgi{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1);font-weight:500}
 .lgb{width:8px;height:8px;border-radius:2px}
 .lgn{margin-left:auto;font-size:10px;color:var(--t2)}
+@media(max-width:480px){
+  .lgd{flex-direction:column;align-items:flex-start;gap:6px}
+  .lgd-lbl{margin-bottom:2px}
+}
 .lgn-touch{display:none}
 @media(hover:none),(pointer:coarse){
   .lgn-hover{display:none}
@@ -1940,7 +1944,7 @@ var USERS={
   'bootsarapo_c':{pass:'111111',empId:'EMP13580',name:'บุษราพร ไชยพันธ์',nick:'หนุงหนิง',role:'ปฏิบัติการ',dept:'แผนกสิ่งแวดล้อม',div:'ฝ่ายบริหารทรัพยากร',pos:'นักวิทยาศาสตร์เกษตรกรรม',color:'#C2410C'},
   'phumipat_p':{pass:'111111',empId:'EMP13978',name:'ภูมิพัฒน์ พินธิตรารติบดี',nick:'ก้อง',role:'ปฏิบัติการ',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',div:'ฝ่ายวิศวกรรมเครื่องกล',pos:'วิศวกรเครื่องกล-ต้นกำลัง',color:'#0891B2'},
   'primprita_k':{pass:'111111',empId:'EMP13566',name:'พริมพริตาน์ แก้วกุลบัณฑิต',nick:'เอิร์น',role:'ปฏิบัติการ',dept:'แผนกบริการพิเศษทางวิศวกรรม',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',pos:'เจ้าหน้าที่เขียนแบบ',color:'#7C3AED'},
-  'anuchit_n':{pass:'111111',empId:'EMP14359',name:'อนุชิต โนนทิง',nick:'บอย',role:'ผู้บริหารระดับสูง',dept:'',div:'ส่วนความมั่นคง ปลอดภัย',pos:'ผู้จัดการส่วนความมั่นคงปลอดภัยโรงงาน',color:'#065F46'},
+  'anuchit_n':{pass:'111111',empId:'EMP14359',name:'อนุชิต โนนทิง',nick:'บอย',role:'ผู้บริหารระดับกลาง',dept:'',div:'ส่วนความมั่นคง ปลอดภัย',pos:'ผู้จัดการส่วนความมั่นคงปลอดภัยโรงงาน',color:'#065F46'},
   'Janejira_N':{pass:'111111',empId:'EMP14442',name:'เจนจิรา หนูตีด',nick:'เจน',role:'ปฏิบัติการ',dept:'',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',pos:'วิศวกรอาหาร 1',color:'#0D6EE7'},
   'subkerd.sah':{pass:'111111',empId:'EMP14547',name:'สหรัฐ ทรัพย์เกิด',nick:'นับหนึ่ง',role:'ปฏิบัติการ',dept:'แผนกบริหารการเปลี่ยนแปลง',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',pos:'นักบริหารการเปลี่ยนแปลง',color:'#1D9E75'},
   'tanapat_t':{pass:'111111',empId:'EMP14549',name:'ธนภัทร ธัญลักษณ์ชัยกุล',nick:'ภัทร',role:'ปฏิบัติการ',dept:'แผนกวิศวกรรมเครื่องกลระบบ',div:'ฝ่ายวิศวกรรมเครื่องกล',pos:'วิศวกรเครื่องกล-งานระบบ 1',color:'#185FA5'},
@@ -2095,7 +2099,7 @@ var ALL_EMP=[
   {empId:'EMP13580',name:'บุษราพร ไชยพันธ์',nick:'หนุงหนิง',role:'ปฏิบัติการ',dept:'แผนกสิ่งแวดล้อม',div:'ฝ่ายบริหารทรัพยากร',pos:'นักวิทยาศาสตร์เกษตรกรรม',color:'#C2410C',group:'CTG',empType:'พนักงาน'},
   {empId:'EMP13978',name:'ภูมิพัฒน์ พินธิตรารติบดี',nick:'ก้อง',role:'ปฏิบัติการ',dept:'แผนกวิศวกรรมเครื่องกลต้นกำลัง',div:'ฝ่ายวิศวกรรมเครื่องกล',pos:'วิศวกรเครื่องกล-ต้นกำลัง',color:'#0891B2',group:'CTEG',empType:'พนักงาน'},
   {empId:'EMP13566',name:'พริมพริตาน์ แก้วกุลบัณฑิต',nick:'เอิร์น',role:'ปฏิบัติการ',dept:'แผนกบริการพิเศษทางวิศวกรรม',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',pos:'เจ้าหน้าที่เขียนแบบ',color:'#7C3AED',group:'BTDE',empType:'พนักงาน'},
-  {empId:'EMP14359',name:'อนุชิต โนนทิง',nick:'บอย',role:'ผู้บริหารระดับสูง',dept:'',div:'ส่วนความมั่นคง ปลอดภัย',pos:'ผู้จัดการส่วนความมั่นคงปลอดภัยโรงงาน',color:'#065F46',group:'CTG',empType:'พนักงาน'},
+  {empId:'EMP14359',name:'อนุชิต โนนทิง',nick:'บอย',role:'ผู้บริหารระดับกลาง',dept:'',div:'ส่วนความมั่นคง ปลอดภัย',pos:'ผู้จัดการส่วนความมั่นคงปลอดภัยโรงงาน',color:'#065F46',group:'CTG',empType:'พนักงาน'},
   {empId:'EMP14442',name:'เจนจิรา หนูตีด',nick:'เจน',role:'ปฏิบัติการ',dept:'',div:'ฝ่ายวิศวกรรมเพื่อการพัฒนาธุรกิจและเทคโนโลยี',pos:'วิศวกรอาหาร 1',color:'#0D6EE7',group:'BTDE',empType:'พนักงาน'},
   {empId:'EMP14547',name:'สหรัฐ ทรัพย์เกิด',nick:'นับหนึ่ง',role:'ปฏิบัติการ',dept:'แผนกบริหารการเปลี่ยนแปลง',div:'ส่วนบริหารการเปลี่ยนแปลงงานเทคนิค',pos:'นักบริหารการเปลี่ยนแปลง',color:'#1D9E75',group:'CMT',empType:'พนักงาน'},
   {empId:'EMP14549',name:'ธนภัทร ธัญลักษณ์ชัยกุล',nick:'ภัทร',role:'ปฏิบัติการ',dept:'แผนกวิศวกรรมเครื่องกลระบบ',div:'ฝ่ายวิศวกรรมเครื่องกล',pos:'วิศวกรเครื่องกล-งานระบบ 1',color:'#185FA5',group:'CTEG',empType:'พนักงาน'},
@@ -5177,8 +5181,13 @@ if(h('crConfirmBtnA'))h('crConfirmBtnA').addEventListener('click',function(){
 /* LOGIN */
 h('eyb').addEventListener('click',function(){var el=h('lp');el.type=el.type==='password'?'text':'password';});
 function doLogin(){
-  var u=h('lu').value.trim();var p=h('lp').value;
-  var ud=USERS[u];
+  var typed=h('lu').value.trim();var p=h('lp').value;
+  /* Item 4: login works regardless of capitalization -- find the real
+     USERS key case-insensitively, then use THAT canonical key for
+     everything else (CU.username, selectableRolesFor, etc.) so the rest
+     of the app keeps seeing the same lowercase username it always did. */
+  var u=Object.keys(USERS).filter(function(k){return k.toLowerCase()===typed.toLowerCase();})[0];
+  var ud=u?USERS[u]:null;
   if(!ud||ud.pass!==p){h('lerr').style.display='block';h('lp').value='';return;}
   h('lerr').style.display='none';
   CU=Object.assign({},ud,{username:u});
@@ -5969,7 +5978,13 @@ h('batchsavebtn').addEventListener('click',function(){
 /* -- AUTO SAVE (localStorage backup) -- */
 function autoSave(){
   if(!CU||!CU.username)return;
-  try{localStorage.setItem('sf_autosave_'+CU.username,JSON.stringify({selfSc:selfSc,othSc:othSc,rsnNotes:rsnNotes,sSaved:sSaved,sSub:sSub,oSaved:oSaved,oSub:oSub,ts:Date.now()}));}catch(e){}
+  /* Item 5 fix: persist manually-added evaluatees (via +เพิ่มบุคคล) too,
+     not just the score data -- otherwise they silently vanish from the
+     list on next login even though their scores are still sitting in
+     storage, unreachable. */
+  var defaultIds={};getDefaults(CU).forEach(function(e){defaultIds[e.empId]=true;});
+  var extraPersonIds=persons.filter(function(p){return !defaultIds[p.empId];}).map(function(p){return p.empId;});
+  try{localStorage.setItem('sf_autosave_'+CU.username,JSON.stringify({selfSc:selfSc,othSc:othSc,rsnNotes:rsnNotes,sSaved:sSaved,sSub:sSub,oSaved:oSaved,oSub:oSub,extraPersonIds:extraPersonIds,ts:Date.now()}));}catch(e){}
 }
 function autoLoad(){
   if(!CU||!CU.username)return false;
@@ -5977,6 +5992,18 @@ function autoLoad(){
     if(d&&d.selfSc){
       selfSc=d.selfSc;othSc=d.othSc||{};rsnNotes=d.rsnNotes||{};
       sSaved=!!d.sSaved;sSub=!!d.sSub;oSaved=!!d.oSaved;oSub=!!d.oSub;
+      /* re-add any manually-added evaluatees from last time -- persons[]
+         itself is rebuilt fresh from getDefaults() on every login, so
+         without this they'd silently disappear even though their
+         scores (in othSc, restored just above) are still intact. */
+      (d.extraPersonIds||[]).forEach(function(eid){
+        if(persons.some(function(p){return p.empId===eid;}))return;
+        var emp=ALL_EMP.filter(function(e){return e.empId===eid;})[0];
+        if(!emp)return;
+        persons.push(Object.assign({},emp));
+        expd[emp.empId]=false;
+        CATS.forEach(function(c){catOp[emp.empId+c]=true;});
+      });
       return true;
     }}catch(e){}
   return false;
@@ -7250,7 +7277,7 @@ function renderChipBar(cid,list){
 function removePerson(eid){
   var defs={};getDefaults(CU).forEach(function(e){defs[e.empId]=true;});
   if(defs[eid]){toast(icon('alerttriangle',18),'ไม่สามารถลบได้','บุคคลนี้อยู่ใน Default list','var(--L)');return;}
-  persons=persons.filter(function(p){return p.empId!==eid;});renderTab();
+  persons=persons.filter(function(p){return p.empId!==eid;});autoSave();renderTab();
 }
 
 /* ADD PERSON */
@@ -7386,6 +7413,7 @@ function commitAddSelected(){
     addedNames.push(emp.name);
   });
   addPendingMode=false;addSelected={};
+  autoSave();
   filterAdd(h('addq').value);
   renderTab();
   if(addedNames.length)toast(icon('circlecheck',18),'\u0e40\u0e1e\u0e34\u0e48\u0e21\u0e1c\u0e39\u0e49\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19 '+addedNames.length+' \u0e04\u0e19\u0e41\u0e25\u0e49\u0e27','\u0e15\u0e49\u0e2d\u0e07\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e43\u0e2b\u0e49\u0e04\u0e23\u0e1a\u0e17\u0e38\u0e01\u0e2b\u0e31\u0e27\u0e02\u0e49\u0e2d\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e01\u0e14 Save \u0e44\u0e14\u0e49','var(--G)');
@@ -7398,6 +7426,7 @@ function addPerson(eid){
   persons.push(Object.assign({},emp));
   expd[emp.empId]=false; /* start collapsed, same as everyone else -- user can tap to expand */
   CATS.forEach(function(c){catOp[emp.empId+c]=true;});
+  autoSave(); /* persist immediately -- don't wait for their first rating (item 5 fix) */
   renderTab();
   toast(icon('circlecheck',18),'\u0e40\u0e1e\u0e34\u0e48\u0e21 '+emp.name+' \u0e41\u0e25\u0e49\u0e27','\u0e15\u0e49\u0e2d\u0e07\u0e1b\u0e23\u0e30\u0e40\u0e21\u0e34\u0e19\u0e43\u0e2b\u0e49\u0e04\u0e23\u0e1a\u0e17\u0e38\u0e01\u0e2b\u0e31\u0e27\u0e02\u0e49\u0e2d\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e01\u0e14 Save \u0e44\u0e14\u0e49','var(--G)');
 }
