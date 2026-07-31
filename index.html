@@ -4644,17 +4644,20 @@ function buildRoundStatusRowsHTML(){
      this exact same data/markup, so the two layouts can never drift out
      of sync with each other (item 4's "ไม่ทำให้ข้อมูลสำคัญหายไป"). */
   var entries=[];
-  entries.push({
-    label:roundLabel(currentRound.year,currentRound.roundNo),startDate:currentRound.startDate,endDate:currentRound.endDate,
-    isAnonymous:currentRound.isAnonymous,empCount:currentRound.empCount,completedCount:currentRound.completedCount,
-    statusHtml:currentRound.closed?statusBadge('var(--I)','rgba(163,45,45,.1)',icon('circlex',12)+' ปิดรอบแล้ว'):statusBadge('var(--E)','rgba(29,158,117,.1)',icon('play',12)+' กำลังดำเนินการ'),
-    rowBg:'',
-    actionsHtml:currentRound.closed
-      ?'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openClosedRoundDetail(\''+currentRound.id+'\')">'+icon('eye',14)+' ดูรายละเอียด</button>'
-       +'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="duplicateRound(\''+currentRound.id+'\')">'+icon('copy',14)+' คัดลอกรอบ</button>'
-      :'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditRoundDatesDialog()">'+icon('pencil',14)+' แก้ไขวันที่</button>'
-       +'<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openCloseCurrentRoundConfirm()">'+icon('lock',14)+' ปิดรอบ</button>'
-  });
+  if(!currentRound.closed){
+    /* only show the "live" current-round row while it's actually still
+       open -- once closed it's already been archived into ROUNDS (see
+       confirmCloseCurrentRound), so keeping this row too would just
+       show the exact same round twice. */
+    entries.push({
+      label:roundLabel(currentRound.year,currentRound.roundNo),startDate:currentRound.startDate,endDate:currentRound.endDate,
+      isAnonymous:currentRound.isAnonymous,empCount:currentRound.empCount,completedCount:currentRound.completedCount,
+      statusHtml:statusBadge('var(--E)','rgba(29,158,117,.1)',icon('play',12)+' กำลังดำเนินการ'),
+      rowBg:'',
+      actionsHtml:'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditRoundDatesDialog()">'+icon('pencil',14)+' แก้ไขวันที่</button>'
+         +'<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openCloseCurrentRoundConfirm()">'+icon('lock',14)+' ปิดรอบ</button>'
+    });
+  }
   SCHEDULED_ROUNDS.forEach(function(r){
     entries.push({
       label:r.label,startDate:r.startDate,endDate:r.endDate,isAnonymous:r.isAnonymous,empCount:undefined,completedCount:undefined,
@@ -4851,6 +4854,7 @@ function confirmCloseCurrentRound(){
     startDate:currentRound.startDate,endDate:currentRound.endDate,
     label:roundLabel(currentRound.year,currentRound.roundNo),
     isAnonymous:currentRound.isAnonymous!==false,
+    empCount:currentRound.empCount,completedCount:currentRound.completedCount,
     closedAt:Date.now(),
     selfSc:{},othSc:{},rsnNotes:{}
   });
