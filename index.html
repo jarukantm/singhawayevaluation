@@ -1378,7 +1378,6 @@ button,input,select{font-family:var(--fb)}
       <div class="sb-sep" id="assignSecSep" style="display:none"></div>
       <div class="sb-sec-lbl" id="assignSecLbl" style="display:none">มอบหมายงาน</div>
       <button class="nb" id="t-config" style="display:none" onclick="showTab('config')" title="Config"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div><span class="nb-txt">Config</span></button>
-      <button class="nb" id="t-assignedorg" style="display:none" onclick="showTab('assignedorg')" title="Assigned Organizations"><div class="ni"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><span class="nb-txt">Assigned Organizations</span></button>
     </nav>
     <div class="sb-foot">
       <button class="sb-logout" id="switchRoleBtn" style="display:none" onclick="openSwitchRolePopup()" title="Switch Role"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span class="nb-txt">Switch Role</span></button>
@@ -1469,11 +1468,11 @@ button,input,select{font-family:var(--fb)}
             <div><div class="ptitle"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg> ภาพรวมผลประเมิน</div></div>
             <button class="btn bt dash-export-btn" style="font-size:12px;padding:9px 14px;flex-shrink:0;white-space:nowrap" onclick="openExportReportPopup('dash')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Report</button>
           </div>
+          <div id="dashOrgTabs" style="margin-bottom:14px"></div>
           <div id="dbody"></div>
         </div>
       </div>
       <div class="view" id="v-config"><div class="vi" id="configBody"></div></div>
-      <div class="view" id="v-assignedorg"><div class="vi" id="assignedOrgBody"></div></div>
     </div>
   </div>
 </div>
@@ -1632,7 +1631,7 @@ button,input,select{font-family:var(--fb)}
     <div class="topbar">
       <div class="tb-top-row">
         <div class="tb-left">
-          <div class="tb-title" id="atbtitle">คะแนนรายบุคคล</div>
+          <div class="tb-title" id="atbtitle">ภาพรวมคะแนน</div>
           <div class="tb-sub" id="atbsub"></div>
         </div>
         <button class="tb-mob-logout" id="tbMobLogoutA" onclick="openLogoutConfirm()" title="ออกจากระบบ"><span class="tb-mob-logout-ico"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>ออกจากระบบ</button>
@@ -2602,7 +2601,7 @@ function showAdminTab(t){
     h('va-'+x).classList.toggle('on',x===t);
     var mb=h('mna-'+x);if(mb)mb.classList.toggle('on',x===t);
   });
-  var titles={status:'Evaluation Status',scores:'Evaluation Report',rounds:'System Settings'};
+  var titles={status:'Evaluation Status',scores:'\u0e20\u0e32\u0e1e\u0e23\u0e27\u0e21\u0e04\u0e30\u0e41\u0e19\u0e19',rounds:'System Settings'};
   h('atbtitle').textContent=titles[t];
   renderAdminTab();
 }
@@ -2661,12 +2660,16 @@ function renderAdminStatus(){
     var c=mockCompletionFor(e.empId);
     return{e:e,c:c};
   });
-  var selfDoneCnt=allRows.filter(function(r){return r.c.selfDone;}).length;
-  var submittedCnt=allRows.filter(function(r){return r.c.submitted;}).length;
-  var pendingSubmit=allRows.filter(function(r){return !r.c.submitted;});
+  /* Item 3: the top summary counts now follow the Filter (กลุ่ม/ฝ่าย/แผนก)
+     selected below, instead of always being company-wide. */
+  var statusScope=resolveStatusScope(allRows);
+  var scopedTopRows=statusScope.scopedRows;
+  var selfDoneCnt=scopedTopRows.filter(function(r){return r.c.selfDone;}).length;
+  var submittedCnt=scopedTopRows.filter(function(r){return r.c.submitted;}).length;
+  var pendingSubmit=scopedTopRows.filter(function(r){return !r.c.submitted;});
   html+='<div class="card" style="padding:14px 16px;margin-bottom:14px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">';
-  html+='<div><div style="font-size:11px;color:var(--t2)">ประเมินตนเองแล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+selfDoneCnt+' / '+allRows.length+'</div></div>';
-  html+='<div><div style="font-size:11px;color:var(--t2)">Submit แล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--G)">'+submittedCnt+' / '+allRows.length+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">ประเมินตนเองแล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--E)">'+selfDoneCnt+' / '+scopedTopRows.length+'</div></div>';
+  html+='<div><div style="font-size:11px;color:var(--t2)">Submit แล้ว</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--G)">'+submittedCnt+' / '+scopedTopRows.length+'</div></div>';
   html+='<div><div style="font-size:11px;color:var(--t2)">ยังไม่ Submit</div><div style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--I)">'+pendingSubmit.length+' คน</div></div>';
   html+='<button class="btn bt" style="margin-left:auto;font-size:12px" '+(canSendReminder?'onclick="notifyAllPending()"':'disabled title="Admin ไม่มีสิทธิ์ Send Reminder"')+'>'+icon('bell',16)+' ส่งแจ้งเตือนทุกคนที่ยังไม่ Submit</button>';
   html+='</div>';
@@ -2683,6 +2686,27 @@ function renderAdminStatus(){
 var statusFilterGroup='ALL';
 var statusFilterDiv='';
 var statusFilterDept='';
+/* Shared by the top summary card (renderAdminStatus) and the rollup +
+   per-person table below (renderEvaluationStatusRollupHTML) so both
+   always describe the exact same filtered scope. */
+function resolveStatusScope(allRows){
+  var scopedRows=allRows,scopeLbl='\u0e17\u0e31\u0e49\u0e07\u0e2d\u0e07\u0e04\u0e4c\u0e01\u0e23 (TPK)';
+  if(statusFilterGroup!=='ALL'){
+    if(!statusFilterDiv){
+      scopedRows=allRows.filter(function(r){return r.e.group===statusFilterGroup;});
+      scopeLbl=statusFilterGroup;
+    } else if(!statusFilterDept){
+      var divName=DIV_CODE_TO_NAME[statusFilterDiv];
+      scopedRows=divName?allRows.filter(function(r){return r.e.div===divName;}):[];
+      scopeLbl=statusFilterDiv;
+    } else {
+      var divName2=DIV_CODE_TO_NAME[statusFilterDiv],deptName=DEPT_CODE_TO_NAME[statusFilterDept];
+      scopedRows=(divName2&&deptName)?allRows.filter(function(r){return r.e.div===divName2&&r.e.dept===deptName;}):[];
+      scopeLbl=statusFilterDept;
+    }
+  }
+  return{scopedRows:scopedRows,scopeLbl:scopeLbl};
+}
 function rollupStatusFor(pct){
   if(pct>=100)return{lbl:'Completed',cl:'var(--E)'};
   if(pct<=0)return{lbl:'Not Started',cl:'var(--I)'};
@@ -2722,22 +2746,10 @@ function renderEvaluationStatusRollupHTML(allRows){
   }
   html+='</div>';
 
-  /* resolve the cascading selection down to actual rows in scope */
-  var scopedRows=allRows,scopeLbl='\u0e17\u0e31\u0e49\u0e07\u0e2d\u0e07\u0e04\u0e4c\u0e01\u0e23 (TPK)';
-  if(statusFilterGroup!=='ALL'){
-    if(!statusFilterDiv){
-      scopedRows=allRows.filter(function(r){return r.e.group===statusFilterGroup;});
-      scopeLbl=statusFilterGroup;
-    } else if(!statusFilterDept){
-      var divName=DIV_CODE_TO_NAME[statusFilterDiv];
-      scopedRows=divName?allRows.filter(function(r){return r.e.div===divName;}):[];
-      scopeLbl=statusFilterDiv;
-    } else {
-      var divName2=DIV_CODE_TO_NAME[statusFilterDiv],deptName=DEPT_CODE_TO_NAME[statusFilterDept];
-      scopedRows=(divName2&&deptName)?allRows.filter(function(r){return r.e.div===divName2&&r.e.dept===deptName;}):[];
-      scopeLbl=statusFilterDept;
-    }
-  }
+  /* resolve the cascading selection down to actual rows in scope --
+     same helper the top summary card above already used */
+  var _scope=resolveStatusScope(allRows);
+  var scopedRows=_scope.scopedRows,scopeLbl=_scope.scopeLbl;
   var pct=scopedRows.length?Math.round(scopedRows.filter(function(r){return r.c.submitted;}).length/scopedRows.length*100):0;
   var st=rollupStatusFor(pct);
   html+='<div style="overflow-x:auto;padding:8px 16px 16px"><table class="sw-table"><thead><tr><th class="lft">หน่วยงาน</th><th>Status</th><th style="min-width:160px">Progress</th></tr></thead><tbody>';
@@ -2905,8 +2917,84 @@ function renderAdminScores(){
   if(adminRoundB&&adminRoundB!==adminRoundA)html+='<span style="font-size:10px;color:var(--t2);padding:3px 8px;background:var(--s2);border-radius:var(--r)">กำลังเทียบ '+roundLabel(getRoundById(adminRoundA).year,getRoundById(adminRoundA).roundNo)+' \u2194 '+roundLabel(getRoundById(adminRoundB).year,getRoundById(adminRoundB).roundNo)+'</span>';
   html+='</div>';
 
-  html+=withRound(adminRoundA,function(){return renderFocusSinghawayFilterCardHTML()+renderFocusChartHTML()+renderSinghawayChartHTML();});
+  html+=withRound(adminRoundA,function(){return renderFocusSinghawayFilterCardHTML()+renderCompareCardHTML()+renderFocusChartHTML()+renderSinghawayChartHTML();});
   h('adminScoresBody').innerHTML=html;
+}
+/* ============================================================
+ * Compare Card: pick any two rounds/years and see FOCUS + Singhaway
+ * Values side by side for the current Filter scope. Picking the SAME
+ * round in both drops back to a single bar per topic (no second bar),
+ * same convention as the "หน้าภาพรวมผลการประเมิน" (employee Dashboard)
+ * comparison feature this was modeled after -- reuses the same
+ * allSelectableRounds()/chronologicalOrder()/getRoundScoreFor() helpers.
+ * ============================================================ */
+var adminCmpA='current';
+var adminCmpB='current';
+function renderCompareCardHTML(){
+  var scope=focusSinghawayScope();
+  var peopleInScope=scope.peopleInScope;
+  var selectableRounds=allSelectableRounds();
+  var html='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">'+icon('calendarrange',18)+'</div><div class="db-sh-ttl">Compare</div></div>';
+  html+='<div style="padding:14px 16px">';
+  html+='<div class="db-compare-row" style="margin-bottom:14px">';
+  html+='<select class="db-compare-sel std-sel" onchange="adminCmpA=this.value;renderAdminTab()">';
+  selectableRounds.forEach(function(r){html+='<option value="'+r.id+'"'+(adminCmpA===r.id?' selected':'')+'>\u0e1b\u0e35 '+r.year+' '+r.label+(r.isCurrent?' (\u0e1b\u0e31\u0e08\u0e08\u0e38\u0e1a\u0e31\u0e19)':'')+'</option>';});
+  html+='</select>';
+  html+='<select class="db-compare-sel std-sel" onchange="adminCmpB=this.value;renderAdminTab()">';
+  selectableRounds.forEach(function(r){html+='<option value="'+r.id+'"'+(adminCmpB===r.id?' selected':'')+'>\u0e1b\u0e35 '+r.year+' '+r.label+(r.isCurrent?' (\u0e1b\u0e31\u0e08\u0e08\u0e38\u0e1a\u0e31\u0e19)':'')+'</option>';});
+  html+='</select>';
+  html+='</div>';
+  if(!peopleInScope.length){
+    html+='<div class="wb" style="margin-bottom:0"><span>\u2139\uFE0F</span><span>\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1e\u0e19\u0e31\u0e01\u0e07\u0e32\u0e19\u0e43\u0e19\u0e02\u0e2d\u0e1a\u0e40\u0e02\u0e15\u0e17\u0e35\u0e48\u0e40\u0e25\u0e37\u0e2d\u0e01</span></div></div></div>';
+    return html;
+  }
+  var cmpMode=adminCmpA!==adminCmpB;
+  var ord=chronologicalOrder(adminCmpA,adminCmpB);
+  var older=ord.older,newer=ord.newer;
+  function avgAt(roundId,keyFn){
+    var vals=peopleInScope.map(function(e){return keyFn(getRoundScoreFor(roundId,e.empId));});
+    return vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:0;
+  }
+  html+='<div class="db-gbar-legend" style="margin-bottom:8px">';
+  if(cmpMode)html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-hollow"></span>'+compactRoundLabel(older)+'</span>';
+  html+='<span class="db-gbar-legend-sw"><span class="db-gbar-legend-dot db-gbar-legend-filled"></span>'+compactRoundLabel(newer)+'</span>';
+  html+='</div>';
+  function cmpBarBlock(keys,keyFn,colorOf,labelOf){
+    var chH=170;
+    var b='<div style="display:flex;align-items:flex-end;gap:14px;height:'+chH+'px;border-bottom:1.5px solid var(--b0);border-left:1.5px solid var(--b0);padding:0 10px 0 30px;position:relative;margin-bottom:8px">';
+    [5,4,3,2,1,0].forEach(function(v){
+      var top=(1-v/5)*100;
+      b+='<div style="position:absolute;left:0;top:'+top+'%;transform:translateY(-50%);font-size:10px;font-weight:700;color:var(--t2);width:24px;text-align:right">'+v+'</div>';
+      b+='<div style="position:absolute;left:30px;right:8px;top:'+top+'%;border-top:1px dashed rgba(0,0,0,.06)"></div>';
+    });
+    keys.forEach(function(k){
+      var newVal=avgAt(newer.id,function(s){return keyFn(s,k);});
+      var oldVal=cmpMode?avgAt(older.id,function(s){return keyFn(s,k);}):null;
+      var col=colorOf(k);
+      var newH=Math.max(1,Math.round(newVal/5*chH));
+      b+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;min-width:0">';
+      if(cmpMode){
+        var oldH=Math.max(1,Math.round((oldVal||0)/5*chH));
+        b+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+labelOf(k)+' \u2013 '+compactRoundLabel(older)+': '+(oldVal||0).toFixed(2)+'">';
+        b+='<div style="width:100%;height:'+oldH+'px;background:'+lightVariantOf(col)+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:10px;font-weight:700;color:#111827">'+(oldVal||0).toFixed(2)+'</span></div></div>';
+      }
+      b+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+labelOf(k)+' \u2013 '+compactRoundLabel(newer)+': '+newVal.toFixed(2)+'">';
+      b+='<div style="width:100%;height:'+newH+'px;background:'+col+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+newVal.toFixed(2)+'</span></div></div>';
+      b+='</div>';
+    });
+    b+='</div>';
+    b+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
+    keys.forEach(function(k){b+='<div style="flex:1;text-align:center;font-size:11px;font-weight:800;color:'+colorOf(k)+';min-width:0">'+labelOf(k)+'</div>';});
+    b+='</div>';
+    return b;
+  }
+  var fkeysC=Object.keys(FDEF);
+  html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin-bottom:6px">FOCUS</div>';
+  html+=cmpBarBlock(fkeysC,function(s,f){return s.byFocus[f];},function(f){return FDEF[f].cl;},function(f){return f;});
+  html+='<div style="font-size:12px;font-weight:700;color:var(--t0);margin:16px 0 6px">Singhaway Values</div>';
+  html+=cmpBarBlock(CATS,function(s,cat){return s.byCat[cat];},function(cat){return CAT_META[cat].cl;},function(cat){return CAT_META[cat].lb;});
+  html+='</div></div>';
+  return html;
 }
 /* ============================================================
  * FOCUS / Singhaway Values aggregate charts (org-wide, cascading
@@ -2954,7 +3042,7 @@ function focusSinghawayScope(){
   return{peopleInScope:peopleInScope,scopeLabel:scopeLabel};
 }
 function renderFocusSinghawayFilterCardHTML(){
-  var html='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('search',16)+'</div><div class="db-sh-ttl">Filter \u2014 \u0e04\u0e27\u0e1a\u0e04\u0e38\u0e21\u0e01\u0e23\u0e32\u0e1f FOCUS \u0e41\u0e25\u0e30 Singhaway Values \u0e17\u0e31\u0e49\u0e07\u0e04\u0e39\u0e48</div></div>';
+  var html='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('search',16)+'</div><div class="db-sh-ttl">Filter</div></div>';
   html+='<div style="padding:14px 16px">';
   /* row 1: กลุ่ม / ฝ่าย / แผนก -- fixed widths so all three comfortably
      share one line instead of wrapping unpredictably */
@@ -3011,6 +3099,15 @@ function renderFocusChartHTML(){
       max:vals.length?Math.max.apply(null,vals):0
     };
   });
+  /* Item 2: overall FOCUS score across all 5 letters (equal weight),
+     shown as one summary number + its E/G/S/L/I letter grade. */
+  var focusOverallAvg=fkeysA.reduce(function(s,f){return s+focusStatScoped[f].avg;},0)/fkeysA.length;
+  var focusOverallLbl=s2l(focusOverallAvg);
+  html+='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--b0)">';
+  html+='<span style="font-size:11px;color:var(--t1)">คะแนนรวม FOCUS ภาพรวม:</span>';
+  html+='<span style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t0)">'+focusOverallAvg.toFixed(2)+'</span>';
+  html+='<span class="rb-inl" style="background:'+RCOL[focusOverallLbl.l]+'">'+focusOverallLbl.l+' \u2013 '+RNAME[focusOverallLbl.l]+'</span>';
+  html+='</div>';
   if(focusChartAxis==='focus'){
     var focusChartH=200;
     html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">\u0e41\u0e01\u0e19\u0e15\u0e31\u0e49\u0e07 = <b>\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22</b> (0-5)</div>';
@@ -3092,11 +3189,6 @@ function renderSinghawayChartHTML(){
     html+='<div class="wb" style="margin-bottom:0"><span>\u2139\uFE0F</span><span>\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e21\u0e35\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25\u0e1e\u0e19\u0e31\u0e01\u0e07\u0e32\u0e19\u0e43\u0e19\u0e23\u0e30\u0e14\u0e31\u0e1a "'+scopeLabel+'"</span></div></div></div>';
     return html;
   }
-  if(focusChartAxis!=='focus'){
-    html+=renderLevelCountBlockHTML(peopleInScope);
-    html+='</div></div>';
-    return html;
-  }
   var catStatScoped={};CATS.forEach(function(cat){
     var vals=peopleInScope.map(function(e){return mockScoreFor(e.empId).byCat[cat];});
     catStatScoped[cat]={
@@ -3105,6 +3197,20 @@ function renderSinghawayChartHTML(){
       max:vals.length?Math.max.apply(null,vals):0
     };
   });
+  /* Item 2: overall Singhaway score across all 4 values (equal weight),
+     shown as one summary number + its E/G/S/L/I letter grade. */
+  var catOverallAvg=CATS.reduce(function(s,cat){return s+catStatScoped[cat].avg;},0)/CATS.length;
+  var catOverallLbl=s2l(catOverallAvg);
+  html+='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--b0)">';
+  html+='<span style="font-size:11px;color:var(--t1)">คะแนนรวม Singhaway ภาพรวม:</span>';
+  html+='<span style="font-family:var(--fh);font-size:22px;font-weight:800;color:var(--t0)">'+catOverallAvg.toFixed(2)+'</span>';
+  html+='<span class="rb-inl" style="background:'+RCOL[catOverallLbl.l]+'">'+catOverallLbl.l+' \u2013 '+RNAME[catOverallLbl.l]+'</span>';
+  html+='</div>';
+  if(focusChartAxis!=='focus'){
+    html+=renderLevelCountBlockHTML(peopleInScope);
+    html+='</div></div>';
+    return html;
+  }
   var catChartH=200;
   html+='<div style="font-size:10px;color:var(--t2);margin-bottom:6px">\u0e41\u0e01\u0e19\u0e15\u0e31\u0e49\u0e07 = <b>\u0e04\u0e30\u0e41\u0e19\u0e19\u0e40\u0e09\u0e25\u0e35\u0e48\u0e22</b> (0-5) \u2014 '+scopeLabel+' ('+peopleInScope.length+' \u0e04\u0e19)</div>';
   html+='<div style="display:flex;gap:14px;padding:0 10px 0 30px">';
@@ -4572,7 +4678,8 @@ function buildRoundStatusRowsHTML(){
     statusHtml:currentRound.closed?statusBadge('var(--I)','rgba(163,45,45,.1)',icon('circlex',12)+' ปิดรอบแล้ว'):statusBadge('var(--E)','rgba(29,158,117,.1)',icon('play',12)+' กำลังดำเนินการ'),
     rowBg:'',
     actionsHtml:currentRound.closed
-      ?'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="toast(\''+icon('info',16)+'\',\'รอบนี้ปิดแล้ว\',\'ดูข้อมูลได้ปกติจากหน้า Dashboard\',\'var(--t2)\')">'+icon('eye',14)+' ดูรายละเอียด</button>'
+      ?'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openClosedRoundDetail(\''+currentRound.id+'\')">'+icon('eye',14)+' ดูรายละเอียด</button>'
+       +'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="duplicateRound(\''+currentRound.id+'\')">'+icon('copy',14)+' คัดลอกรอบ</button>'
       :'<button class="btn bo" style="font-size:10px;padding:4px 9px" onclick="openEditRoundDatesDialog()">'+icon('pencil',14)+' แก้ไขวันที่</button>'
        +'<button class="btn bo" style="font-size:10px;padding:4px 9px;color:var(--I);border-color:rgba(163,45,45,.3)" onclick="openCloseCurrentRoundConfirm()">'+icon('lock',14)+' ปิดรอบ</button>'
   });
@@ -4632,12 +4739,12 @@ function buildRoundStatusRowsHTML(){
   return '<div class="rh-table-wrap">'+tableHtml+'</div><div class="rh-card-list">'+cardsHtml+'</div>';
 }
 function openClosedRoundDetail(roundId){
-  var r=ROUNDS.filter(function(x){return x.id===roundId;})[0];
+  var r=roundId===currentRound.id?currentRound:ROUNDS.filter(function(x){return x.id===roundId;})[0];
   if(!r)return;
   toast(''+icon('eye',16)+'',r.label,(r.startDate?fmtThaiDate(r.startDate)+' \u2013 '+fmtThaiDate(r.endDate):'')+' \u2014 ดูผลย้อนหลังเต็มรูปแบบได้จากหน้า Dashboard (เลือกรอบนี้ในตัวเปรียบเทียบ)','var(--t2)');
 }
 function duplicateRound(roundId){
-  var r=ROUNDS.filter(function(x){return x.id===roundId;})[0];
+  var r=roundId===currentRound.id?currentRound:ROUNDS.filter(function(x){return x.id===roundId;})[0];
   if(!r)return;
   var durationMs=r.endDate&&r.startDate?(new Date(r.endDate+'T00:00:00')-new Date(r.startDate+'T00:00:00')):30*86400000;
   var lastKnown=SCHEDULED_ROUNDS.length?SCHEDULED_ROUNDS[SCHEDULED_ROUNDS.length-1]:currentRound;
@@ -5051,7 +5158,12 @@ function finishLogin(role){
     renderAdminTab();
     return;
   }
-  persons=getDefaults(CU).slice().sort(function(a,b){return a.name.localeCompare(b.name,'th');});
+  persons=getDefaults(CU).slice().sort(function(a,b){
+    var order={s:0,k:1,p:2};
+    var la=order[personLevelKey(a.role)],lb=order[personLevelKey(b.role)];
+    if(la!==lb)return la-lb;
+    return a.name.localeCompare(b.name,'th');
+  });
   persons.forEach(function(p2){expd[p2.empId]=false;CATS.forEach(function(c){catOp[p2.empId+c]=true;});});
   /* All person cards start collapsed so the user sees the full list (and count) before opening any */
   populateUserProfileUI(); /* bug fix: used to only run for new users via the welcome popup's Start button */
@@ -5063,15 +5175,14 @@ function finishLogin(role){
   h('sl').classList.remove('on');
   h('sa').classList.add('on');
 
-  /* Group C: Config (Task 3, Middle/Top Management only) and Assigned
-     Organizations (anyone currently holding \u22651 accepted assignment as
-     receiver) -- both hidden by default in the HTML, shown here. */
+  /* Group C: Config (Task 3, Middle/Top Management only). Assigned org
+     data (anyone holding \u22651 accepted assignment as receiver) now
+     appears as an inline tab inside the Dashboard itself instead of a
+     separate nav item -- see renderDash()/renderDashOrgTabs(). */
   var showConfig=canUseConfig();
-  var showAssignedOrg=activeAssignmentsAsReceiver(CU.empId).length>0;
   if(h('t-config'))h('t-config').style.display=showConfig?'':'none';
-  if(h('t-assignedorg'))h('t-assignedorg').style.display=showAssignedOrg?'':'none';
-  if(h('assignSecLbl'))h('assignSecLbl').style.display=(showConfig||showAssignedOrg)?'':'none';
-  if(h('assignSecSep'))h('assignSecSep').style.display=(showConfig||showAssignedOrg)?'':'none';
+  if(h('assignSecLbl'))h('assignSecLbl').style.display=showConfig?'':'none';
+  if(h('assignSecSep'))h('assignSecSep').style.display=showConfig?'':'none';
   refreshBellBadges();
 
   /* -- New-vs-returning routing (item 3) --
@@ -5082,6 +5193,19 @@ function finishLogin(role){
      land on the evaluation tab with their data already filled back in;
      already Submit'd -> land straight on the Dashboard instead, since
      there's nothing left to fill in. */
+  if(currentRound.closed){
+    /* Item 2: the round has closed -- there's nothing left anyone can
+       evaluate, so skip the welcome popup and the usual new/returning
+       branching entirely and land straight on the Dashboard. Whatever
+       was previously saved/submitted still loads (autoLoad) so the
+       self/person/grid tabs show it in read-only form (see the
+       currentRound.closed lock added to rbHTML) if the person goes
+       looking for it, they just can't enter anything new. */
+    autoLoad();
+    curTab='dash';
+    showTab('dash');
+    return;
+  }
   var isNewUser=!hasSeenWelcomeBefore(CU.username);
   if(isNewUser){
     /* setup welcome popup */
@@ -5162,7 +5286,7 @@ function doLogout(){
   CU=null;persons=[];selfSc={};othSc={};
   sSaved=false;sSub=false;oSaved=false;oSub=false;
   curTab='self';expd={};catOp={};orgExp={};
-  gmCat=CATS[0];gmSM=false;gmSel={};gmDP=null;gmRI=null;gmArmed=null;subTgt=null;cdIdx=null;orgMode='dept';orgQ='';
+  gmCat=CATS[0];gmSM=false;gmSel={};gmDP=null;gmRI=null;gmArmed=null;subTgt=null;cdIdx=null;orgMode='dept';orgQ='';dashOrgView='own';
   h('lu').value='';h('lp').value='';h('lp').type='password';h('eyb').innerHTML=icon('eye',16);h('lerr').style.display='none';
   /* close all overlays */
   ['wovl','subovl','addovl','drillovl','rsnovl','batchrsnovl','closeRoundOvl','logoutovl','roleSelOvl','permConfirmOvl','shareReportOvl'].forEach(function(id){h(id).classList.remove('on');});
@@ -5203,7 +5327,7 @@ function populateUserProfileUI(){
   h('sbav').innerHTML=sPh?'<img src="'+sPh+'" alt="'+CU.name+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%">':'<span style="font-size:12px;font-weight:700">'+ini2(CU.name)+'</span>';
   h('sbav').style.background=sPh?'transparent':CU.color;
   h('sbuname').textContent=CU.name;
-  h('sbrole').textContent=CU.role;
+  h('sbrole').textContent=CU.pos;
   h('selfavdiv').innerHTML=avHTML(CU,52);
   h('selfname').textContent=CU.name;h('selfpos').textContent=CU.pos;
   h('selfdept').textContent='แผนก'+CU.dept+' \u00B7 ฝ่าย'+CU.div;
@@ -5257,17 +5381,17 @@ function getDefaults(user){
 }
 
 /* TABS */
-var TAB_TITLES={'self':'ประเมินตนเอง','person':'ประเมินรายบุคคล','grid':'ประเมินรายหัวข้อ','dash':'ภาพรวมผลประเมิน','config':'Config','assignedorg':'Assigned Organizations'};
+var TAB_TITLES={'self':'ประเมินตนเอง','person':'ประเมินรายบุคคล','grid':'ประเมินรายหัวข้อ','dash':'ภาพรวมผลประเมิน','config':'Config'};
 function showTab(t){
   curTab=t;
-  ['self','person','grid','dash','config','assignedorg'].forEach(function(x){
+  ['self','person','grid','dash','config'].forEach(function(x){
     h('t-'+x).classList.toggle('on',x===t);
     h('v-'+x).classList.toggle('on',x===t);
     var mb=h('mn-'+x);if(mb)mb.classList.toggle('on',x===t);
   });
   /* update topbar */
   if(h('tbtitle'))h('tbtitle').textContent=TAB_TITLES[t]||t;
-  if(h('tbright'))h('tbright').innerHTML=(t==='self'||t==='config'||t==='assignedorg')?'':actBtns(t==='self');
+  if(h('tbright'))h('tbright').innerHTML=(t==='self'||t==='config')?'':actBtns(t==='self');
   /* close mobile sidebar */
   if(h('sb'))h('sb').classList.remove('open');
   if(h('mobOvl'))h('mobOvl').classList.remove('open');
@@ -5280,7 +5404,6 @@ function renderTab(){
   else if(curTab==='person')renderPerson();
   else if(curTab==='grid')renderGrid();
   else if(curTab==='config')renderConfigTab();
-  else if(curTab==='assignedorg')renderAssignedOrgTab();
   else renderDash();
 }
 
@@ -5378,7 +5501,7 @@ function ftag(f){
 function rbHTML(pid,cid,isSelf){
   var fl=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){fl=CRITERIA[i].foc;break;}}
   var fd=fl?FDEF[fl]:null;
-  var locked=isSelf?(sSub||sSaved):(oSub||oSaved);
+  var locked=currentRound.closed||(isSelf?(sSub||sSaved):(oSub||oSaved));
   var sel=(isSelf?gSelf(cid):gS(pid,cid));
   var defTarget=isSelf?'self':pid;
 
@@ -6222,30 +6345,33 @@ function renderLevelFilterCardHTML(containerId,rerenderFn){
  * ============================================================ */
 /* Task 3: Config is for Middle ('k') and Top ('s') Management only. */
 function canUseConfig(){return CU&&(personLevelKey(CU.role)==='k'||personLevelKey(CU.role)==='s');}
-/* Which org units this person can hand off: a Division-level (ส)
- * manager oversees whole Divisions; a Department-level (ก) manager
- * oversees the Departments within their own Division. (This dataset
- * only has one Division value, so a ส manager sees just that one --
- * the code itself supports more.) */
+/* Which org units this person can hand off: they can ONLY hand off the
+ * ONE unit they themselves are responsible for -- a Division Manager
+ * (ส) can only assign their own Division, a Department Manager (ก) can
+ * only assign their own Department. They cannot act on behalf of a
+ * sibling unit they don't manage. */
 function orgOptionsForAssigner(e){
   var lvl=personLevelKey(e.role);
-  if(lvl==='s'){
-    return Array.from(new Set(ALL_EMP.filter(function(x){return x.group===e.group;}).map(function(x){return x.div;}).filter(Boolean))).map(function(d){return{type:'Division',value:d};});
-  }
-  if(lvl==='k'){
-    return Array.from(new Set(ALL_EMP.filter(function(x){return x.div===e.div;}).map(function(x){return x.dept;}).filter(Boolean))).map(function(d){return{type:'Department',value:d};});
-  }
+  if(lvl==='s'&&e.div)return[{type:'Division',value:e.div}];
+  if(lvl==='k'&&e.dept)return[{type:'Department',value:e.dept}];
   return [];
 }
-/* Task 4: default candidate receivers = exactly one level up or down
- * from the assigner; anyone else must be added via "Add Person". */
+/* Default candidate receivers = the assigner's own direct manager (one
+ * level up, over the SAME unit) plus their own direct reports (one
+ * level down, WITHIN the same unit only) -- e.g. a Department Manager's
+ * defaults are their Division Manager + everyone else in that same
+ * Department, never someone in a different department. Anyone else
+ * must be added via "Add Person". */
 function defaultAssignCandidates(senderE){
-  var order={s:0,k:1,p:2};
   var lvl=personLevelKey(senderE.role);
-  return ALL_EMP.filter(function(e){
-    if(e.empId===senderE.empId)return false;
-    return Math.abs(order[personLevelKey(e.role)]-order[lvl])===1;
-  });
+  var candidates=[];
+  if(lvl==='k'){
+    candidates=candidates.concat(ALL_EMP.filter(function(e){return personLevelKey(e.role)==='s'&&e.div===senderE.div;}));
+    candidates=candidates.concat(ALL_EMP.filter(function(e){return personLevelKey(e.role)==='p'&&e.dept===senderE.dept;}));
+  } else if(lvl==='s'){
+    candidates=candidates.concat(ALL_EMP.filter(function(e){return personLevelKey(e.role)==='k'&&e.div===senderE.div;}));
+  }
+  return candidates.filter(function(e){return e.empId!==senderE.empId;});
 }
 function activeAssignmentsAsReceiver(empId){
   return ASSIGNMENTS.filter(function(a){return a.receiverEmpId===empId&&a.status==='Accepted';});
@@ -6832,6 +6958,8 @@ function renderSelf(){
   var html='';
   if(sSub){
     html+='<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--teal);font-size:13px;font-weight:600;background:var(--tlt);border-bottom:1px solid var(--b0)">\u2705 ส่งข้อมูลเรียบร้อยแล้ว ไม่สามารถแก้ไขได้ \u2014 รายการที่ประเมินไปแล้วแสดงอยู่ด้านล่าง (อ่านอย่างเดียว)</div>';
+  } else if(currentRound.closed){
+    html+='<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--I);font-size:13px;font-weight:600;background:rgba(163,45,45,.06);border-bottom:1px solid var(--b0)">'+icon('lock',16)+' รอบนี้ปิดรับการประเมินแล้ว ไม่สามารถประเมินหรือแก้ไขได้ \u2014 รายการที่เคยบันทึกไว้ (ถ้ามี) แสดงอยู่ด้านล่าง (อ่านอย่างเดียว)</div>';
   }
   CATS.forEach(function(cat){
     var m=CAT_META[cat];var cc=CRITERIA.filter(function(c){return c.cat===cat;});
@@ -6863,7 +6991,7 @@ function renderPerson(){
   persons.forEach(function(p){CRITERIA.forEach(function(c){if(gS(p.empId,c.id))done++;});});
   if(h('tbsub'))h('tbsub').textContent='ประเมินแล้ว '+done+'/'+total+' รายการ';
   if(h('tbright'))h('tbright').innerHTML=actBtns(false);
-  if(h('padd'))h('padd').style.display=(oSub||oSaved)?'none':'inline-flex';
+  if(h('padd'))h('padd').style.display=(currentRound.closed||oSub||oSaved)?'none':'inline-flex';
   /* Task 8: ระดับ filter (ส/ก/ป) -- its own Filter Card, between the
      rating-legend card and the ผู้รับการประเมิน chip bar. Controls
      EVERYTHING below it: the chip bar, the person list, AND the
@@ -6876,8 +7004,9 @@ function renderPerson(){
   if(!persons.length){h('pcards').innerHTML='<div style="padding:2rem;text-align:center;color:var(--t1)">ยังไม่มีผู้รับการประเมิน</div>';return;}
   /* score summary card shown after Save */
   var sumHtml=oSaved?scoreSummaryCard():'';
-  var html=sumHtml+'<div style="display:flex;flex-direction:column;gap:10px">';
-  var locked2=oSub||oSaved;
+  var closedBanner=(currentRound.closed&&!oSub)?'<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--I);font-size:13px;font-weight:600;background:rgba(163,45,45,.06);border-radius:var(--r);margin-bottom:10px">'+icon('lock',16)+' รอบนี้ปิดรับการประเมินแล้ว ไม่สามารถประเมินหรือแก้ไขได้ \u2014 รายการที่เคยบันทึกไว้ (ถ้ามี) แสดงอยู่ด้านล่าง (อ่านอย่างเดียว)</div>':'';
+  var html=closedBanner+sumHtml+'<div style="display:flex;flex-direction:column;gap:10px">';
+  var locked2=currentRound.closed||oSub||oSaved;
   var defs2={};getDefaults(CU).forEach(function(e){defs2[e.empId]=true;});
   if(!visiblePersons.length)html+='<div style="padding:1.5rem;text-align:center;color:var(--t2);font-size:13px">ไม่มีผู้รับการประเมินในระดับที่เลือก</div>';
   visiblePersons.forEach(function(p){
@@ -6911,7 +7040,7 @@ function renderPerson(){
       html+='<div class="note-col-hd">เหตุผล / ข้อสังเกต</div>';
       html+='</div>';
       cc.forEach(function(c){
-        html+='<div class="cr"><div class="cl">'+ftag(c.foc)+'<div class="ct"><div class="clb">'+c.lb+'</div></div></div>'+rbHTML(p.empId,c.id,false)+noteCell(p.empId,c.id,oSub||oSaved)+'</div>';
+        html+='<div class="cr"><div class="cl">'+ftag(c.foc)+'<div class="ct"><div class="clb">'+c.lb+'</div></div></div>'+rbHTML(p.empId,c.id,false)+noteCell(p.empId,c.id,currentRound.closed||oSub||oSaved)+'</div>';
         html+='<div id="idef_'+p.empId+'_'+c.id+'" class="idef-box"></div>';
       });
       html+='</div></div>';
@@ -6924,7 +7053,7 @@ function renderPerson(){
 /* CHIP BAR */
 function renderChipBar(cid,list){
   var w=h(cid);if(!w)return;w.innerHTML='';
-  var locked=oSub||oSaved;
+  var locked=currentRound.closed||oSub||oSaved;
   var defs={};getDefaults(CU).forEach(function(e){defs[e.empId]=true;});
   var items=list||persons;
   items.forEach(function(p,i){
@@ -7113,7 +7242,7 @@ function addPerson(eid){
 
 /* GRID */
 function renderGrid(){
-  var locked=oSub||oSaved;
+  var locked=currentRound.closed||oSub||oSaved;
   var total=CRITERIA.length*persons.length;var done=0;
   persons.forEach(function(p){CRITERIA.forEach(function(c){if(gS(p.empId,c.id))done++;});});
   if(h('tbsub'))h('tbsub').textContent='ประเมินแล้ว '+done+'/'+total+' รายการ';
@@ -7611,7 +7740,80 @@ function yPct(v){
   return Math.max(dotRadiusPct,Math.min(100-dotRadiusPct,raw));
 }
 
+/* Item 2: inline "Assigned Organizations" tabs on the Dashboard page,
+ * replacing the old separate page. dashOrgView is 'own' or an
+ * assignment id. */
+var dashOrgView='own';
+function renderDashOrgTabsHTML(){
+  var box=h('dashOrgTabs');if(!box)return;
+  var mine=activeAssignmentsAsReceiver(CU.empId);
+  if(!mine.length){box.innerHTML='';return;}
+  var html='<div style="display:flex;gap:8px;flex-wrap:wrap">';
+  html+='<button class="btn '+(dashOrgView==='own'?'bt':'bo')+'" style="font-size:12px" onclick="dashOrgView=\'own\';renderDash()">ของฉัน</button>';
+  mine.forEach(function(a){
+    html+='<button class="btn '+(dashOrgView===a.id?'bt':'bo')+'" style="font-size:12px" onclick="dashOrgView=\''+a.id+'\';renderDash()">'+a.orgType+': '+a.orgValue+'</button>';
+  });
+  html+='</div>';
+  box.innerHTML=html;
+}
+/* A simplified view of the assigned unit's aggregate FOCUS/Singhaway
+ * scores, in the same visual style the assigner (sender) would see for
+ * their own unit -- but the sender's OWN individual score is excluded
+ * from every average here, since this is meant to show the unit's
+ * standing, not expose that specific person's personal result. */
+function renderAssignedOrgDashboardHTML(assignment){
+  var peopleInOrg=ALL_EMP.filter(function(e){
+    var inOrg=assignment.orgType==='Department'?e.dept===assignment.orgValue:e.div===assignment.orgValue;
+    return inOrg&&e.empId!==assignment.senderEmpId; /* exclude the assigner's own individual data */
+  });
+  var html='<div class="wb" style="margin-bottom:14px"><span>'+icon('info',16)+'</span><span>มุมมองข้อมูลของ '+assignment.orgType+': '+assignment.orgValue+' ที่ได้รับมอบหมายจาก '+assignment.senderName+' \u2014 เป็นข้อมูลภาพรวมของหน่วยงาน ไม่รวมคะแนนส่วนบุคคลของ '+assignment.senderName+'</span></div>';
+  if(!peopleInOrg.length){
+    html+='<div class="card" style="padding:2rem;text-align:center;color:var(--t2)">ไม่มีข้อมูลพนักงานอื่นในหน่วยงานนี้</div>';
+    return html;
+  }
+  var fkeysD=Object.keys(FDEF);
+  var focusAvg={};fkeysD.forEach(function(f){
+    var vals=peopleInOrg.map(function(e){return mockScoreFor(e.empId).byFocus[f];});
+    focusAvg[f]=vals.reduce(function(a,b){return a+b;},0)/vals.length;
+  });
+  var focusOverall=fkeysD.reduce(function(s,f){return s+focusAvg[f];},0)/fkeysD.length;
+  var focusOverallLbl=s2l(focusOverall);
+  html+='<div class="card" style="margin-bottom:14px"><div class="chd"><div class="db-sh-ico" style="background:var(--vlt)">'+icon('chartcolumn',18)+'</div><div class="db-sh-ttl">สรุปคะแนน FOCUS \u2014 '+assignment.orgValue+' ('+peopleInOrg.length+' คน)</div></div>';
+  html+='<div style="padding:14px 16px">';
+  html+='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px"><span style="font-size:11px;color:var(--t1)">คะแนนรวมภาพรวม:</span><span style="font-family:var(--fh);font-size:20px;font-weight:800;color:var(--t0)">'+focusOverall.toFixed(2)+'</span><span class="rb-inl" style="background:'+RCOL[focusOverallLbl.l]+'">'+focusOverallLbl.l+' \u2013 '+RNAME[focusOverallLbl.l]+'</span></div>';
+  html+='<div style="display:flex;gap:14px;align-items:flex-end;height:150px;padding:0 10px 0 4px">';
+  fkeysD.forEach(function(f){
+    var fd=FDEF[f];var val=focusAvg[f];var barH=Math.max(1,Math.round(val/5*150));
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0"><div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;color:#fff">'+val.toFixed(2)+'</span></div><div style="font-size:11px;font-weight:800;color:'+fd.cl+'">'+f+'</div></div>';
+  });
+  html+='</div></div></div>';
+
+  var catAvg={};CATS.forEach(function(cat){
+    var vals=peopleInOrg.map(function(e){return mockScoreFor(e.empId).byCat[cat];});
+    catAvg[cat]=vals.reduce(function(a,b){return a+b;},0)/vals.length;
+  });
+  var catOverall=CATS.reduce(function(s,cat){return s+catAvg[cat];},0)/CATS.length;
+  var catOverallLbl=s2l(catOverall);
+  html+='<div class="card"><div class="chd"><div class="db-sh-ico" style="background:var(--s2)">'+icon('star',16)+'</div><div class="db-sh-ttl">สรุปคะแนน Singhaway Values \u2014 '+assignment.orgValue+'</div></div>';
+  html+='<div style="padding:14px 16px">';
+  html+='<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:14px"><span style="font-size:11px;color:var(--t1)">คะแนนรวมภาพรวม:</span><span style="font-family:var(--fh);font-size:20px;font-weight:800;color:var(--t0)">'+catOverall.toFixed(2)+'</span><span class="rb-inl" style="background:'+RCOL[catOverallLbl.l]+'">'+catOverallLbl.l+' \u2013 '+RNAME[catOverallLbl.l]+'</span></div>';
+  html+='<div style="display:flex;gap:14px;align-items:flex-end;height:150px;padding:0 10px 0 4px">';
+  CATS.forEach(function(cat){
+    var m=CAT_META[cat];var val=catAvg[cat];var barH=Math.max(1,Math.round(val/5*150));
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0"><div style="width:100%;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;color:#fff">'+val.toFixed(2)+'</span></div><div style="font-size:10px;font-weight:700;color:'+m.cl+';text-align:center">'+m.lb+'</div></div>';
+  });
+  html+='</div></div></div>';
+  return html;
+}
 function renderDash(){
+  /* Item 2: inline org tab-switcher (replaces the old separate
+     "Assigned Organizations" page). "ของฉัน" is always first; one more
+     tab per assignment this person has ACCEPTED as a receiver. */
+  renderDashOrgTabsHTML();
+  if(dashOrgView!=='own'){
+    var asg=ASSIGNMENTS.filter(function(x){return x.id===dashOrgView&&x.status==='Accepted'&&x.receiverEmpId===CU.empId;})[0];
+    if(!asg){dashOrgView='own';renderDashOrgTabsHTML();} else {h('dbody').innerHTML=renderAssignedOrgDashboardHTML(asg);return;}
+  }
   var fkeys=Object.keys(FDEF);
   var allIds=persons.map(function(p){return p.empId;});
   var selfId=CU?[CU.empId]:[];
