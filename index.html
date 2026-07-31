@@ -6953,7 +6953,7 @@ function renderSelf(){
   if(sSub){
     html+='<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--teal);font-size:13px;font-weight:600;background:var(--tlt);border-bottom:1px solid var(--b0)">\u2705 ส่งข้อมูลเรียบร้อยแล้ว ไม่สามารถแก้ไขได้ \u2014 รายการที่ประเมินไปแล้วแสดงอยู่ด้านล่าง (อ่านอย่างเดียว)</div>';
   } else if(currentRound.closed){
-    html+='<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--I);font-size:13px;font-weight:600;background:rgba(163,45,45,.06);border-bottom:1px solid var(--b0)">'+icon('lock',16)+' รอบนี้ปิดรับการประเมินแล้ว ไม่สามารถประเมินหรือแก้ไขได้ \u2014 รายการที่เคยบันทึกไว้ (ถ้ามี) แสดงอยู่ด้านล่าง (อ่านอย่างเดียว)</div>';
+    html+='<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--I);font-size:13px;font-weight:600;background:rgba(163,45,45,.06);border-bottom:1px solid var(--b0)">'+icon('lock',16)+' รอบนี้ปิดรับการประเมินแล้ว ไม่สามารถประเมินหรือแก้ไขได้</div>';
   }
   CATS.forEach(function(cat){
     var m=CAT_META[cat];var cc=CRITERIA.filter(function(c){return c.cat===cat;});
@@ -6998,7 +6998,7 @@ function renderPerson(){
   if(!persons.length){h('pcards').innerHTML='<div style="padding:2rem;text-align:center;color:var(--t1)">ยังไม่มีผู้รับการประเมิน</div>';return;}
   /* score summary card shown after Save */
   var sumHtml=oSaved?scoreSummaryCard():'';
-  var closedBanner=(currentRound.closed&&!oSub)?'<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--I);font-size:13px;font-weight:600;background:rgba(163,45,45,.06);border-radius:var(--r);margin-bottom:10px">'+icon('lock',16)+' รอบนี้ปิดรับการประเมินแล้ว ไม่สามารถประเมินหรือแก้ไขได้ \u2014 รายการที่เคยบันทึกไว้ (ถ้ามี) แสดงอยู่ด้านล่าง (อ่านอย่างเดียว)</div>':'';
+  var closedBanner=(currentRound.closed&&!oSub)?'<div style="padding:0.9rem 1.25rem;text-align:center;color:var(--I);font-size:13px;font-weight:600;background:rgba(163,45,45,.06);border-radius:var(--r);margin-bottom:10px">'+icon('lock',16)+' รอบนี้ปิดรับการประเมินแล้ว ไม่สามารถประเมินหรือแก้ไขได้</div>':'';
   var html=closedBanner+sumHtml+'<div style="display:flex;flex-direction:column;gap:10px">';
   var locked2=currentRound.closed||oSub||oSaved;
   var defs2={};getDefaults(CU).forEach(function(e){defs2[e.empId]=true;});
