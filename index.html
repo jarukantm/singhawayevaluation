@@ -5243,6 +5243,7 @@ function openSwitchRolePopup(){
 function finishLogin(role){
   CU.currentRole=role;
   loadRoundsData(); /* round/history is organizational state, shared across logins on this browser */
+  refreshRoundStatusFromBackend(); /* best-effort: pull in any round change made on a different device (e.g. closed on desktop) since this browser's own local copy was last saved */
   ensureMockRound1(); /* demo: simulate a prior round's data if no real round history exists yet */
   loadEvalRules(); /* evaluation-rights rules, also organizational state shared across logins */
   dbRoundView='current';
@@ -6075,7 +6076,7 @@ function markWelcomeSeen(username){
  * currently in that cache. Call SimDB.refresh() (and re-render) whenever
  * you want the freshest data from the Sheet -- it's called automatically
  * whenever the Admin's round-management page renders. */
-var GAS_WEBAPP_URL='https://script.google.com/macros/s/AKfycbxP7zgBtHMDUD1YrzoSygNWweNWAfz3W8fYCYOzzERzdas28WxECcE6U6zWtEsomVl0cw/exec';
+var GAS_WEBAPP_URL='https://script.google.com/macros/s/AKfycbxFHhSTf_003KQAhn8p-XcvIgpAJDZvsGG1SNIk89CaJSy3nVLl62vVUhmW7TGWN5fsiQ/exec';
 var SimDB={
   _cache:[], /* array of row objects, refreshed from the Sheet via refresh() */
   _loaded:false,
@@ -6319,11 +6320,52 @@ function downloadDatabaseCSV(){
   URL.revokeObjectURL(url);
 }
 function saveRoundsData(){
-  try{localStorage.setItem('sf_rounds',JSON.stringify({currentRound:currentRound,ROUNDS:ROUNDS,SCHEDULED_ROUNDS:SCHEDULED_ROUNDS}));}catch(e){}
+  var payload={currentRound:currentRound,ROUNDS:ROUNDS,SCHEDULED_ROUNDS:SCHEDULED_ROUNDS};
+  try{localStorage.setItem('sf_rounds',JSON.stringify(payload));}catch(e){}
+  /* Also push to the real backend so OTHER devices can see the change
+     (this used to be localStorage-only, which is exactly why a round
+     closed on desktop wouldn't show as closed on a phone). Fire-and-
+     forget: local save above already happened synchronously, so a
+     network failure here just means other devices stay stale until
+     the next successful push -- it never blocks this device. */
+  try{
+    fetch(GAS_WEBAPP_URL,{
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({action:'saveRoundStatus',data:payload})
+    }).catch(function(e){console.error('saveRoundsData: backend sync failed (saved locally):',e);});
+  }catch(e){}
 }
 function loadRoundsData(){
   try{var d=JSON.parse(localStorage.getItem('sf_rounds')||'null');
     if(d){currentRound=d.currentRound||currentRound;ROUNDS=d.ROUNDS||[];SCHEDULED_ROUNDS=d.SCHEDULED_ROUNDS||[];}}catch(e){}
+}
+/* Best-effort background refresh from the real backend, same pattern as
+ * SimDB.refresh() for scores. Called after login (once currentRound
+ * already has a usable value from localStorage, so the UI never blocks
+ * waiting on this) -- if the backend has newer round status than this
+ * device's local cache (e.g. someone closed the round on their phone),
+ * pulls it in and re-renders whichever admin page is currently open. */
+function refreshRoundStatusFromBackend(){
+  fetch(GAS_WEBAPP_URL+'?action=roundStatus',{method:'GET'})
+    .then(function(res){return res.text();})
+    .then(function(text){
+      var data;try{data=JSON.parse(text);}catch(e){return;}
+      if(!data||!data.ok||!data.currentRound)return;
+      var changed=JSON.stringify(data.currentRound)!==JSON.stringify(currentRound)
+        ||JSON.stringify(data.ROUNDS||[])!==JSON.stringify(ROUNDS)
+        ||JSON.stringify(data.SCHEDULED_ROUNDS||[])!==JSON.stringify(SCHEDULED_ROUNDS);
+      if(!changed)return;
+      currentRound=data.currentRound;
+      ROUNDS=data.ROUNDS||[];
+      SCHEDULED_ROUNDS=data.SCHEDULED_ROUNDS||[];
+      try{localStorage.setItem('sf_rounds',JSON.stringify({currentRound:currentRound,ROUNDS:ROUNDS,SCHEDULED_ROUNDS:SCHEDULED_ROUNDS}));}catch(e){}
+      if(curAdminTab==='rounds')renderAdminRounds();
+      else if(curAdminTab==='status')renderAdminStatus();
+      else if(curAdminTab==='scores')renderAdminScores();
+      if(curTab)renderTab();
+    })
+    .catch(function(e){console.error('refreshRoundStatusFromBackend failed (using local cache):',e);});
 }
 
 /* ── Admin: close the current round & start a new one ──
