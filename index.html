@@ -236,10 +236,6 @@ button,input,select{font-family:var(--fb)}
 .lgi{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--t1);font-weight:500}
 .lgb{width:8px;height:8px;border-radius:2px}
 .lgn{margin-left:auto;font-size:10px;color:var(--t2)}
-@media(max-width:480px){
-  .lgd{flex-direction:column;align-items:flex-start;gap:6px}
-  .lgd-lbl{margin-bottom:2px}
-}
 .lgn-touch{display:none}
 @media(hover:none),(pointer:coarse){
   .lgn-hover{display:none}
@@ -320,7 +316,7 @@ button,input,select{font-family:var(--fb)}
 /* ── INLINE DEFINITION BOX (replaces clipped hover popup) ── */
 .idef-box{display:none;margin:0 16px 8px;padding:10px 12px;background:var(--s1);
   border-left:3px solid var(--pb);border-radius:0 var(--r) var(--r) 0;
-  animation:idefIn .15s ease}
+  animation:idefIn .15s ease;box-sizing:border-box;max-width:100%;overflow-wrap:break-word;word-break:break-word}
 @keyframes idefIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 /* cat header with เหตุผล label */
 .cath{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--b0);transition:background .1s}
@@ -1752,39 +1748,52 @@ var RNAME={E:'Excellence',G:'Good',S:'Standard',L:'Low',I:'Improve'};
  * Singhaway charts. Looked up directly rather than computed, since the
  * spec gives fixed hex pairs rather than an algorithm. */
 var LIGHT_VARIANT={
-  '#2563EB':'#93C5FD', /* Fast / Family -- main blue -> light blue */
-  '#06B6D4':'#67E8F9', /* Ownership / Courage -- main cyan -> light cyan */
-  '#60A5FA':'#BFDBFE', /* Commitment / Premium Quality -- main light-blue -> lighter blue */
-  '#A855F7':'#D8B4FE', /* United / Happiness -- main purple -> light purple */
-  '#EC4899':'#F9A8D4'  /* Strong -- main pink -> light pink */
+  '#2671BC':'#9DBFE0', /* Fast -- main blue -> dropped/lighter blue */
+  '#8ECAE6':'#CCE7F3', /* Ownership -- main sky blue -> dropped/lighter */
+  '#6BAAAE':'#BCD8DA', /* Commitment -- main teal -> dropped/lighter */
+  '#EDE2CD':'#F6F1E8', /* United -- main sand -> dropped/lighter */
+  '#FFB703':'#FFDE8D', /* Strong -- main amber -> dropped/lighter */
+  '#E97700':'#F5C18C', /* Family -- main orange -> dropped/lighter */
+  '#D1470B':'#EAAC91', /* Courage -- main red-orange -> dropped/lighter */
+  '#63C7FF':'#B8E5FF', /* Premium Quality -- main sky blue -> dropped/lighter */
+  '#7CC7DB':'#C4E5EE'  /* Happiness -- main teal-blue -> dropped/lighter */
 };
 function lightVariantOf(hex){return LIGHT_VARIANT[hex]||hex;}
+/* Bar value-label text color: white-with-shadow reads fine on the
+ * darker/more saturated bars, but is low-contrast on the two pale ones
+ * (O #8ECAE6, U #EDE2CD) -- use dark text there instead. */
+var PALE_BAR_COLORS={'#8ECAE6':1,'#EDE2CD':1};
+function barLabelStyle(hex){
+  return PALE_BAR_COLORS[hex]
+    ? 'color:#1F2937'
+    : 'color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)';
+}
 var FDEF={
-  F:{nm:'Fast',cl:'#2563EB',bg:'rgba(37,99,235,.1)',df:{
+  F:{nm:'Fast',cl:'#2671BC',bg:'rgba(38,113,188,.1)',df:{
     E:'\u0e40\u0e02\u0e49\u0e32\u0e43\u0e08\u0e41\u0e25\u0e30\u0e15\u0e2d\u0e1a\u0e2a\u0e19\u0e2d\u0e07\u0e04\u0e27\u0e32\u0e21\u0e15\u0e49\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e25\u0e39\u0e01\u0e04\u0e49\u0e32\u0e44\u0e14\u0e49\u0e17\u0e31\u0e19\u0e17\u0e35 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27\u0e01\u0e27\u0e48\u0e32\u0e41\u0e1c\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e21\u0e35\u0e1b\u0e23\u0e30\u0e2a\u0e34\u0e17\u0e18\u0e34\u0e20\u0e32\u0e1e\u0e41\u0e25\u0e30\u0e15\u0e23\u0e07\u0e08\u0e38\u0e14 \u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e23\u0e31\u0e1a\u0e21\u0e37\u0e2d\u0e07\u0e32\u0e19\u0e40\u0e23\u0e48\u0e07\u0e14\u0e48\u0e27\u0e19 \u0e41\u0e25\u0e30\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e27\u0e34\u0e18\u0e35\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e43\u0e2b\u0e49\u0e40\u0e23\u0e47\u0e27\u0e02\u0e36\u0e49\u0e19',
     G:'\u0e23\u0e32\u0e22\u0e07\u0e32\u0e19\u0e04\u0e27\u0e32\u0e21\u0e04\u0e37\u0e1a\u0e2b\u0e19\u0e49\u0e32 \u0e41\u0e01\u0e49\u0e1b\u0e31\u0e0d\u0e2b\u0e32 \u0e15\u0e2d\u0e1a\u0e2a\u0e19\u0e2d\u0e07\u0e41\u0e25\u0e30\u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27\u0e01\u0e27\u0e48\u0e32\u0e41\u0e1c\u0e19\u0e40\u0e25\u0e47\u0e01\u0e19\u0e49\u0e2d\u0e22 \u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e1a\u0e19\u0e1e\u0e37\u0e49\u0e19\u0e10\u0e32\u0e19\u0e02\u0e49\u0e2d\u0e21\u0e39\u0e25',
     S:'\u0e41\u0e08\u0e49\u0e07\u0e1c\u0e39\u0e49\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e17\u0e31\u0e19\u0e17\u0e35\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e04\u0e32\u0e14\u0e27\u0e48\u0e32\u0e07\u0e32\u0e19\u0e08\u0e30\u0e25\u0e48\u0e32\u0e0a\u0e49\u0e32 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27 \u0e16\u0e39\u0e01\u0e15\u0e49\u0e2d\u0e07\u0e43\u0e19\u0e02\u0e2d\u0e1a\u0e40\u0e02\u0e15\u0e07\u0e32\u0e19 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e2b\u0e25\u0e32\u0e01\u0e2b\u0e25\u0e32\u0e22\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27\u0e15\u0e23\u0e07\u0e15\u0e32\u0e21\u0e41\u0e1c\u0e19 \u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49\u0e07\u0e32\u0e19\u0e43\u0e2b\u0e21\u0e48\u0e44\u0e14\u0e49\u0e40\u0e23\u0e47\u0e27',
     L:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e14\u0e49\u0e15\u0e32\u0e21\u0e41\u0e1c\u0e19 \u0e41\u0e15\u0e48\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e21\u0e35\u0e07\u0e32\u0e19\u0e41\u0e17\u0e23\u0e01\u0e08\u0e30\u0e40\u0e2a\u0e35\u0e22\u0e08\u0e31\u0e07\u0e2b\u0e27\u0e30 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e0a\u0e49\u0e32\u0e41\u0e21\u0e49\u0e08\u0e30\u0e40\u0e04\u0e22\u0e40\u0e1b\u0e47\u0e19\u0e07\u0e32\u0e19\u0e17\u0e35\u0e48\u0e17\u0e33\u0e21\u0e32\u0e41\u0e25\u0e49\u0e27 \u0e41\u0e25\u0e30\u0e15\u0e49\u0e2d\u0e07\u0e04\u0e2d\u0e22\u0e15\u0e34\u0e14\u0e15\u0e32\u0e21\u0e07\u0e32\u0e19\u0e40\u0e2a\u0e21\u0e2d',
     I:'\u0e44\u0e21\u0e48\u0e08\u0e31\u0e14\u0e25\u0e33\u0e14\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e33\u0e04\u0e31\u0e0d\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e17\u0e33\u0e07\u0e32\u0e19\u0e25\u0e48\u0e32\u0e0a\u0e49\u0e32 \u0e23\u0e39\u0e49\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e41\u0e15\u0e48\u0e44\u0e21\u0e48\u0e25\u0e07\u0e21\u0e37\u0e2d\u0e41\u0e01\u0e49 \u0e23\u0e2d\u0e04\u0e33\u0e2a\u0e31\u0e48\u0e07 \u0e15\u0e31\u0e14\u0e2a\u0e34\u0e19\u0e43\u0e08\u0e0a\u0e49\u0e32 \u0e41\u0e08\u0e49\u0e07\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e01\u0e23\u0e30\u0e0a\u0e31\u0e49\u0e19\u0e0a\u0e34\u0e14\u0e2b\u0e23\u0e37\u0e2d\u0e44\u0e21\u0e48\u0e41\u0e08\u0e49\u0e07'}},
-  O:{nm:'Ownership',cl:'#06B6D4',bg:'rgba(6,182,212,.1)',df:{
+  O:{nm:'Ownership',cl:'#8ECAE6',bg:'rgba(142,202,230,.15)',df:{
     E:'\u0e21\u0e35\u0e04\u0e27\u0e32\u0e21\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e08\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e15\u0e48\u0e2d\u0e1c\u0e25\u0e25\u0e31\u0e1e\u0e18\u0e4c \u0e44\u0e21\u0e48\u0e1b\u0e25\u0e48\u0e2d\u0e22\u0e1c\u0e48\u0e32\u0e19\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e41\u0e08\u0e49\u0e07\u0e41\u0e25\u0e30\u0e41\u0e01\u0e49\u0e44\u0e02\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e19\u0e33\u0e44\u0e1b\u0e1b\u0e23\u0e31\u0e1a\u0e1b\u0e23\u0e38\u0e07\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1b\u0e49\u0e2d\u0e07\u0e01\u0e31\u0e19\u0e01\u0e32\u0e23\u0e40\u0e01\u0e34\u0e14\u0e0b\u0e49\u0e33',
     G:'\u0e21\u0e35\u0e04\u0e27\u0e32\u0e21\u0e40\u0e1b\u0e47\u0e19\u0e40\u0e08\u0e49\u0e32\u0e02\u0e2d\u0e07\u0e07\u0e32\u0e19 \u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e15\u0e48\u0e2d\u0e1c\u0e25\u0e25\u0e31\u0e1e\u0e18\u0e4c \u0e41\u0e08\u0e49\u0e07\u0e41\u0e25\u0e30\u0e41\u0e01\u0e49\u0e44\u0e02\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34',
     S:'\u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e2b\u0e19\u0e49\u0e32\u0e17\u0e35\u0e48 \u0e41\u0e01\u0e49\u0e44\u0e02\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e01\u0e32\u0e23\u0e0a\u0e35\u0e49\u0e41\u0e19\u0e30 \u0e41\u0e08\u0e49\u0e07\u0e1c\u0e39\u0e49\u0e40\u0e01\u0e35\u0e48\u0e22\u0e27\u0e02\u0e49\u0e2d\u0e07\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34',
     L:'\u0e1b\u0e0f\u0e34\u0e1a\u0e31\u0e15\u0e34\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e17\u0e35\u0e48\u0e44\u0e14\u0e49\u0e23\u0e31\u0e1a\u0e21\u0e2d\u0e1a\u0e2b\u0e21\u0e32\u0e22 \u0e15\u0e49\u0e2d\u0e07\u0e15\u0e34\u0e14\u0e15\u0e32\u0e21 \u0e40\u0e1e\u0e34\u0e01\u0e40\u0e09\u0e22\u0e15\u0e48\u0e2d\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e41\u0e25\u0e30\u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e04\u0e27\u0e32\u0e21\u0e23\u0e31\u0e1a\u0e1c\u0e34\u0e14\u0e0a\u0e2d\u0e1a\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e40\u0e01\u0e34\u0e14\u0e1b\u0e31\u0e0d\u0e2b\u0e32',
     I:'\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e1e\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e1b\u0e01\u0e15\u0e34 \u0e44\u0e21\u0e48\u0e41\u0e08\u0e49\u0e07\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e2b\u0e23\u0e37\u0e2d\u0e41\u0e01\u0e49\u0e44\u0e02 \u0e2a\u0e48\u0e07\u0e1c\u0e25\u0e01\u0e23\u0e30\u0e17\u0e1a\u0e15\u0e48\u0e2d\u0e07\u0e32\u0e19\u0e41\u0e25\u0e30\u0e17\u0e35\u0e21 \u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e01\u0e32\u0e23\u0e22\u0e2d\u0e21\u0e23\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e1c\u0e34\u0e14\u0e41\u0e25\u0e30\u0e1c\u0e25\u0e31\u0e01\u0e20\u0e32\u0e23\u0e30\u0e43\u0e2b\u0e49\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19'}},
-  C:{nm:'Commitment',cl:'#60A5FA',bg:'rgba(96,165,250,.1)',df:{
+  C:{nm:'Commitment',cl:'#6BAAAE',bg:'rgba(107,170,174,.12)',df:{
     E:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32 \u0e04\u0e32\u0e14\u0e01\u0e32\u0e23\u0e13\u0e4c \u0e41\u0e25\u0e30\u0e27\u0e32\u0e07\u0e41\u0e1c\u0e19\u0e1b\u0e49\u0e2d\u0e07\u0e01\u0e31\u0e19\u0e1b\u0e31\u0e0d\u0e2b\u0e32\u0e44\u0e14\u0e49\u0e17\u0e38\u0e01\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e41\u0e25\u0e30\u0e1e\u0e31\u0e12\u0e19\u0e32\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e15\u0e48\u0e2d\u0e40\u0e19\u0e37\u0e48\u0e2d\u0e07',
     G:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14\u0e43\u0e19\u0e2a\u0e34\u0e48\u0e07\u0e17\u0e35\u0e48\u0e17\u0e33\u0e44\u0e14\u0e49 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d \u0e1e\u0e31\u0e12\u0e19\u0e32\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e43\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19',
     S:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14\u0e43\u0e19\u0e2a\u0e34\u0e48\u0e07\u0e17\u0e35\u0e48\u0e17\u0e33\u0e44\u0e14\u0e49 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49 \u0e2a\u0e48\u0e07\u0e21\u0e2d\u0e1a\u0e07\u0e32\u0e19\u0e15\u0e32\u0e21\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19',
     L:'\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32\u0e44\u0e14\u0e49\u0e1a\u0e32\u0e07\u0e04\u0e23\u0e31\u0e49\u0e07 \u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e44\u0e21\u0e48\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d',
     I:'\u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e01\u0e32\u0e23\u0e23\u0e31\u0e1a\u0e1b\u0e32\u0e01/\u0e44\u0e21\u0e48\u0e23\u0e31\u0e01\u0e29\u0e32\u0e04\u0e33\u0e1e\u0e39\u0e14 \u0e44\u0e21\u0e48\u0e17\u0e33\u0e15\u0e32\u0e21\u0e2a\u0e31\u0e0d\u0e0d\u0e32 \u0e44\u0e21\u0e48\u0e21\u0e35\u0e21\u0e32\u0e15\u0e23\u0e10\u0e32\u0e19\u0e43\u0e19\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19'}},
-  U:{nm:'United',cl:'#A855F7',bg:'rgba(168,85,247,.1)',df:{
+  U:{nm:'United',cl:'#EDE2CD',bg:'rgba(237,226,205,.35)',df:{
     E:'\u0e40\u0e1b\u0e47\u0e19\u0e41\u0e1a\u0e1a\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e02\u0e2d\u0e07\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e40\u0e1b\u0e47\u0e19\u0e17\u0e35\u0e21 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e43\u0e2b\u0e49\u0e04\u0e19\u0e23\u0e2d\u0e1a\u0e15\u0e31\u0e27\u0e2d\u0e22\u0e32\u0e01\u0e23\u0e48\u0e27\u0e21\u0e21\u0e37\u0e2d\u0e14\u0e49\u0e27\u0e22',
     G:'\u0e0a\u0e48\u0e27\u0e22\u0e40\u0e2b\u0e25\u0e37\u0e2d\u0e17\u0e35\u0e21\u0e40\u0e0a\u0e34\u0e07\u0e23\u0e38\u0e01 \u0e41\u0e25\u0e30\u0e2a\u0e48\u0e07\u0e40\u0e2a\u0e23\u0e34\u0e21\u0e1a\u0e23\u0e23\u0e22\u0e32\u0e01\u0e32\u0e28\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e2a\u0e21\u0e48\u0e33\u0e40\u0e2a\u0e21\u0e2d',
     S:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e1a\u0e17\u0e35\u0e21\u0e15\u0e32\u0e21\u0e1a\u0e17\u0e1a\u0e32\u0e17\u0e2b\u0e19\u0e49\u0e32\u0e17\u0e35\u0e48 \u0e41\u0e25\u0e30\u0e40\u0e04\u0e32\u0e23\u0e1e\u0e02\u0e49\u0e2d\u0e15\u0e01\u0e25\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21',
     L:'\u0e43\u0e2b\u0e49\u0e04\u0e27\u0e32\u0e21\u0e23\u0e48\u0e27\u0e21\u0e21\u0e37\u0e2d\u0e40\u0e09\u0e1e\u0e32\u0e30\u0e40\u0e21\u0e37\u0e48\u0e2d\u0e16\u0e39\u0e01\u0e02\u0e2d \u0e41\u0e15\u0e48\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e43\u0e2a\u0e48\u0e43\u0e08\u0e04\u0e27\u0e32\u0e21\u0e2a\u0e33\u0e40\u0e23\u0e47\u0e08\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e43\u0e19\u0e20\u0e32\u0e1e\u0e23\u0e27\u0e21',
     I:'\u0e17\u0e33\u0e07\u0e32\u0e19\u0e41\u0e1a\u0e1a\u0e15\u0e48\u0e32\u0e07\u0e04\u0e19\u0e15\u0e48\u0e32\u0e07\u0e17\u0e33 \u0e44\u0e21\u0e48\u0e40\u0e1b\u0e34\u0e14\u0e23\u0e31\u0e1a\u0e04\u0e27\u0e32\u0e21\u0e04\u0e34\u0e14\u0e40\u0e2b\u0e47\u0e19 \u0e41\u0e25\u0e30\u0e17\u0e33\u0e43\u0e2b\u0e49\u0e01\u0e32\u0e23\u0e17\u0e33\u0e07\u0e32\u0e19\u0e23\u0e48\u0e27\u0e21\u0e01\u0e31\u0e19\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e15\u0e34\u0e14\u0e02\u0e31\u0e14'}},
-  S:{nm:'Strong',cl:'#EC4899',bg:'rgba(236,72,153,.1)',df:{
+  S:{nm:'Strong',cl:'#FFB703',bg:'rgba(255,183,3,.12)',df:{
     E:'\u0e40\u0e1b\u0e47\u0e19\u0e1e\u0e25\u0e31\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21\u0e43\u0e19\u0e17\u0e38\u0e01\u0e2a\u0e16\u0e32\u0e19\u0e01\u0e32\u0e23\u0e13\u0e4c \u0e2a\u0e23\u0e49\u0e32\u0e07\u0e41\u0e23\u0e07\u0e1a\u0e31\u0e19\u0e14\u0e32\u0e25\u0e43\u0e08\u0e43\u0e2b\u0e49\u0e1c\u0e39\u0e49\u0e2d\u0e37\u0e48\u0e19\u0e01\u0e25\u0e49\u0e32\u0e01\u0e49\u0e32\u0e27\u0e02\u0e49\u0e32\u0e21\u0e02\u0e35\u0e14\u0e08\u0e33\u0e01\u0e31\u0e14 \u0e41\u0e25\u0e30\u0e1c\u0e25\u0e31\u0e01\u0e14\u0e31\u0e19\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07\u0e44\u0e1b\u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e01\u0e31\u0e19',
     G:'\u0e22\u0e37\u0e19\u0e2b\u0e22\u0e31\u0e14\u0e17\u0e48\u0e32\u0e21\u0e01\u0e25\u0e32\u0e07\u0e04\u0e27\u0e32\u0e21\u0e01\u0e14\u0e14\u0e31\u0e19 \u0e01\u0e25\u0e49\u0e32\u0e40\u0e2a\u0e19\u0e2d\u0e41\u0e19\u0e27\u0e04\u0e34\u0e14\u0e43\u0e2b\u0e21\u0e48 \u0e41\u0e25\u0e30\u0e23\u0e48\u0e27\u0e21\u0e02\u0e31\u0e1a\u0e40\u0e04\u0e25\u0e37\u0e48\u0e2d\u0e19\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07\u0e02\u0e2d\u0e07\u0e17\u0e35\u0e21',
     S:'\u0e01\u0e25\u0e49\u0e32\u0e40\u0e1c\u0e0a\u0e34\u0e0d\u0e1b\u0e31\u0e0d\u0e2b\u0e32 \u0e41\u0e2a\u0e14\u0e07\u0e04\u0e27\u0e32\u0e21\u0e04\u0e34\u0e14\u0e40\u0e2b\u0e47\u0e19\u0e2d\u0e22\u0e48\u0e32\u0e07\u0e40\u0e2b\u0e21\u0e32\u0e30\u0e2a\u0e21 \u0e1e\u0e23\u0e49\u0e2d\u0e21\u0e40\u0e23\u0e35\u0e22\u0e19\u0e23\u0e39\u0e49\u0e41\u0e25\u0e30\u0e40\u0e1b\u0e34\u0e14\u0e23\u0e31\u0e1a\u0e41\u0e19\u0e27\u0e04\u0e34\u0e14\u0e43\u0e2b\u0e21\u0e48\u0e40\u0e1e\u0e37\u0e48\u0e2d\u0e1e\u0e31\u0e12\u0e19\u0e32\u0e15\u0e19\u0e40\u0e2d\u0e07',
@@ -1792,10 +1801,10 @@ var FDEF={
     I:'\u0e2b\u0e25\u0e35\u0e01\u0e40\u0e25\u0e35\u0e48\u0e22\u0e07\u0e04\u0e27\u0e32\u0e21\u0e17\u0e49\u0e32\u0e17\u0e32\u0e22 \u0e44\u0e21\u0e48\u0e01\u0e25\u0e49\u0e32\u0e41\u0e2a\u0e14\u0e07\u0e04\u0e27\u0e32\u0e21\u0e04\u0e34\u0e14\u0e40\u0e2b\u0e47\u0e19 \u0e41\u0e25\u0e30\u0e22\u0e31\u0e07\u0e44\u0e21\u0e48\u0e40\u0e1b\u0e34\u0e14\u0e43\u0e08\u0e15\u0e48\u0e2d\u0e01\u0e32\u0e23\u0e40\u0e1b\u0e25\u0e35\u0e48\u0e22\u0e19\u0e41\u0e1b\u0e25\u0e07'}}
 };
 var CAT_META={
-  'Family':{lb:'We are Family',cl:'#2563EB',bg:'rgba(37,99,235,.08)'},
-  'Courage':{lb:'We act with Courage',cl:'#06B6D4',bg:'rgba(6,182,212,.08)'},
-  'Premium Quality':{lb:'We deliver Premium Quality',cl:'#60A5FA',bg:'rgba(96,165,250,.08)'},
-  'Happiness':{lb:'We believe in Happiness',cl:'#A855F7',bg:'rgba(168,85,247,.08)'}
+  'Family':{lb:'We are Family',cl:'#E97700',bg:'rgba(233,119,0,.1)'},
+  'Courage':{lb:'We act with Courage',cl:'#D1470B',bg:'rgba(209,71,11,.1)'},
+  'Premium Quality':{lb:'We deliver Premium Quality',cl:'#63C7FF',bg:'rgba(99,199,255,.15)'},
+  'Happiness':{lb:'We believe in Happiness',cl:'#7CC7DB',bg:'rgba(124,199,219,.15)'}
 };
 var CATS=['Family','Courage','Premium Quality','Happiness'];
 var CRITERIA=[
@@ -3105,7 +3114,7 @@ function renderFocusChartHTML(){
       }
       html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+val.toFixed(2)+' ('+s2l(val).l+')">';
       html+='<div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
-      html+='<span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+val.toFixed(2)+'</span></div></div>';
+      html+='<span style="font-size:11px;font-weight:800;'+barLabelStyle(fd.cl)+'">'+val.toFixed(2)+'</span></div></div>';
       html+='</div>';
     });
     html+='</div>';
@@ -3221,7 +3230,7 @@ function renderSinghawayChartHTML(){
     }
     html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+val.toFixed(2)+' ('+s2l(val).l+')">';
     html+='<div style="width:100%;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center">';
-    html+='<span style="font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.3)">'+val.toFixed(2)+'</span></div></div>';
+    html+='<span style="font-size:11px;font-weight:800;'+barLabelStyle(m.cl)+'">'+val.toFixed(2)+'</span></div></div>';
     html+='</div>';
   });
   html+='</div>';
@@ -5606,14 +5615,22 @@ if(_isHoverDevice){
 }
 function toggleDef(target,cid,r){
   if(_isHoverDevice)return; /* desktop: definition already shown via hover popup */
-  var key=target+'_'+cid;
-  var elId='idef_'+key;
+  var elId='idef_'+target+'_'+cid;
+  /* Bug fix: this used to be keyed by target+cid alone, so tapping a
+     DIFFERENT rating letter on the SAME criterion row (e.g. E then G)
+     matched the "same box already open" check below and just toggled
+     the box closed instead of showing G's definition -- because the
+     row/element is the same even though the rating tapped isn't.
+     Including the rating itself in the toggle-tracking key fixes it:
+     switching ratings always shows the new one; only tapping the exact
+     same rating button again collapses the box. */
+  var toggleKey=target+'_'+cid+'_'+r;
   var el=document.getElementById(elId);
   if(!el)return;
   /* close any other open def box first */
   document.querySelectorAll('.idef-box').forEach(function(x){if(x.id!==elId)x.style.display='none';});
-  if(_openDefKey===key){
-    /* same box -> toggle closed */
+  if(_openDefKey===toggleKey){
+    /* same row AND same rating tapped again -> toggle closed */
     el.style.display='none';_openDefKey=null;return;
   }
   var crit=null;for(var i=0;i<CRITERIA.length;i++){if(CRITERIA[i].id===cid){crit=CRITERIA[i];break;}}
@@ -5624,7 +5641,7 @@ function toggleDef(target,cid,r){
     +'<span style="padding:2px 10px;border-radius:5px;background:'+RCOL[r]+';color:#fff;font-size:11px;font-weight:700">'+r+' \u2013 '+RNAME[r]+'</span>'
     +'</div>'
     +'<div style="font-size:12px;color:var(--t0);line-height:1.65">'+fd.df[r]+'</div>';
-  el.style.display='block';_openDefKey=key;
+  el.style.display='block';_openDefKey=toggleKey;
 }
 function ftag(f){
   var fd=FDEF[f];if(!fd)return '<span style="font-size:9px">'+f+'</span>';
@@ -7976,7 +7993,7 @@ function renderAssignedOrgDashboardHTML(assignment){
   html+='<div style="display:flex;gap:14px;align-items:flex-end;height:150px;padding:0 10px 0 4px">';
   fkeysD.forEach(function(f){
     var fd=FDEF[f];var val=focusAvg[f];var barH=Math.max(1,Math.round(val/5*150));
-    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0"><div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;color:#fff">'+val.toFixed(2)+'</span></div><div style="font-size:11px;font-weight:800;color:'+fd.cl+'">'+f+'</div></div>';
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0"><div style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;'+barLabelStyle(fd.cl)+'">'+val.toFixed(2)+'</span></div><div style="font-size:11px;font-weight:800;color:'+fd.cl+'">'+f+'</div></div>';
   });
   html+='</div></div></div>';
 
@@ -7992,7 +8009,7 @@ function renderAssignedOrgDashboardHTML(assignment){
   html+='<div style="display:flex;gap:14px;align-items:flex-end;height:150px;padding:0 10px 0 4px">';
   CATS.forEach(function(cat){
     var m=CAT_META[cat];var val=catAvg[cat];var barH=Math.max(1,Math.round(val/5*150));
-    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0"><div style="width:100%;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;color:#fff">'+val.toFixed(2)+'</span></div><div style="font-size:10px;font-weight:700;color:'+m.cl+';text-align:center">'+m.lb+'</div></div>';
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0"><div style="width:100%;height:'+barH+'px;background:'+m.cl+';border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center"><span style="font-size:11px;font-weight:800;'+barLabelStyle(m.cl)+'">'+val.toFixed(2)+'</span></div><div style="font-size:10px;font-weight:700;color:'+m.cl+';text-align:center">'+m.lb+'</div></div>';
   });
   html+='</div></div></div>';
   html+=renderAssignedOrgIndividualScoreTableHTML(peopleInOrg,assignment);
@@ -8268,13 +8285,13 @@ function renderDash(){
         html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
         if(!newFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:9px;font-weight:700;color:#111827">'+valNewer.toFixed(2)+'</span>';
         html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:'+m.cl+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
-          +(newFits?'<span class="db-bar-label" style="font-size:9px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
+          +(newFits?'<span class="db-bar-label" style="font-size:9px;'+barLabelStyle(m.cl)+'">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
       } else {
         var fits=barHNewer>=22;
         html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+cmpNewer.label+': '+valNewer.toFixed(2)+' ('+lblNewer.l+')">';
         if(!fits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barHNewer+2)+'px;font-size:10px;font-weight:700;color:#111827">'+valNewer.toFixed(2)+'</span>';
         html+='<div class="db-anim-bar" style="width:100%;height:'+barHNewer+'px;background:'+m.cl+';border-radius:4px 4px 0 0;display:flex;align-items:center;justify-content:center">'
-          +(fits?'<span class="db-bar-label" style="font-size:10px;color:#fff">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
+          +(fits?'<span class="db-bar-label" style="font-size:10px;'+barLabelStyle(m.cl)+'">'+valNewer.toFixed(2)+'</span>':'')+'</div></div>';
       }
       html+='</div>';
     });
@@ -8585,7 +8602,7 @@ function renderDash(){
       html+='<div style="flex:1;height:100%;display:flex;align-items:flex-end;min-width:0" title="'+fd.nm+' \u2013 \u0e23\u0e2d\u0e1a '+compactRoundLabel(cmpNewer)+(cur?': '+cur.toFixed(2)+' ('+lblNewFoc.l+')':'')+'">';
       if(cur&&!numFits)html+='<span class="db-bar-label" style="position:relative;bottom:'+(barH+2)+'px;font-size:clamp(8px,2vw,10px);font-weight:800;color:'+fd.cl+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
       html+='<div class="db-anim-bar" style="width:100%;height:'+barH+'px;background:'+fd.cl+';border-radius:6px 6px 0 0;position:relative;display:flex;align-items:center;justify-content:center">';
-      if(cur&&numFits)html+='<span class="db-bar-label" style="font-size:clamp(8px,2vw,10px);font-weight:800;color:#fff;font-family:var(--fh);text-shadow:0 1px 3px rgba(0,0,0,.25)">'+cur.toFixed(2)+'</span>';
+      if(cur&&numFits)html+='<span class="db-bar-label" style="font-size:clamp(8px,2vw,10px);font-weight:800;'+barLabelStyle(fd.cl)+';font-family:var(--fh)">'+cur.toFixed(2)+'</span>';
       if(!cur)html+='<span style="position:absolute;bottom:2px;font-size:clamp(9px,2vw,11px);color:var(--t2)">\u2013</span>';
       html+='</div></div>';
       html+='</div>';
