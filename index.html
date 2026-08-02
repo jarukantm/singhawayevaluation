@@ -196,10 +196,6 @@ button,input,select{font-family:var(--fb)}
   cursor:pointer;white-space:nowrap}
 .tb-mob-logout:active{background:rgba(163,45,45,.14)}
 .tb-mob-logout .tb-mob-logout-ico{font-size:14px;line-height:1}
-.tb-mob-menu{display:none;flex-shrink:0;align-items:center;justify-content:center;
-  width:34px;height:34px;border-radius:50%;border:1px solid var(--b1);
-  background:var(--white);color:var(--t1);cursor:pointer}
-.tb-mob-menu:active{background:var(--s1)}
 
 /* ── VIEWS ── */
 .views{flex:1;overflow:hidden;display:flex;flex-direction:column;min-height:0}
@@ -897,6 +893,16 @@ button,input,select{font-family:var(--fb)}
 .mob-nav-btn::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%) scaleX(0);
   width:28px;height:2px;background:var(--pb2);transition:transform .15s}
 .mob-nav-btn.on::after{transform:translateX(-50%) scaleX(1)}
+/* Divider between the core evaluation tabs and the extra account-level
+   buttons (Config / Switch Role) injected at login -- keeps the two
+   groups visually distinct without needing a different color. */
+.mn-divider{width:1px;align-self:stretch;margin:6px 2px;background:var(--b0);flex-shrink:0}
+/* When Config and/or Switch Role are added, up to 6 buttons need to
+   share the same row -- tighten padding/font slightly so nothing wraps
+   or gets clipped on narrow phones. */
+.mob-nav-inner.dense .mob-nav-btn{padding:7px 6px;font-size:8px;min-width:0}
+.mob-nav-inner.dense .mn-ico{font-size:18px}
+.mob-nav-inner.dense .mn-ico svg{width:16px!important;height:16px!important}
 
 /* ── MOBILE LAYOUT THRESHOLD ──
    680px (not 768px) so iPads -- including iPad Mini at 768px portrait --
@@ -913,7 +919,6 @@ button,input,select{font-family:var(--fb)}
   .tb-title{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .tb-mob-logout{display:flex;flex-shrink:0;padding:5px 10px;font-size:11px}
   .tb-mob-logout-ico{font-size:12px}
-  .tb-mob-menu{display:flex}
   .mob-nav{display:block}
   /* ── Recipient chip bar (ผู้รับการประเมิน) on mobile ──
      Puts the label + "เพิ่มบุคคล" button on their own top row, and lets
@@ -1065,6 +1070,7 @@ button,input,select{font-family:var(--fb)}
       <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>
       <span>ภาพรวม</span>
     </button>
+    <span id="mnExtra" style="display:contents"></span>
   </div>
 </nav>
 
@@ -1085,6 +1091,7 @@ button,input,select{font-family:var(--fb)}
       <span class="mn-ico"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span>
       <span>สถานะ</span>
     </button>
+    <span id="mnaExtra" style="display:contents"></span>
   </div>
 </nav>
 
@@ -1395,7 +1402,6 @@ button,input,select{font-family:var(--fb)}
     <!-- TOPBAR -->
     <div class="topbar">
       <div class="tb-top-row">
-        <button class="tb-mob-menu" onclick="toggleSb()" title="เมนู"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></button>
         <div class="tb-left">
           <div class="tb-title" id="tbtitle">ประเมินตนเอง</div>
           <div class="tb-sub" id="tbsub"></div>
@@ -1636,7 +1642,6 @@ button,input,select{font-family:var(--fb)}
   <div class="main">
     <div class="topbar">
       <div class="tb-top-row">
-        <button class="tb-mob-menu" onclick="toggleSb()" title="เมนู"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg></button>
         <div class="tb-left">
           <div class="tb-title" id="atbtitle">ภาพรวมคะแนน</div>
           <div class="tb-sub" id="atbsub"></div>
@@ -5334,6 +5339,7 @@ function finishLogin(role){
   var canSwitch=myRoles.length>1;
   if(h('switchRoleBtn'))h('switchRoleBtn').style.display=canSwitch?'':'none';
   if(h('switchRoleBtnA'))h('switchRoleBtnA').style.display=canSwitch?'':'none';
+  renderMobileNavExtras(canSwitch);
   if(role==='Admin'||role==='SuperAdmin'){
     /* Admin / SuperAdmin: system-management shell only -- no
        self/person/grid evaluation tabs for this session, matching the
@@ -6629,6 +6635,37 @@ function renderLevelFilterCardHTML(containerId,rerenderFn){
  * ============================================================ */
 /* Task 3: Config is for Middle ('k') and Top ('s') Management only. */
 function canUseConfig(){return CU&&(personLevelKey(CU.role)==='k'||personLevelKey(CU.role)==='s');}
+/* Mobile bottom-nav design: Config and Switch Role -- when relevant for
+ * this account -- appear as REAL buttons in the same row as the other
+ * tabs (ตนเอง/รายบุคคล/รายหัวข้อ/ภาพรวม, or the Admin shell's 3 tabs),
+ * not tucked behind a hamburger menu. A thin divider separates these
+ * "account-level" actions from the core evaluation tabs so the grouping
+ * still reads clearly even with up to 6 buttons in one row; a "dense"
+ * class trims padding/icon size slightly so nothing wraps on narrow
+ * phones. Colors and every existing button's own look are untouched.
+ * Computed once per login/switch-role (job level + which roles this
+ * account holds are both fixed for the session, no need to recompute
+ * on every render). */
+function renderMobileNavExtras(canSwitch){
+  if(!CU)return;
+  var gearIco='<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+  var switchIco='<svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;flex-shrink:0"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
+  var showConfig=canUseConfig();
+
+  var empExtra='';
+  if(showConfig||canSwitch)empExtra+='<span class="mn-divider"></span>';
+  if(showConfig)empExtra+='<button class="mob-nav-btn" id="mn-config" onclick="showTab(\'config\')"><span class="mn-ico">'+gearIco+'</span><span>Config</span></button>';
+  if(canSwitch)empExtra+='<button class="mob-nav-btn" onclick="openSwitchRolePopup()"><span class="mn-ico">'+switchIco+'</span><span>สลับ Role</span></button>';
+  if(h('mnExtra'))h('mnExtra').innerHTML=empExtra;
+  var empInner=document.querySelector('#mobNav .mob-nav-inner');
+  if(empInner)empInner.classList.toggle('dense',4+(showConfig?1:0)+(canSwitch?1:0)>4);
+
+  var adminExtra='';
+  if(canSwitch)adminExtra='<span class="mn-divider"></span><button class="mob-nav-btn" onclick="openSwitchRolePopup()"><span class="mn-ico">'+switchIco+'</span><span>สลับ Role</span></button>';
+  if(h('mnaExtra'))h('mnaExtra').innerHTML=adminExtra;
+  var adminInner=document.querySelector('#mobNavAdmin .mob-nav-inner');
+  if(adminInner)adminInner.classList.toggle('dense',3+(canSwitch?1:0)>3);
+}
 /* Which org units this person can hand off: they can ONLY hand off the
  * ONE unit they themselves are responsible for -- a Division Manager
  * (ส) can only assign their own Division, a Department Manager (ก) can
