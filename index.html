@@ -892,6 +892,12 @@ button,input,select{font-family:var(--fb)}
 .sov-frow-top{align-items:flex-start}
 .sov-fcol{display:flex;flex-direction:column;gap:8px}
 .sov-chips{display:flex;gap:8px;flex-wrap:wrap}
+.sov-dlt{font-size:9px;font-weight:800;margin-top:1px;white-space:nowrap}
+.sov-dlt-up{color:var(--E)}
+.sov-dlt-dn{color:var(--I)}
+.sov-dlt-eq,.sov-dlt-na{color:var(--t2);font-weight:600}
+.sov-cmpbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 10px;padding:8px 12px;background:rgba(13,110,231,.06);border:1px solid rgba(13,110,231,.2);border-radius:var(--r);font-size:11px;color:var(--t0)}
+.sov-cmpbar small{font-size:10px;color:var(--t1)}
 @media(max-width:680px){.sov-flbl{min-width:100%}.sov-sel select{min-width:130px}.sov-filters{padding:9px 10px}}
 .sov-tbl .lv-k td{background:rgba(13,110,231,.03)}
 .sov-tbl .lv-p td{background:var(--s0)}
@@ -7969,29 +7975,43 @@ var dbFilter='overall'; /* overall | self | other | p | k | s */
 var dbScale=5; /* 5 or 7.5 -- display scale for numeric scores, managers+ only */
 var sovSortDir='desc'; /* 'desc' (มาก→น้อย, default) or 'asc' (น้อย→มาก) -- Score Overview table sort, within each role tier */
 /* ══ Overview-table filters (ภาพรวมคะแนนรายบุคคล) ══
+ * CYCLES. Everything below is computed PER CYCLE (cycleId = a round's id from
+ * allSelectableRounds(): 'current' or a closed round's id). The table has a
+ * base cycle (the newer round picked in the two round dropdowns) and,
+ * optionally, a compare cycle (the older one). Each cycle gets its own
+ * context (sovMakeCycle): its own evaluator records (SimDB rows of THAT
+ * round), its own rules (round.rules -> who may evaluate whom, and at what
+ * scope -- this is what makes "N" differ between rounds) and its own
+ * supervisor snapshot (round.supervisors, optional). Nothing computed for
+ * one cycle is ever reused for the other.
+ *
  * "ระดับของผู้ประเมิน" has three groups of check-boxes:
- *   Row 1  N+2 / N+1 / N / N-1 / N-2 -- the evaluator's REAL reporting
- *          relationship to the evaluated person (see sovRelKeysFor):
+ *   Row 1  N+2 / N+1 / N / N-1 / N-2 -- the evaluator's relationship to the
+ *          evaluated person (sovRelKeysFor):
  *            N+1 = direct supervisor, N+2 = supervisor's supervisor,
- *            N   = peer (same level, same unit), N-1 = direct report,
- *            N-2 = direct report's direct report.
+ *            N-1 = direct report,     N-2 = direct report's direct report
+ *            (all from the supervisor chain: supervisorId, see sovBosses),
+ *            N   = peer: same level AND the cycle's rules let the evaluator
+ *                  evaluate this person (rules[evaluator][evaluated].scope =
+ *                  dept / div / group / company); never also N+x / N-x / self.
  *   Row 2  ป / ก / ส -- the evaluator's own level.
  *   Row 3  "ดูเฉพาะคะแนนประเมินตนเอง" -- only the person's own self-assessment.
- * Rows 1 and 2 combine with AND; several boxes inside a row combine with
- * OR; every matching score is pooled and averaged once (same "each
- * evaluation counts once" rule as avgScore2's Overall mode). Row 3 is
- * mutually exclusive with rows 1-2: ticking it clears them, ticking any
- * of them clears it. Nothing ticked = the table behaves exactly as before.
+ * Rows 1 and 2 combine as a UNION: an evaluator's scores count when the
+ * evaluator matches ANY ticked relationship OR ANY ticked level; each
+ * evaluator is counted once however many boxes match. Self-assessments are
+ * excluded unless row 3 is ticked. Row 3 is mutually exclusive with rows 1-2.
+ * Nothing ticked (and no compare cycle) = the table behaves exactly as before.
  * Org filter -- กลุ่ม > ฝ่าย > แผนก cascading dropdowns narrow WHO is
  *          listed; they only offer units the logged-in user is
  *          responsible for (sovScopePeople).
  * View -- 'person' (one row per employee) or 'unit' (one row per
  *          group / division / department, depending on what is selected).
- * Data source for the evaluator filters is SimDB (one row per evaluator ->
- * evaluated pair, round by round; self-assessments are rows where both are
- * the same person), because selfSc/othSc only ever hold the logged-in
- * person's own scores. The logged-in person's not-yet-synced live scores
- * are merged in on top. */
+ * Data source whenever an evaluator filter or a compare cycle is on is
+ * SimDB (one row per evaluator -> evaluated pair, round by round;
+ * self-assessments are rows where both are the same person), because
+ * selfSc/othSc only ever hold the logged-in person's own scores. The
+ * logged-in person's not-yet-synced live scores are merged into the
+ * 'current' cycle only. */
 var SOV_REL_KEYS=['N+2','N+1','N','N-1','N-2'];
 var sovRelSel={'N+2':false,'N+1':false,'N':false,'N-1':false,'N-2':false};
 var sovLvlSel={p:false,k:false,s:false}; /* level of the EVALUATOR */
@@ -8053,60 +8073,112 @@ function sovMaybeToast(isEmpty,msg){
   if(isEmpty)toast(icon('alerttriangle',18),msg||'ไม่มีข้อมูลดังกล่าว','','var(--L)');
 }
 function sovLvlRank(role){var k=personLevelKey(role);return k==='s'?2:(k==='k'?1:0);}
-/* ── reporting lines, derived from the roster ──
-   ป -> its แผนก's ก; if that แผนก has no ก -> the ส of its ฝ่าย; if none -> the group head.
-   ก -> the ส of its ฝ่าย; if none -> the group head.
-   ส -> the group head (a ส whose unit is a "กลุ่ม…"), if any other than self.
-   N+1 = those; N+2 = THEIR supervisors. The roster has no "boss" column and the
-   admin-configurable eval rules (getDefaults) are not a hierarchy, so this is
-   the single place to change if the real reporting lines differ. */
+/* ── cycles ── */
+function sovRulesOf(roundId){
+  if(roundId==='current')return (currentRound&&currentRound.rules)||EVAL_RULES||null;
+  var r=ROUNDS.filter(function(x){return x.id===roundId;})[0];
+  return (r&&r.rules)||null;
+}
+/* info = an entry of allSelectableRounds(). includeLive: merge the logged-in user's unsynced scores (current round only). */
+function sovMakeCycle(info,includeLive){
+  if(!info)return null;
+  var rnd=info.id==='current'?currentRound:(ROUNDS.filter(function(r){return r.id===info.id;})[0]||null);
+  return {id:info.id,year:info.year,roundNo:info.roundNo,
+          label:info.label||roundLabel(info.year,info.roundNo),
+          rules:sovRulesOf(info.id),
+          supervisors:(rnd&&rnd.supervisors)||null, /* optional snapshot {empId: supervisorEmpId} for this cycle */
+          includeLive:!!includeLive,_lines:{},_idx:null,_recs:{}};
+}
+function sovCycleIdx(cyc){if(!cyc._idx)cyc._idx=sovBuildRelIndex(cyc.label,cyc.includeLive);return cyc._idx;}
+
+/* ── reporting lines ──
+   Direct supervisor(s) of p, in this order of preference:
+     1. an explicit supervisorId -- the cycle's snapshot (cyc.supervisors) first,
+        then the employee record itself (emp.supervisorId);
+     2. derived from the roster (the roster has no such column today):
+        ป -> its แผนก's ก; none -> the ส of its ฝ่าย; none -> the group head.
+        ก -> the ส of its ฝ่าย; none -> the group head.
+        ส -> the group head (a ส whose unit is a "กลุ่ม…"), if any other than self.
+   N+1 = those; N+2 = THEIR supervisors. */
 var _sovEmpIdx=null,_sovEmpIdxN=-1,_sovLineCache={};
 function sovEmp(id){
   if(!_sovEmpIdx||_sovEmpIdxN!==ALL_EMP.length){_sovEmpIdx={};ALL_EMP.forEach(function(e){_sovEmpIdx[e.empId]=e;});_sovEmpIdxN=ALL_EMP.length;_sovLineCache={};}
   return _sovEmpIdx[id]||null;
 }
-function sovBosses(p){ /* direct supervisors (N+1) -> array of ALL_EMP records */
+function sovBosses(p,cyc){ /* direct supervisors (N+1) -> array of ALL_EMP records */
   sovEmp(p.empId);
-  var c=_sovLineCache['b'+p.empId];if(c)return c;
+  var cache=(cyc&&cyc._lines)||_sovLineCache,key='b'+p.empId;
+  if(cache[key])return cache[key];
+  var sid=(cyc&&cyc.supervisors&&cyc.supervisors[p.empId])||p.supervisorId;
+  var s=sid?sovEmp(sid):null;
+  if(s&&s.empId!==p.empId)return (cache[key]=[s]);
   var lvl=sovLvlRank(p.role),out=[];
   if(lvl===0&&p.dept)out=ALL_EMP.filter(function(e){return e.empId!==p.empId&&sovLvlRank(e.role)===1&&e.div===p.div&&e.dept===p.dept;});
   if(!out.length&&lvl<=1)out=ALL_EMP.filter(function(e){return e.empId!==p.empId&&sovLvlRank(e.role)===2&&e.div===p.div;});
   if(!out.length)out=ALL_EMP.filter(function(e){return e.empId!==p.empId&&sovLvlRank(e.role)===2&&e.group===p.group&&/^กลุ่ม/.test(e.div||'')&&e.div!==p.div;});
-  return (_sovLineCache['b'+p.empId]=out);
+  return (cache[key]=out);
 }
-function sovBosses2(p){ /* supervisors of the supervisors (N+2) */
-  var c=_sovLineCache['c'+p.empId];if(c)return c;
-  var n1={};sovBosses(p).forEach(function(e){n1[e.empId]=1;});
+function sovBosses2(p,cyc){ /* supervisors of the supervisors (N+2) */
+  var cache=(cyc&&cyc._lines)||_sovLineCache,key='c'+p.empId;
+  if(cache[key])return cache[key];
+  var n1={};sovBosses(p,cyc).forEach(function(e){n1[e.empId]=1;});
   var seen={},out=[];
-  sovBosses(p).forEach(function(b){sovBosses(b).forEach(function(e){if(!n1[e.empId]&&e.empId!==p.empId&&!seen[e.empId]){seen[e.empId]=1;out.push(e);}});});
-  return (_sovLineCache['c'+p.empId]=out);
-}
-function sovIsPeer(a,b){ /* N: same level AND same unit (ป: แผนก, else ฝ่าย; ก: ฝ่าย; ส: กลุ่ม) */
-  if(a.empId===b.empId||sovLvlRank(a.role)!==sovLvlRank(b.role))return false;
-  var r=sovLvlRank(a.role);
-  if(r===2)return a.group===b.group;
-  if(r===1)return a.div===b.div;
-  return a.div===b.div&&(a.dept||'')===(b.dept||'');
+  sovBosses(p,cyc).forEach(function(b){sovBosses(b,cyc).forEach(function(e){if(!n1[e.empId]&&e.empId!==p.empId&&!seen[e.empId]){seen[e.empId]=1;out.push(e);}});});
+  return (cache[key]=out);
 }
 function sovHasEmp(list,id){for(var i=0;i<list.length;i++)if(list[i].empId===id)return true;return false;}
-/* relationship(s) of evaluator E to evaluated P, e.g. ['N+1'] -- [] when unrelated */
-function sovRelKeysFor(evId,P){
+/* Does the cycle's rule set let evaluator E evaluate P?  Same logic as
+   getDefaults(), but for ANY cycle's rules and any pair. */
+function sovRuleAllows(rules,E,P){
+  if(!E||!P||E.empId===P.empId)return false;
+  if(rules&&rules[E.role]){
+    var entry=rules[E.role][P.role];
+    if(!entry||!entry.checked)return false;
+    if(entry.scope==='dept')return P.dept===E.dept;
+    if(entry.scope==='div')return P.div===E.div;
+    if(entry.scope==='group')return P.group===E.group;
+    return true; /* company-wide (or unset) */
+  }
+  if(E.role==='ปฏิบัติการ')return (P.dept===E.dept&&['ปฏิบัติการ','ผู้บริหารระดับกลาง','เชี่ยวชาญ'].indexOf(P.role)>=0)||(P.div===E.div&&P.role==='ผู้บริหารระดับสูง');
+  if(E.role==='ผู้บริหารระดับกลาง')return ['ปฏิบัติการ','เชี่ยวชาญ','ผู้บริหารระดับสูง'].indexOf(P.role)>=0||(P.div===E.div&&P.role==='ผู้บริหารระดับกลาง');
+  return ['ผู้บริหารระดับกลาง','ผู้บริหารระดับสูง'].indexOf(P.role)>=0;
+}
+/* relationship of evaluator E to evaluated P within one cycle: ['N+1'] etc, [] when none of the five applies */
+function sovRelKeysFor(evId,P,cyc){
   var E=sovEmp(evId);if(!E||!P||E.empId===P.empId)return [];
   var k=[];
-  if(sovHasEmp(sovBosses(P),E.empId))k.push('N+1');
-  if(sovHasEmp(sovBosses2(P),E.empId))k.push('N+2');
-  if(sovHasEmp(sovBosses(E),P.empId))k.push('N-1');
-  if(sovHasEmp(sovBosses2(E),P.empId))k.push('N-2');
-  if(!k.length&&sovIsPeer(E,P))k.push('N'); /* a boss/report is never also a "peer" (e.g. ส in the same กลุ่ม as its group head) */
+  if(sovHasEmp(sovBosses(P,cyc),E.empId))k.push('N+1');
+  if(sovHasEmp(sovBosses2(P,cyc),E.empId))k.push('N+2');
+  if(sovHasEmp(sovBosses(E,cyc),P.empId))k.push('N-1');
+  if(sovHasEmp(sovBosses2(E,cyc),P.empId))k.push('N-2');
+  /* N: a peer under THIS cycle's rules, and not already one of the four above */
+  if(!k.length&&sovLvlRank(E.role)===sovLvlRank(P.role)&&sovRuleAllows(cyc?cyc.rules:sovRulesOf('current'),E,P))k.push('N');
   return k;
 }
-/* may this evaluator's scores count for this evaluated person under the current filters? */
-function sovRecAllowed(rec,evaluated){
+/* may this evaluator record count for this evaluated person?  Evaluator filters on: UNION of the ticked
+   relationships and the ticked levels (self-assessments only in self-only mode).  Evaluator filters
+   off (compare-only): the "แสดงผล" selector's meaning, applied to per-evaluator records. */
+function sovRecAllowed(rec,P,cyc,dbF){
   if(sovSelfOnly)return !!rec.isSelf;
+  if(sovRelActive()||sovLvlActive()){
+    if(rec.isSelf)return false;
+    if(sovRelActive()&&sovRelKeysFor(rec.evId,P,cyc).some(function(k){return sovRelSel[k];}))return true;
+    if(sovLvlActive()){var E=sovEmp(rec.evId);if(sovLvlSel[personLevelKey(E?E.role:rec.evRole)])return true;}
+    return false;
+  }
+  var f=dbF||'overall';
+  if(f==='overall')return true;
+  if(f==='self')return !!rec.isSelf;
   if(rec.isSelf)return false;
-  if(sovRelActive()&&!sovRelKeysFor(rec.evId,evaluated).some(function(k){return sovRelSel[k];}))return false;
-  if(sovLvlActive()){var E=sovEmp(rec.evId);if(!sovLvlSel[personLevelKey(E?E.role:rec.evRole)])return false;}
-  return true;
+  if(f==='other')return true;
+  var E2=sovEmp(rec.evId);return personLevelKey(E2?E2.role:rec.evRole)===f; /* 'p' | 'k' | 's' */
+}
+/* ▲ / ▼ % of the base cycle against the compare cycle (null when either side has no score) */
+function sovDeltaHTML(b,c){
+  if(!b||!c)return '<div class="sov-dlt sov-dlt-na" title="ไม่มีคะแนนในรอบใดรอบหนึ่ง จึงเปรียบเทียบไม่ได้">\u2013</div>';
+  var pct=(b-c)/c*100;
+  if(Math.abs(pct)<0.05)return '<div class="sov-dlt sov-dlt-eq">= 0%</div>';
+  return '<div class="sov-dlt '+(pct>0?'sov-dlt-up':'sov-dlt-dn')+'">'+(pct>0?'\u25B2':'\u25BC')+' '+Math.abs(pct).toFixed(1)+'%</div>';
 }
 /* ── who the logged-in user is responsible for (feeds the table AND the dropdowns) ──
    ก / ป : their own แผนก (same ฝ่าย + same แผนก)
@@ -8242,9 +8314,9 @@ function sovFilterBarHTML(){
   } else if(sovRelMode()){
     note='กำลังแสดงคะแนนที่ให้โดย';
     if(sovRelActive())note+=' ผู้ประเมิน <b>'+SOV_REL_KEYS.filter(function(k){return sovRelSel[k];}).join(' + ')+'</b>';
-    if(sovRelActive()&&sovLvlActive())note+=' และ';
+    if(sovRelActive()&&sovLvlActive())note+=' <b>รวมกับ</b>';
     if(sovLvlActive())note+=' ผู้ประเมินระดับ <b>'+['p','k','s'].filter(function(k){return sovLvlSel[k];}).map(function(k){return PERSON_LEVEL_LABEL[k];}).join(' + ')+'</b>';
-    note+=' (เลือกหลายตัว = เฉลี่ยรวมทุกคะแนนของกลุ่มที่เลือก, ไม่รวมคะแนนประเมินตนเอง และใช้แทนตัวเลือก "แสดงผล" ด้านบน)';
+    note+=' (นำคะแนนของผู้ประเมินที่เข้าเงื่อนไขข้อใดข้อหนึ่งมาเฉลี่ยรวมกัน นับผู้ประเมินคนละครั้ง, ไม่รวมคะแนนประเมินตนเอง และใช้แทนตัวเลือก "แสดงผล" ด้านบน)';
   } else {
     note='ไม่เลือกระดับของผู้ประเมิน = แสดงคะแนนตามตัวเลือก "แสดงผล" ด้านบน (ค่าเริ่มต้น)';
   }
@@ -9200,16 +9272,19 @@ function renderDash(){
     html+='</div>';
     html+='<div style="padding:14px 16px">';
     html+=sovFilterBarHTML();
-    /* With a Tab 1/2 (per-evaluator) filter on, scores come from SimDB, so the
+    /* With an evaluator filter or a compare round on, scores come from SimDB, so the
        table is still worth showing even when this session has no live data. */
-    if(noData&&!sovRelMode()){
+    if(noData&&!sovRelMode()&&!dbCompareMode){
       html+='<div style="padding:1.5rem;text-align:center;color:var(--t2)">'+icon('chartcolumn',18)+' ยังไม่มีข้อมูลการประเมิน</div>';
       sovMaybeToast(sovOrgActive()||!!window._sovQ);
     } else {
+      /* base = the newer round, compare = the older one (same chronological rule as every other widget);
+         both are recomputed on every render, so changing either dropdown updates the table at once */
       var _sovPast=(_viewingPast&&pastRound)?pastRound:null;
+      var _sovBaseInfo=_sovPast?{id:_sovPast.id,year:_sovPast.year,roundNo:_sovPast.roundNo,label:_sovPast.label||roundLabel(_sovPast.year,_sovPast.roundNo)}:cmpNewer;
       html+=scoreOverviewSection({
-        roundLabel:_sovPast?(_sovPast.label||roundLabel(_sovPast.year,_sovPast.roundNo)):(cmpNewer&&cmpNewer.label)||roundLabel(currentRound.year,currentRound.roundNo),
-        includeLive:!!(_sovPast||(cmpNewer&&cmpNewer.isCurrent))
+        base:sovMakeCycle(_sovBaseInfo,!!(_sovPast||(cmpNewer&&cmpNewer.isCurrent))),
+        compare:(dbCompareMode&&cmpOlder)?sovMakeCycle(cmpOlder,!!cmpOlder.isCurrent):null
       });
     }
     html+='</div></div>';
@@ -9348,39 +9423,44 @@ function scoreOverviewSection(ctx){
   var scopeTotal=scope.length;
   var visible=sovOrgActive()?scope.filter(sovInOrg):scope; /* กลุ่ม › ฝ่าย › แผนก dropdowns */
 
-  /* Tabs 1+2: per-evaluator index (SimDB + the logged-in person's live
-     scores). Only built when a tab is ticked, so the default path below
-     is the old calculation unchanged. */
+  /* ── cycles: base (the newer round) and optional compare (the older one) ──
+     Each has its OWN context -- records, rules, supervisor lines -- so nothing
+     from one is ever reused for the other. */
+  if(!ctx.base){ /* legacy call shape {roundLabel,includeLive} */
+    ctx.base=sovMakeCycle({id:'current',year:currentRound.year,roundNo:currentRound.roundNo,label:ctx.roundLabel},!!ctx.includeLive);
+  }
+  var baseCyc=ctx.base,cmpCyc=ctx.compare||null;
+  var cmpOn=!!cmpCyc;
   var relOn=sovRelMode();
-  var relIdx=relOn?sovBuildRelIndex(ctx.roundLabel,!!ctx.includeLive):null;
+  /* per-evaluator records (SimDB + the logged-in user's live scores) are used when an evaluator
+     filter OR a compare cycle is on; otherwise the legacy live-session average below, unchanged. */
+  var engine=relOn||cmpOn;
   var fkeys=Object.keys(FDEF);
   var critsByCat={},critsByFoc={};
   CATS.forEach(function(cat){critsByCat[cat]=CRITERIA.filter(function(c){return c.cat===cat;});});
   fkeys.forEach(function(f){critsByFoc[f]=CRITERIA.filter(function(c){return c.foc===f;});});
 
-  var recCache={};
-  function relRecsFor(p){
-    if(recCache[p.empId])return recCache[p.empId];
-    var m=relIdx[p.empId]||{};
+  function recsOf(cyc,p){
+    if(cyc._recs[p.empId])return cyc._recs[p.empId];
+    var m=sovCycleIdx(cyc)[p.empId]||{};
     var out=[];
-    Object.keys(m).forEach(function(ev){if(sovRecAllowed(m[ev],p))out.push(m[ev]);});
-    return (recCache[p.empId]=out);
+    Object.keys(m).forEach(function(ev){if(sovRecAllowed(m[ev],p,cyc,dbFilter))out.push(m[ev]);});
+    return (cyc._recs[p.empId]=out);
   }
-  function scoreFor(p,crits){
-    return relOn?sovAvgRel(relRecsFor(p),crits):avgScore2([p.empId],crits,dbFilter);
-  }
-  /* one profile per person, computed once and reused by sort, rows,
+  /* one profile per person per cycle, computed once and reused by sort, rows,
      summary row and unit aggregation */
-  var profCache={};
-  function profileOf(p){
-    if(profCache[p.empId])return profCache[p.empId];
-    var pcAs=CATS.map(function(cat){return scoreFor(p,critsByCat[cat]);});
-    var pfAs=fkeys.map(function(f){return scoreFor(p,critsByFoc[f]);});
+  function buildProfile(p,cyc){
+    function sc(crits){return engine?sovAvgRel(recsOf(cyc,p),crits):avgScore2([p.empId],crits,dbFilter);}
+    var pcAs=CATS.map(function(cat){return sc(critsByCat[cat]);});
+    var pfAs=fkeys.map(function(f){return sc(critsByFoc[f]);});
     var swS=pcAs.filter(function(a){return a>0;});var swM=swS.length?swS.reduce(function(a,b){return a+b;},0)/swS.length:0;
     var focS=pfAs.filter(function(a){return a>0;});var focM=focS.length?focS.reduce(function(a,b){return a+b;},0)/focS.length:0;
     var ovAll=swM||focM?(swM+focM)/2:0;
-    return (profCache[p.empId]={pcAs:pcAs,pfAs:pfAs,swM:swM,focM:focM,ovAll:ovAll,nEval:relOn?relRecsFor(p).length:0});
+    return {pcAs:pcAs,pfAs:pfAs,swM:swM,focM:focM,ovAll:ovAll,nEval:engine?recsOf(cyc,p).length:0};
   }
+  var profCache={},cmpCache={};
+  function profileOf(p){return profCache[p.empId]||(profCache[p.empId]=buildProfile(p,baseCyc));}
+  function cmpProfileOf(p){return cmpCache[p.empId]||(cmpCache[p.empId]=buildProfile(p,cmpCyc));}
 
   /* sort: by role tier first (ส > ก > ป, always -- not affected by the
      toggle), then by คะแนนรวม descending or ascending within each tier
@@ -9403,11 +9483,12 @@ function scoreOverviewSection(ctx){
   });
   var profs=filtered.map(profileOf);
   var withData=profs.filter(function(x){return x.ovAll>0;}).length;
+  var withAny=cmpOn?filtered.filter(function(p){return profileOf(p).ovAll>0||cmpProfileOf(p).ovAll>0;}).length:withData;
 
   /* "ไม่มีข้อมูลดังกล่าว" toast: a filter/search/view change that leaves
      nothing to show (nobody matches, or nobody has a score under it) */
   var anyFilter=relOn||sovOrgActive()||!!sovQ;
-  sovMaybeToast(anyFilter&&(filtered.length===0||withData===0),
+  sovMaybeToast(anyFilter&&(filtered.length===0||withAny===0),
     (relOn&&filtered.length>0)?'ไม่มีคะแนนประเมินในระดับที่ท่านเลือก':'ไม่มีข้อมูลดังกล่าว');
 
   var html='<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">'
@@ -9418,11 +9499,17 @@ function scoreOverviewSection(ctx){
     +'<span style="font-size:11px;color:var(--t1)">แสดง <b style="color:var(--t0)">'+filtered.length+'</b> จาก '+scopeTotal+' คน</span></div>';
 
   /* a score filter is on but nobody in view has any matching score yet */
-  if(relOn&&filtered.length&&withData===0){
+  if(relOn&&filtered.length&&withAny===0){
     html+='<div class="sov-info">ไม่มีคะแนนประเมินในระดับที่เลือกสำหรับพนักงานที่แสดงอยู่ (ต้องมีการ Save/Submit การประเมินในรอบนี้ก่อน) \u2014 ลองเลือกเงื่อนไขอื่นเพิ่ม หรือกด "ล้างตัวกรอง"</div>';
   }
 
   html+=sovLegendHTML();
+  if(cmpOn){
+    var cmpHasData=filtered.some(function(p){return cmpProfileOf(p).ovAll>0;});
+    html+='<div class="sov-cmpbar"><b>เปรียบเทียบรอบ</b><span>รอบหลัก: <b>ปี '+baseCyc.year+' '+sovEsc(baseCyc.label)+'</b></span><span>เทียบกับ: <b>ปี '+cmpCyc.year+' '+sovEsc(cmpCyc.label)+'</b></span>'
+      +'<small>\u25B2/\u25BC = % ที่รอบหลักสูงขึ้น/ต่ำลงจากรอบเปรียบเทียบ \u00B7 แต่ละรอบคำนวณแยกอิสระตามกติกา (rules) และสายบังคับบัญชาของรอบนั้น'+(relOn?'':' \u00B7 ใช้ข้อมูลรายผู้ประเมินจากฐานข้อมูลของทั้งสองรอบ')+'</small></div>';
+    if(!cmpHasData)html+='<div class="sov-info">รอบเปรียบเทียบ (ปี '+cmpCyc.year+' '+sovEsc(cmpCyc.label)+') ยังไม่มีคะแนนตามเงื่อนไขที่เลือกสำหรับพนักงานที่แสดงอยู่ จึงยังไม่มีผลต่างให้แสดง</div>';
+  }
 
   /* ── unit aggregation (รายหน่วยงาน view) ──
      Level follows the deepest dropdown chosen: nothing -> กลุ่ม rows,
@@ -9431,8 +9518,8 @@ function scoreOverviewSection(ctx){
   var uLv=(sovOrg.d||sovOrg.t)?'t':(sovOrg.g?'d':'g');
   var uLvName={g:'กลุ่ม',d:'ฝ่าย',t:'แผนก'}[uLv];
   function _mean(arr){var v=arr.filter(function(a){return a>0;});return v.length?v.reduce(function(a,b){return a+b;},0)/v.length:0;}
-  function aggregate(plist){
-    var ps=plist.map(profileOf);
+  function aggregate(plist,profFn){
+    var ps=plist.map(profFn||profileOf);
     var swM=_mean(ps.map(function(x){return x.swM;})),focM=_mean(ps.map(function(x){return x.focM;}));
     return {
       cat:CATS.map(function(c,i){return _mean(ps.map(function(x){return x.pcAs[i];}));}),
@@ -9453,7 +9540,7 @@ function scoreOverviewSection(ctx){
       if(!uMap[key]){uMap[key]={key:key,name:name,sub:sub,g:p.group||'',d:p.div||'',t:p.dept||SOV_NONE,members:[]};uOrder.push(key);}
       uMap[key].members.push(p);
     });
-    units=uOrder.map(function(k){var u=uMap[k];u.agg=aggregate(u.members);return u;});
+    units=uOrder.map(function(k){var u=uMap[k];u.agg=aggregate(u.members,profileOf);u.aggC=cmpOn?aggregate(u.members,cmpProfileOf):null;return u;});
     /* same คะแนน toggle as the person view; units without any score always go last */
     units.sort(function(a,b){
       if((a.agg.ov>0)!==(b.agg.ov>0))return a.agg.ov>0?-1:1;
@@ -9479,15 +9566,20 @@ function scoreOverviewSection(ctx){
   html+='<th style="color:#534AB7;font-size:10px;min-width:96px">คะแนนรวม<small>FOCUS</small></th>';
   html+='</tr></thead><tbody>';
 
-  function lvlCell(a,name){
-    if(!a)return '<td title="'+name+': ไม่มีข้อมูล">\u2013</td>';
+  /* a = base score, c = compare-cycle score (only when comparing) */
+  function lvlCell(a,name,c){
+    var dl=cmpOn?sovDeltaHTML(a,c):'';
+    var ct=cmpOn?' | รอบเปรียบเทียบ: '+(c?scaleScore(c).toFixed(2):'ไม่มีข้อมูล'):'';
+    if(!a)return '<td title="'+name+': ไม่มีข้อมูล'+ct+'">\u2013'+dl+'</td>';
     var l=s2l(a);var sc=scaleScore(a).toFixed(2);
-    return '<td title="'+name+': '+sc+' ('+l.l+' \u2013 '+RNAME[l.l]+')"><span class="rb-inl" style="background:'+RCOL[l.l]+';font-size:10px">'+l.l+'</span><div class="sov-num">'+sc+'</div></td>';
+    return '<td title="'+name+': '+sc+' ('+l.l+' \u2013 '+RNAME[l.l]+')'+ct+'"><span class="rb-inl" style="background:'+RCOL[l.l]+';font-size:10px">'+l.l+'</span><div class="sov-num">'+sc+'</div>'+dl+'</td>';
   }
-  function totCell(a){
-    if(!a)return '<td>\u2013</td>';
+  function totCell(a,c){
+    var dl=cmpOn?sovDeltaHTML(a,c):'';
+    var cl=cmpOn&&c?'<div class="sov-num" style="font-weight:500;color:var(--t2)">เทียบ '+scaleScore(c).toFixed(2)+'</div>':'';
+    if(!a)return '<td>\u2013'+dl+cl+'</td>';
     var l=s2l(a);
-    return '<td><b style="color:'+l.c+'">'+scaleScore(a).toFixed(2)+'</b><div class="sov-lvl" style="color:'+l.c+'">'+l.l+' \u2013 '+RNAME[l.l]+'</div></td>';
+    return '<td><b style="color:'+l.c+'">'+scaleScore(a).toFixed(2)+'</b><div class="sov-lvl" style="color:'+l.c+'">'+l.l+' \u2013 '+RNAME[l.l]+'</div>'+dl+cl+'</td>';
   }
 
   /* ── summary row, always the first row: average of everything currently listed ──
@@ -9496,7 +9588,7 @@ function scoreOverviewSection(ctx){
      in that column -- so it always equals the average of what is shown
      below it and recalculates on every change. */
   if(filtered.length){
-    var tot=aggregate(filtered);
+    var tot=aggregate(filtered,profileOf),totC=cmpOn?aggregate(filtered,cmpProfileOf):null;
     var depts={};filtered.forEach(function(p){depts[p.dept||p.div||'-']=true;});
     var deptNames=Object.keys(depts);
     var oneDept=filtered.every(function(p){return p.dept&&p.dept===filtered[0].dept;});
@@ -9512,10 +9604,10 @@ function scoreOverviewSection(ctx){
       +'<div style="font-size:10px;color:var(--t1);line-height:1.4">'+sovEsc(scopeLbl)+(fsum?' \u00B7 '+sovEsc(fsum):'')+'</div>'
       +'<div style="font-size:9px;color:var(--t2)">เฉลี่ยจาก '+tot.nData+' คน (แสดง '+tot.n+' คน)</div></td>';
     html+='<td><span style="font-size:9px;color:var(--t2)">เฉลี่ย</span></td>';
-    tot.cat.forEach(function(a,i){html+=lvlCell(a,sumTitle+' \u2013 '+CATS[i]);});
-    html+=totCell(tot.sw);
-    tot.foc.forEach(function(a,i){html+=lvlCell(a,sumTitle+' \u2013 '+fkeys[i]+' ('+FDEF[fkeys[i]].nm+')');});
-    html+=totCell(tot.focT);
+    tot.cat.forEach(function(a,i){html+=lvlCell(a,sumTitle+' \u2013 '+CATS[i],totC&&totC.cat[i]);});
+    html+=totCell(tot.sw,totC&&totC.sw);
+    tot.foc.forEach(function(a,i){html+=lvlCell(a,sumTitle+' \u2013 '+fkeys[i]+' ('+FDEF[fkeys[i]].nm+')',totC&&totC.foc[i]);});
+    html+=totCell(tot.focT,totC&&totC.focT);
     if(evalCol)html+='<td>\u2013</td>';
     html+='</tr>';
   }
@@ -9531,10 +9623,11 @@ function scoreOverviewSection(ctx){
         +(u.sub?'<div style="font-size:9px;color:var(--t2)">'+sovEsc(u.sub)+'</div>':'')
         +'<div style="font-size:9px;color:var(--t2)">'+a.n+' คน \u00B7 มีคะแนน '+a.nData+' คน</div></button></td>';
       html+='<td><span style="font-size:9px;color:var(--t2)">#'+(ui+1)+'</span></td>';
-      a.cat.forEach(function(v,i){html+=lvlCell(v,u.name+' \u2013 '+CATS[i]);});
-      html+=totCell(a.sw);
-      a.foc.forEach(function(v,i){html+=lvlCell(v,u.name+' \u2013 '+fkeys[i]+' ('+FDEF[fkeys[i]].nm+')');});
-      html+=totCell(a.focT);
+      var ac=u.aggC;
+      a.cat.forEach(function(v,i){html+=lvlCell(v,u.name+' \u2013 '+CATS[i],ac&&ac.cat[i]);});
+      html+=totCell(a.sw,ac&&ac.sw);
+      a.foc.forEach(function(v,i){html+=lvlCell(v,u.name+' \u2013 '+fkeys[i]+' ('+FDEF[fkeys[i]].nm+')',ac&&ac.foc[i]);});
+      html+=totCell(a.focT,ac&&ac.focT);
       if(evalCol)html+='<td>\u2013</td>';
       html+='</tr>';
     });
@@ -9542,7 +9635,7 @@ function scoreOverviewSection(ctx){
     /* ── รายบุคคล ── */
     var prevRole=null;var roleRank=0;
     filtered.forEach(function(p){
-      var pr=profileOf(p);
+      var pr=profileOf(p),pc=cmpOn?cmpProfileOf(p):null;
       /* role group separator */
       if(p.role!==prevRole){
         prevRole=p.role;roleRank=0;
@@ -9561,10 +9654,10 @@ function scoreOverviewSection(ctx){
         +'<div><div style="font-size:11px;font-weight:700;color:var(--t0)">'+p.name+' <span style="font-size:9px;color:var(--t2)">('+p.nick+')</span></div>'
         +'<div style="font-size:9px;color:var(--t2)">'+dispEmpId(p.empId)+' \u00B7 '+(p.dept||p.div)+'</div></div></div></td>';
       html+='<td><span style="font-size:9px;color:var(--t2)">#'+roleRank+'</span></td>';
-      pr.pcAs.forEach(function(a,i){html+=lvlCell(a,CATS[i]);});
-      html+=totCell(pr.swM);
-      pr.pfAs.forEach(function(a,i){html+=lvlCell(a,fkeys[i]+' ('+FDEF[fkeys[i]].nm+')');});
-      html+=totCell(pr.focM);
+      pr.pcAs.forEach(function(a,i){html+=lvlCell(a,CATS[i],pc&&pc.pcAs[i]);});
+      html+=totCell(pr.swM,pc&&pc.swM);
+      pr.pfAs.forEach(function(a,i){html+=lvlCell(a,fkeys[i]+' ('+FDEF[fkeys[i]].nm+')',pc&&pc.pfAs[i]);});
+      html+=totCell(pr.focM,pc&&pc.focM);
       if(evalCol)html+='<td><span style="font-size:11px;font-weight:700;color:'+(pr.nEval?'var(--t0)':'var(--t2)')+'">'+(pr.nEval||'\u2013')+'</span></td>';
       html+='</tr>';
     });
