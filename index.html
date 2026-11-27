@@ -898,6 +898,7 @@ button,input,select{font-family:var(--fb)}
 .sov-dlt-eq,.sov-dlt-na{color:var(--t2);font-weight:600}
 .sov-cmpbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin:0 0 10px;padding:8px 12px;background:rgba(13,110,231,.06);border:1px solid rgba(13,110,231,.2);border-radius:var(--r);font-size:11px;color:var(--t0)}
 .sov-cmpbar small{font-size:10px;color:var(--t1)}
+.sov-status{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin:0 0 8px;font-size:10px;color:var(--t1)}
 @media(max-width:680px){.sov-flbl{min-width:100%}.sov-sel select{min-width:130px}.sov-filters{padding:9px 10px}}
 .sov-tbl .lv-k td{background:rgba(13,110,231,.03)}
 .sov-tbl .lv-p td{background:var(--s0)}
@@ -8025,11 +8026,40 @@ function sovLvlActive(){return !!(sovLvlSel.p||sovLvlSel.k||sovLvlSel.s);}
 function sovRelMode(){return sovSelfOnly||sovRelActive()||sovLvlActive();} /* scores come from per-evaluator data */
 function sovOrgActive(){return !!(sovOrg.g||sovOrg.d||sovOrg.t);}
 function sovEsc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function sovToggleRel(k){if(Object.prototype.hasOwnProperty.call(sovRelSel,k)){sovRelSel[k]=!sovRelSel[k];if(sovRelSel[k])sovSelfOnly=false;sovToastPending=true;renderDash();}}
-function sovToggleLvl(k){if(Object.prototype.hasOwnProperty.call(sovLvlSel,k)){sovLvlSel[k]=!sovLvlSel[k];if(sovLvlSel[k])sovSelfOnly=false;sovToastPending=true;renderDash();}}
+/* ── keeping the per-evaluator data fresh ──
+   Everything that needs OTHER people's scores (self-only, N/level filters, round compare) reads
+   SimDB._cache, which is a copy of the Google Sheet filled by SimDB.refresh(). renderDash() only
+   triggers that once per page load, so anyone who saved after that (or whose first fetch failed)
+   stayed missing -- shown as "-" -- until a full reload. These helpers re-fetch when the person
+   turns such a mode on (forced), at most once a minute while it stays on (passive), or on demand. */
+var _sovLastRefresh=0,_sovRefreshing=false,_sovLoadedAt=null,_sovLastOk=null;
+function sovEnsureFresh(force){
+  var now=Date.now();
+  if(SimDB._loading||_sovRefreshing)return;
+  if(now-_sovLastRefresh<(force?5000:60000))return;
+  _sovLastRefresh=now;_sovRefreshing=true;
+  try{
+    SimDB.refresh(function(ok){
+      _sovRefreshing=false;_sovLastOk=!!ok;if(ok)_sovLoadedAt=new Date();
+      if(curTab==='dash'&&CU)renderDash();
+    });
+  }catch(e){_sovRefreshing=false;_sovLastOk=false;}
+}
+function sovRefreshNow(){_sovLastRefresh=0;sovEnsureFresh(true);renderDash();}
+function sovStatusHTML(){
+  var st;
+  if(SimDB._loading||_sovRefreshing)st='กำลังโหลดข้อมูลจากฐานข้อมูล…';
+  else if(_sovLastOk===false)st='<span style="color:var(--I);font-weight:700">โหลดข้อมูลจากฐานข้อมูลไม่สำเร็จ'+(SimDB._lastError?' ('+sovEsc(String(SimDB._lastError).slice(0,120))+')':'')+' \u2014 ข้อมูลที่แสดงอาจไม่ครบ</span>';
+  else if(_sovLoadedAt)st='ข้อมูลจากฐานข้อมูล อัปเดตล่าสุด '+_sovLoadedAt.toLocaleTimeString('th-TH');
+  else st='ข้อมูลจากฐานข้อมูล (โหลดตอนเปิดหน้านี้)';
+  return '<div class="sov-status sov-noprint"><span>'+st+'</span><button class="sov-fclear" onclick="sovRefreshNow()">รีเฟรชข้อมูล</button></div>';
+}
+function sovToggleRel(k){if(Object.prototype.hasOwnProperty.call(sovRelSel,k)){sovRelSel[k]=!sovRelSel[k];if(sovRelSel[k]){sovSelfOnly=false;sovEnsureFresh(true);}sovToastPending=true;renderDash();}}
+function sovToggleLvl(k){if(Object.prototype.hasOwnProperty.call(sovLvlSel,k)){sovLvlSel[k]=!sovLvlSel[k];if(sovLvlSel[k]){sovSelfOnly=false;sovEnsureFresh(true);}sovToastPending=true;renderDash();}}
 function sovToggleSelf(){
   sovSelfOnly=!sovSelfOnly;
   if(sovSelfOnly){SOV_REL_KEYS.forEach(function(k){sovRelSel[k]=false;});sovLvlSel={p:false,k:false,s:false};}
+  if(sovSelfOnly)sovEnsureFresh(true);
   sovToastPending=true;renderDash();
 }
 function sovSetView(v){sovView=(v==='unit')?'unit':'person';sovToastPending=true;renderDash();}
@@ -8069,7 +8099,9 @@ function sovDrillEl(el){
 }
 function sovMaybeToast(isEmpty,msg){
   if(!sovToastPending)return;
+  if(SimDB._loading||_sovRefreshing)return;           /* data still on its way: decide after the re-render that follows the fetch */
   sovToastPending=false;
+  if(_sovLastOk===false&&/คะแนนประเมิน/.test(msg||''))return; /* the fetch failed: the status line says so; "no scores" would be misleading */
   if(isEmpty)toast(icon('alerttriangle',18),msg||'ไม่มีข้อมูลดังกล่าว','','var(--L)');
 }
 function sovLvlRank(role){var k=personLevelKey(role);return k==='s'?2:(k==='k'?1:0);}
@@ -9435,6 +9467,7 @@ function scoreOverviewSection(ctx){
   /* per-evaluator records (SimDB + the logged-in user's live scores) are used when an evaluator
      filter OR a compare cycle is on; otherwise the legacy live-session average below, unchanged. */
   var engine=relOn||cmpOn;
+  if(engine)sovEnsureFresh(false); /* passive: at most once a minute */
   var fkeys=Object.keys(FDEF);
   var critsByCat={},critsByFoc={};
   CATS.forEach(function(cat){critsByCat[cat]=CRITERIA.filter(function(c){return c.cat===cat;});});
@@ -9503,6 +9536,7 @@ function scoreOverviewSection(ctx){
     html+='<div class="sov-info">ไม่มีคะแนนประเมินในระดับที่เลือกสำหรับพนักงานที่แสดงอยู่ (ต้องมีการ Save/Submit การประเมินในรอบนี้ก่อน) \u2014 ลองเลือกเงื่อนไขอื่นเพิ่ม หรือกด "ล้างตัวกรอง"</div>';
   }
 
+  if(engine)html+=sovStatusHTML();
   html+=sovLegendHTML();
   if(cmpOn){
     var cmpHasData=filtered.some(function(p){return cmpProfileOf(p).ovAll>0;});
@@ -9652,7 +9686,8 @@ function scoreOverviewSection(ctx){
       html+='<tr>';
       html+='<td class="" style=""><div style="display:flex;align-items:center">'+avH
         +'<div><div style="font-size:11px;font-weight:700;color:var(--t0)">'+p.name+' <span style="font-size:9px;color:var(--t2)">('+p.nick+')</span></div>'
-        +'<div style="font-size:9px;color:var(--t2)">'+dispEmpId(p.empId)+' \u00B7 '+(p.dept||p.div)+'</div></div></div></td>';
+        +'<div style="font-size:9px;color:var(--t2)">'+dispEmpId(p.empId)+' \u00B7 '+(p.dept||p.div)+'</div>'
+        +(sovSelfOnly&&!pr.ovAll?'<div style="font-size:9px;color:var(--L);font-weight:700">ยังไม่มีคะแนนประเมินตนเองในฐานข้อมูล</div>':'')+'</div></div></td>';
       html+='<td><span style="font-size:9px;color:var(--t2)">#'+roleRank+'</span></td>';
       pr.pcAs.forEach(function(a,i){html+=lvlCell(a,CATS[i],pc&&pc.pcAs[i]);});
       html+=totCell(pr.swM,pc&&pc.swM);
