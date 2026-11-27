@@ -4997,7 +4997,7 @@ function refreshSimDBAndRender(){
 function testGASConnection(){
   var box=h('gasTestResult');
   if(box)box.innerHTML='<span style="color:var(--t2)">\u23F3 กำลังทดสอบ...</span>';
-  fetch(GAS_WEBAPP_URL,{method:'GET'})
+  fetch(GAS_WEBAPP_URL+'?action=scores',{method:'GET'})
     .then(function(res){
       return res.text().then(function(text){return{status:res.status,text:text};});
     })
@@ -6201,7 +6201,7 @@ function markWelcomeSeen(username){
  * currently in that cache. Call SimDB.refresh() (and re-render) whenever
  * you want the freshest data from the Sheet -- it's called automatically
  * whenever the Admin's round-management page renders. */
-var GAS_WEBAPP_URL='https://script.google.com/macros/s/AKfycbxh6O2NGexo59i239BGMO8w9a8j3APOEzHofCMC4X93bzv34Fui3KOgkAMTdF9lf0uIyw/exec';
+var GAS_WEBAPP_URL='hhttps://script.google.com/macros/s/AKfycbxKuJXueW7S7qppG-fkRlXuk1s5dckH1b1Tjls1G30fy8Y5982PYY30RF65eq8nTLF3Xg/exec';
 var SimDB={
   _cache:[], /* array of row objects, refreshed from the Sheet via refresh() */
   _loaded:false,
@@ -6216,7 +6216,7 @@ var SimDB={
     if(this._loading){if(onDone)onDone(false);return;}
     this._loading=true;
     var self=this;
-    fetch(GAS_WEBAPP_URL,{method:'GET'})
+    fetch(GAS_WEBAPP_URL+'?action=scores',{method:'GET'})
       .then(function(res){
         return res.text().then(function(text){
           var data;
@@ -6229,7 +6229,12 @@ var SimDB={
       })
       .then(function(data){
         self._loading=false;self._loaded=true;
-        if(data&&data.ok){
+        if(data&&data.ok&&!Array.isArray(data.rows)){
+          /* ok but no score rows: not a scores reply (e.g. an outdated Apps Script answering with the
+             employee roster). Keep the cache we have instead of replacing it with nothing. */
+          self._lastError='เซิร์ฟเวอร์ตอบกลับไม่มีรายการคะแนน (rows) — ตรวจสอบว่า Deploy Google Apps Script เวอร์ชันล่าสุดแล้ว';
+        }
+        else if(data&&data.ok){
           /* Merge with a short grace window instead of an unconditional
              overwrite OR an unconditional keep-forever merge: a row
              written locally in the last few seconds (e.g. right after
@@ -6257,7 +6262,7 @@ var SimDB={
           self._lastError=null;
         }
         else{self._lastError=(data&&data.error)||'เซิร์ฟเวอร์ตอบกลับ ok:false โดยไม่ระบุสาเหตุ';}
-        if(onDone)onDone(!!(data&&data.ok));
+        if(onDone)onDone(!!(data&&data.ok&&Array.isArray(data.rows)));
       })
       .catch(function(err){
         self._loading=false;
